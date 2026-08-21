@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workout App Exercise Page</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <nav>
+      <div class="logo">WORKOUT APP</div>
+
+      <a href="/" class="header">🏠 Home</a>
+      <a href="/workout-page" class="header">🏋️ Workouts</a>
+      <a href="/exercise-page" class="header">💪 Exercises</a>
+      <a href="/progress-page" class="selected">📊 Progress</a>
+      <a href="/about-page" class="header">📚 About</a>
+
+      <nav>
+        <div class="content">
+          <h1 class="page">📊 Progress Page</h1>
+        </div>
+      </nav>
+    </nav>
+  </body>
+</html>

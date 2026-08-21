@@ -1,0 +1,96 @@
+#addButton {
+  color: red;
+  font-family: monospace;
+  width: 10%;
+  height: 12%;
+}
+
+body {
+  background-color: rgb(220, 222, 245) !important;
+}
+.logo {
+  color: rgb(73, 48, 91);
+  font-family: cursive;
+  font-family: monospace;
+  font-size: 2.2em;
+  font-weight: bold;
+  width: 200px;
+  margin: auto;
+  padding: 0px 0px 3px 0px;
+}
+.header {
+  color: red;
+  font-family: cursive;
+  font-size: 1.6em;
+  border: 3px solid red;
+  margin: 15px 2px 2px 2px;
+  padding-top: 2px;
+  padding-right: 3px;
+  padding-left: 3px;
+  padding-bottom: 2px;
+  height: 25px;
+  width: 50px;
+}
+a {
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 12px;
+}
+#list_of_exercises {
+  color: blueviolet;
+  font-family: monospace;
+  font-family: cursive;
+  font-style: italic;
+  font-size: 12px;
+}
+#table-of-contents {
+  color: gold;
+  font-size: 1.2em;
+  font-family: cursive;
+}
+#table_of_contents {
+  color: red;
+}
+.top {
+  color: green;
+  font-family: fantasy;
+  font-family: monospace;
+  font-size: 1.2em;
+}
+.page {
+  color: rgb(73, 48, 91);
+  font-family: monospace;
+  font-size: 1.7em;
+  font-style: italic;
+  text-decoration: underline;
+}
+.info {
+  text-align: justify;
+  font-family: monospace;
+  font-size: 12px;
+}
+.selected {
+  color: rgb(146, 2, 146);
+  font-weight: bold;
+  font-family: cursive;
+  font-size: 1.63em;
+  border: 5px solid rgb(146, 2, 146);
+  margin: 15px 2px 2px 2px;
+  padding-top: 2px;
+  padding-right: 3px;
+  padding-left: 3px;
+  padding-bottom: 2px;
+  height: 25px;
+  width: 50px;
+}
+#list {
+  font-family: cursive;
+  font-size: 1.2em;
+}
+#container {
+  background-color: rgb(193, 197, 241);
+  border: 5px solid rgb(162, 169, 248);
+  margin-top: 10px;
+  overflow-y: auto;
+  overflow-x: auto;
+}

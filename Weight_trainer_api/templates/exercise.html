@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout App Exercise Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+</head>
+<body>
+    <nav>
+        
+        <div class="logo">WORKOUT APP</div>
+
+
+        <a href="/"class = "header">🏠 Home</a>
+        <a href="/workout-page"class = "header">🏋️ Workouts</a>
+        <a href="/exercise-page"class = "selected">💪 Exercises</a>
+        <a href="/progress-page"class = "header">📊 Progress</a>
+        <a href ="/about-page" class = "header">📚 About</a>
+
+    </nav>
+
+    <div class="content">
+
+        <h1 class = "page">💪 Exercises Page</h1>
+    </div>
+
+    <div class="addButton">
+        <button id="addButton">+ Add Exercise</button>
+    </div>
+    <form action="/store-input" method="POST">
+        <div id="promptBox" style="display: none;">
+            <input type="text" id="exerciseInput" name = "exercise" placeholder="Enter your exercise name" >
+            <button type = "button" id="submitExerciseName">Submit</button>
+        </div>
+    
+        <div id="repSection" style="display: none;">
+            <h2> Select what type of max <h2>
+            <button type = "button" id="oneRepButton" name = "onerep">1rep</button>
+            <button type = "button" id="threeRepButton" name = "threerep">3rep</button>
+        </div>
+        <div id = "oneRepSection" style = "display: none;">
+            <p> only enter a number, in lbs</p>
+            <input type = "text" id = "oneRepInput" name = "weight_one" placeholder = "Enter your one rep max in lbs">
+            <button type="submit" id="submitMaxWeight" name="rep_choice" value="1">Submit 1-Rep Max</button>
+        </div>
+        <div id = "threeRepSection" style = "display: none;">
+            <p> only enter a number, in lbs</p>
+            <input type = "text" id = "threeRepInput" name = "weight_three" placeholder = "Enter your three rep max in lbs">
+            <button type="submit" id="submitMaxWeight2" name="rep_choice" value="3">Submit 3-Rep Max</button>
+        </div>
+    </form>
+
+    <p id="result"></p>
+
+    <script src="{{ url_for('static', filename='server.js') }}"></script>
+    <h2 id = "list">Exercise List</h2>
+    <div id = "container">
+        <ul>
+            {% for item in items_list %}
+                <li id = "list_of_exercises"> Exercise Name: {{item[0]}} | Rep Amount: {{item[1]}} | Weight: {{item[2]}}
+            {% endfor %}
+        </ul> 
+    </div>  
+
+    
+    
+
+</body>
+</html>

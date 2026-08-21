@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workout App Workout Page</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <nav>
+      <div class="logo">WORKOUT APP</div>
+
+      <a href="/" class="header">🏠 Home</a>
+      <a href="/workout-page" class="selected">🏋️ Workouts</a>
+      <a href="/exercise-page" class="header">💪 Exercises</a>
+      <a href="/progress-page" class="header">📊 Progress</a>
+      <a href="/about-page" class="header">📚 About</a>
+
+      <nav>
+        <div class="content">
+          <h1 class="page">🏋️ Workout Page</h1>
+        </div>
+
+        <div class="addButton">
+          <button id="addButton">+ Add Workout</button>
+        </div>
+      </nav>
+    </nav>
+  </body>
+</html>
