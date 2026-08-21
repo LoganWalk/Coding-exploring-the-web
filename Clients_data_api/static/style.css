@@ -1,0 +1,1551 @@
+/* =========================================================
+   WORKOUT / CLIENT MANAGEMENT APP
+   COMPLETE STYLESHEET
+   ========================================================= */
+
+/* =========================================================
+   FONTS
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
+
+
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
+
+:root {
+    --bg: #f0eef5;
+    --surface: #ffffff;
+    --surface-alt: #e8e4f0;
+
+    --border: #d0c9e0;
+
+    --ink: #1e1a2e;
+    --ink-muted: #6b6480;
+
+    --accent: #5b3fa6;
+    --accent-hover: #4a3288;
+    --accent-soft: #ede9f8;
+
+    --student-name: #36307a;
+
+    --alert-bg: #ffd5de;
+    --alert-text: #970020;
+
+    --danger: #c62828;
+    --danger-soft: #fde8e8;
+
+    --success: #2e7d32;
+    --success-soft: #e8f5e9;
+
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+
+    --shadow-sm:
+        0 2px 6px rgba(30, 26, 46, 0.06);
+
+    --shadow-card:
+        0 3px 10px rgba(91, 63, 166, 0.10);
+
+    --shadow-lg:
+        0 12px 40px rgba(30, 26, 46, 0.18);
+
+    --shadow-nav:
+        0 1px 5px rgba(91, 63, 166, 0.08);
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+
+    background: var(--bg);
+    color: var(--ink);
+
+    overflow-x: auto;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+}
+
+::selection {
+    background: var(--accent);
+    color: white;
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+nav {
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 0 32px;
+
+    background: var(--surface);
+
+    border-bottom: 1px solid var(--border);
+
+    box-shadow: var(--shadow-nav);
+
+    position: relative;
+    z-index: 100;
+}
+
+nav a {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 40px;
+
+    padding: 7px 15px;
+
+    border-radius: var(--radius-sm);
+
+    color: var(--ink-muted);
+
+    font-family: 'Sora', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        color 0.18s ease,
+        background 0.18s ease,
+        transform 0.15s ease;
+}
+
+nav a:hover,
+nav a:focus-visible {
+    color: var(--accent);
+    background: var(--accent-soft);
+
+    outline: none;
+}
+
+nav a:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================================================
+   GENERAL PAGE CONTENT
+   ========================================================= */
+
+.content {
+    width: 100%;
+
+    margin: 0 auto;
+
+    padding: 38px 32px;
+}
+
+.content > h1 {
+    margin-bottom: 28px;
+
+    color: var(--accent);
+
+    font-family: 'Sora', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+
+    letter-spacing: -0.02em;
+}
+
+.content > h2 {
+    margin-bottom: 12px;
+
+    color: var(--accent);
+
+    font-family: 'Sora', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+
+    letter-spacing: -0.02em;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    line-height: 1.25;
+}
+
+
+/* =========================================================
+   ALERTS
+   ========================================================= */
+
+.alert {
+    padding: 14px 18px;
+    margin-bottom: 18px;
+
+    background: var(--alert-bg);
+    color: var(--alert-text);
+
+    border-left: 4px solid var(--alert-text);
+    border-radius: var(--radius-sm);
+
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   GENERAL CARDS
+   ========================================================= */
+
+.post {
+    padding: 22px 26px;
+    margin-bottom: 18px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    box-shadow: var(--shadow-card);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.post:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 7px 22px rgba(91, 63, 166, 0.14);
+}
+
+.post h2 {
+    margin-bottom: 12px;
+
+    color: var(--student-name);
+
+    font-family: 'Sora', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   DETAIL TABLE
+   ========================================================= */
+
+.student-details {
+    display: grid;
+
+    grid-template-columns: max-content 1fr;
+
+    margin-top: 8px;
+}
+
+.student-details dt,
+.student-details dd {
+    padding: 11px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.student-details dt {
+    padding-right: 32px;
+
+    color: var(--ink-muted);
+
+    font-size: 0.78rem;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+
+    white-space: nowrap;
+}
+
+.student-details dd {
+    padding-left: 8px;
+
+    color: var(--ink);
+
+    font-size: 0.95rem;
+}
+
+.student-details dt:last-of-type,
+.student-details dd:last-of-type {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   FORMS
+   ========================================================= */
+
+form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 16px;
+
+    padding: 24px;
+    margin-bottom: 32px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-card);
+}
+
+form label {
+    color: var(--ink-muted);
+
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+form select,
+form input[type="text"],
+form input[type="number"],
+form input[type="date"] {
+    min-width: 200px;
+
+    padding: 10px 13px;
+
+    background: var(--bg);
+    color: var(--ink);
+
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+
+    outline: none;
+
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+form select {
+    flex: 1;
+
+    cursor: pointer;
+}
+
+form select:focus,
+form input:focus {
+    border-color: var(--accent);
+
+    box-shadow:
+        0 0 0 3px rgba(91, 63, 166, 0.12);
+}
+
+form input[type="submit"] {
+    padding: 10px 22px;
+
+    background: var(--accent);
+    color: white;
+
+    border: none;
+    border-radius: var(--radius-sm);
+
+    font-family: 'Sora', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    transition:
+        background 0.18s ease,
+        transform 0.12s ease;
+}
+
+form input[type="submit"]:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+form input[type="submit"]:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   CALENDAR PAGE
+   ========================================================= */
+
+.calendar-page {
+    width: 100%;
+    max-width: none;
+
+    padding: 32px;
+}
+
+
+/* =========================================================
+   CALENDAR CONTROLS
+   ========================================================= */
+
+.calendar-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    margin-bottom: 22px;
+}
+
+.calendar-controls button {
+    padding: 10px 18px;
+
+    background: var(--accent);
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    font-family: 'Sora', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    transition:
+        background 0.18s ease,
+        transform 0.12s ease,
+        box-shadow 0.18s ease;
+}
+
+.calendar-controls button:hover {
+    background: var(--accent-hover);
+
+    box-shadow:
+        0 4px 12px rgba(91, 63, 166, 0.18);
+
+    transform: translateY(-1px);
+}
+
+.calendar-controls button:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   THREE COLUMN CALENDAR LAYOUT
+
+   LEFT   = Clients / Recommendations
+   CENTER = Monday-Friday Calendar
+   RIGHT  = Completed / Revenue
+   ========================================================= */
+
+.calendar-layout {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 20px;
+
+    width: max-content;
+    min-width: 100%;
+}
+
+
+/* =========================================================
+   LEFT CALENDAR SIDEBAR
+   ========================================================= */
+
+.calendar-sidebar {
+    width: 300px;
+    min-width: 300px;
+
+    flex: 0 0 300px;
+}
+
+
+/* =========================================================
+   SIDEBAR PANELS
+   ========================================================= */
+
+.calendar-panel {
+    padding: 18px;
+    margin-bottom: 20px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-card);
+}
+
+.calendar-panel > h2 {
+    margin-bottom: 15px;
+
+    color: var(--accent);
+
+    font-family: 'Sora', sans-serif;
+    font-size: 1.15rem;
+}
+
+.recommendation-section {
+    margin-bottom: 20px;
+}
+
+.recommendation-section h3 {
+    margin-bottom: 9px;
+
+    font-size: 0.9rem;
+}
+
+.client-frequency-section {
+    margin-bottom: 20px;
+}
+
+.client-frequency-section > h3 {
+    margin-bottom: 10px;
+
+    color: var(--accent);
+
+    font-size: 1rem;
+}
+
+
+/* =========================================================
+   CITY CLIENT SECTIONS
+   ========================================================= */
+
+.city-client-section {
+    margin-bottom: 15px;
+}
+
+.city-client-section h4 {
+    margin-bottom: 7px;
+
+    color: var(--ink-muted);
+
+    font-size: 0.78rem;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+
+/* =========================================================
+   CLIENT DROP ZONES
+   ========================================================= */
+
+.client-drop-zone {
+    width: 100%;
+    min-height: 42px;
+
+    padding: 5px;
+
+    border: 1px dashed transparent;
+    border-radius: 7px;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.client-drop-zone:empty::after {
+    content: "Drop client here";
+
+    display: block;
+
+    padding: 8px;
+
+    color: var(--ink-muted);
+
+    font-size: 0.72rem;
+    text-align: center;
+
+    opacity: 0.6;
+}
+
+.client-drop-zone.drag-over {
+    background: var(--accent-soft);
+
+    border-color: var(--accent);
+}
+
+
+/* =========================================================
+   SIDEBAR CLIENT CARDS
+   ========================================================= */
+
+.calendar-sidebar .calendar-client {
+    padding: 9px 11px;
+    margin-bottom: 7px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 7px;
+
+    box-shadow: none;
+
+    cursor: grab;
+
+    font-size: 0.84rem;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.calendar-sidebar .calendar-client:hover {
+    background: var(--accent-soft);
+
+    transform: none;
+}
+
+.calendar-sidebar .calendar-client:active {
+    cursor: grabbing;
+}
+
+.calendar-sidebar .calendar-client strong {
+    color: var(--ink);
+}
+
+
+/* =========================================================
+   CENTER CALENDAR
+   ========================================================= */
+
+.calendar-container {
+    width: 1100px;
+    min-width: 1100px;
+
+    flex: 0 0 1100px;
+}
+
+
+/* =========================================================
+   WEEK HEADER
+   ========================================================= */
+
+.week-header {
+    display: grid;
+
+    grid-template-columns: repeat(5, 1fr);
+
+    gap: 8px;
+
+    width: 1100px;
+
+    margin-bottom: 8px;
+}
+
+.week-header .day-column {
+    width: auto;
+    min-width: 0;
+
+    padding: 13px 10px;
+
+    background: var(--accent);
+    color: white;
+
+    border: none;
+    border-radius: var(--radius-md);
+
+    text-align: center;
+
+    box-shadow:
+        0 3px 8px rgba(91, 63, 166, 0.15);
+}
+
+.week-header .day-column h2 {
+    margin-bottom: 2px;
+
+    color: white;
+
+    font-size: 1rem;
+}
+
+.week-header .day-column p {
+    color: rgba(255, 255, 255, 0.82);
+
+    font-size: 0.82rem;
+}
+
+
+/* =========================================================
+   WEEK BODY
+   ========================================================= */
+
+.week-body {
+    display: grid;
+
+    grid-template-columns: repeat(5, 1fr);
+
+    gap: 8px;
+
+    width: 1100px;
+}
+
+.week-body .day-column {
+    width: auto;
+    min-width: 0;
+
+    height: 650px;
+
+    padding: 10px;
+
+    background: #faf9fd;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.week-body .day-column::-webkit-scrollbar {
+    width: 7px;
+}
+
+.week-body .day-column::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 20px;
+}
+
+
+/* =========================================================
+   EMPTY DROP ZONE
+   ========================================================= */
+
+.drop-zone:empty::after {
+    content: "Drag clients here";
+
+    display: block;
+
+    margin-top: 22px;
+
+    color: var(--ink-muted);
+
+    font-size: 0.8rem;
+    text-align: center;
+
+    opacity: 0.7;
+}
+
+.drop-zone.drag-over {
+    background: var(--accent-soft) !important;
+
+    border: 2px dashed var(--accent) !important;
+}
+
+
+/* =========================================================
+   SCHEDULED CLIENT
+   ========================================================= */
+
+.scheduled-client {
+    padding: 11px;
+    margin-bottom: 10px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--accent);
+    border-radius: 8px;
+
+    box-shadow: var(--shadow-card);
+
+    cursor: pointer;
+
+    font-size: 0.85rem;
+
+    transition:
+        background 0.15s ease,
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.scheduled-client:hover {
+    background: var(--accent-soft);
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(91, 63, 166, 0.12);
+}
+
+.scheduled-client strong {
+    color: var(--student-name);
+}
+
+.scheduled-name {
+    margin-bottom: 5px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   GENERIC CALENDAR CLIENT
+   ========================================================= */
+
+.calendar-client {
+    padding: 10px;
+    margin-bottom: 10px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--accent);
+    border-radius: 8px;
+
+    box-shadow: var(--shadow-card);
+
+    cursor: grab;
+
+    transition:
+        background 0.15s ease,
+        transform 0.15s ease;
+}
+
+.calendar-client:hover {
+    background: var(--accent-soft);
+
+    transform: translateY(-1px);
+}
+
+.calendar-client:active {
+    cursor: grabbing;
+}
+
+
+/* =========================================================
+   DRAGGING STATES
+   ========================================================= */
+
+.being-dragged {
+    opacity: 0.4;
+}
+
+.drag-over {
+    background: var(--accent-soft) !important;
+
+    border: 2px dashed var(--accent) !important;
+}
+
+
+/* =========================================================
+   RIGHT SIDEBAR
+   ========================================================= */
+
+.completed-sidebar {
+    width: 260px;
+    min-width: 260px;
+
+    flex: 0 0 260px;
+
+    padding: 18px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-card);
+}
+
+.completed-sidebar h2 {
+    margin-bottom: 15px;
+
+    color: var(--accent);
+
+    font-family: 'Sora', sans-serif;
+    font-size: 1.1rem;
+}
+
+.completed-sidebar h3 {
+    margin-top: 16px;
+    margin-bottom: 5px;
+
+    color: var(--ink-muted);
+
+    font-size: 0.85rem;
+}
+
+
+/* =========================================================
+   REVENUE
+   ========================================================= */
+
+.revenue-number {
+    color: var(--accent);
+
+    font-size: 1.45rem;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   COMPLETED JOBS
+   ========================================================= */
+
+.completed-job {
+    padding: 9px;
+    margin-bottom: 7px;
+
+    background: var(--accent-soft);
+
+    border-radius: 7px;
+
+    font-size: 0.82rem;
+}
+
+.completed-job-card {
+    padding: 12px;
+    margin-bottom: 10px;
+
+    background: var(--accent-soft);
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.completed-job-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 4px 12px rgba(30, 26, 46, 0.14);
+}
+
+.completed-job-card strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 16px;
+}
+
+.completed-job-card div {
+    margin-top: 2px;
+
+    font-size: 13px;
+}
+
+.completed-job-card small {
+    display: block;
+
+    margin-top: 8px;
+
+    color: var(--ink-muted);
+
+    font-size: 0.75rem;
+}
+
+
+/* =========================================================
+   COMPLETED CHECKBOXES
+   ========================================================= */
+
+.completed-checkbox {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 8px;
+
+    cursor: pointer;
+}
+
+.completed-checkbox input {
+    width: 16px;
+    height: 16px;
+
+    flex-shrink: 0;
+
+    margin-top: 4px;
+
+    cursor: pointer;
+}
+
+.completed-checkbox span {
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   MOWING CHECKLIST
+   ========================================================= */
+
+#mowing-checklist {
+    display: none;
+}
+
+body.mowing-mode #mowing-checklist {
+    display: block !important;
+}
+
+.mowing-job {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 10px;
+    margin: 5px 0;
+
+    background: var(--accent-soft);
+
+    border-radius: 7px;
+}
+
+.mowing-job input[type="checkbox"] {
+    display: block;
+
+    width: 20px;
+    height: 20px;
+
+    flex-shrink: 0;
+
+    cursor: pointer;
+
+    accent-color: var(--accent);
+}
+
+.mowing-job label {
+    flex: 1;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   CLIENT LIST
+   ========================================================= */
+
+#client-list {
+    width: 100%;
+    max-width: 1200px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 16px;
+
+    margin-top: 20px;
+}
+
+
+/* =========================================================
+   CLIENT CARD
+   ========================================================= */
+
+.client-card {
+    width: 100%;
+
+    padding: 20px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-sm);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.client-card:hover {
+    transform: translateY(-2px);
+
+    border-color: var(--accent);
+
+    box-shadow:
+        0 7px 20px rgba(30, 26, 46, 0.10);
+}
+
+
+/* =========================================================
+   CLIENT CARD HEADER
+   ========================================================= */
+
+.client-card-header {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.client-card-header h2 {
+    margin: 0;
+
+    font-family: 'Sora', sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.client-subtitle {
+    margin-top: 5px;
+
+    color: var(--ink-muted);
+
+    font-size: 13px;
+}
+
+.client-price {
+    color: var(--accent);
+
+    font-size: 20px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   CLIENT CARD DIVIDER
+   ========================================================= */
+
+.client-card-divider {
+    height: 1px;
+
+    margin: 16px 0;
+
+    background: var(--border);
+}
+
+
+/* =========================================================
+   CLIENT INFORMATION GRID
+   ========================================================= */
+
+.client-info-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+.client-info-item {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding: 10px;
+
+    background: var(--accent-soft);
+
+    border-radius: 8px;
+}
+
+.client-info-label {
+    color: var(--ink-muted);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.client-info-value {
+    color: var(--ink);
+
+    font-size: 14px;
+    font-weight: 500;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   CLIENT CARD FOOTER
+   ========================================================= */
+
+.client-card-footer {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 16px;
+    padding-top: 12px;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--ink-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   EMPTY / ERROR CLIENT STATES
+   ========================================================= */
+
+.no-clients,
+.client-load-error {
+    padding: 25px;
+    margin-top: 20px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+
+    text-align: center;
+}
+
+.client-load-error {
+    color: var(--danger);
+
+    background: var(--danger-soft);
+
+    border-color: var(--danger);
+}
+
+
+/* =========================================================
+   CLIENT INFORMATION MODAL
+   ========================================================= */
+
+.client-modal {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+    padding: 20px;
+
+    background: rgba(30, 26, 46, 0.55);
+
+    backdrop-filter: blur(3px);
+}
+
+.client-modal.show {
+    display: flex;
+}
+
+.client-modal-content {
+    position: relative;
+
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+
+    padding: 30px;
+
+    overflow-y: auto;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    box-shadow: var(--shadow-lg);
+}
+
+.client-modal-content h2 {
+    margin-bottom: 20px;
+
+    color: var(--accent);
+
+    font-family: 'Sora', sans-serif;
+    font-size: 1.35rem;
+}
+
+
+/* =========================================================
+   MODAL CLOSE BUTTONS
+   ========================================================= */
+
+.client-modal-close,
+.close-modal {
+    position: absolute;
+
+    top: 12px;
+    right: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    background: transparent;
+
+    border: none;
+
+    color: var(--ink-muted);
+
+    font-size: 28px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    border-radius: 6px;
+
+    transition:
+        color 0.15s ease,
+        background 0.15s ease;
+}
+
+.client-modal-close:hover,
+.close-modal:hover {
+    color: var(--accent);
+
+    background: var(--accent-soft);
+}
+
+
+/* =========================================================
+   MODAL DETAILS
+   ========================================================= */
+
+.client-modal-details {
+    display: grid;
+
+    gap: 0;
+}
+
+.client-modal-details p {
+    padding: 12px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.client-modal-details p:last-child {
+    border-bottom: none;
+}
+
+.client-modal-details strong {
+    display: inline-block;
+
+    min-width: 170px;
+
+    color: var(--ink-muted);
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   SCROLLBARS
+   ========================================================= */
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 20px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-muted);
+}
+
+
+/* =========================================================
+   RESPONSIVE — CLIENT CARDS
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .client-info-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE — SMALL SCREENS
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    nav {
+        height: auto;
+
+        flex-wrap: wrap;
+
+        padding: 10px 16px;
+    }
+
+    nav a {
+        font-size: 0.82rem;
+    }
+
+    .content {
+        padding: 24px 16px;
+    }
+
+    .calendar-page {
+        padding: 24px 16px;
+    }
+
+    form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    form select,
+    form input[type="text"],
+    form input[type="number"],
+    form input[type="date"] {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .client-card {
+        padding: 15px;
+    }
+
+    .client-card-header {
+        flex-direction: column;
+    }
+
+    .client-price {
+        font-size: 18px;
+    }
+
+    .client-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .client-card-footer {
+        flex-direction: column;
+
+        gap: 5px;
+    }
+
+    .client-modal {
+        padding: 10px;
+    }
+
+    .client-modal-content {
+        padding: 22px;
+    }
+
+    .client-modal-details strong {
+        display: block;
+
+        min-width: 0;
+
+        margin-bottom: 3px;
+    }
+}
+
+
+/* =========================================================
+   CALENDAR RESPONSIVE BEHAVIOR
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .calendar-layout {
+        width: max-content;
+
+        overflow-x: auto;
+    }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    .post:hover,
+    .client-card:hover,
+    .scheduled-client:hover,
+    .completed-job-card:hover {
+        transform: none;
+    }
+}

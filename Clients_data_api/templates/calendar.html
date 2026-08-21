@@ -1,0 +1,3002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Mowing Schedule</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <a href="/">🏠 Dashboard</a>
+    <a href="/revenue-page">💰 Revenue Analytics</a>
+    <a href="/" style="color: var(--accent); background: var(--accent-soft);">📅 Work Agenda</a>
+    <a href="/client-page">🧑 Clients</a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <img src = "https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw", width = "60", height = "60">
+</nav>
+
+
+<div class="content calendar-page">
+
+    <h1>📅 Weekly Mowing Schedule</h1>
+
+    <div class="calendar-controls">
+        <button id="save-button">💾 Save Schedule</button>
+        <button id="edit-button" style="display:none;">✏️ Edit Schedule</button>
+        <button id="email-button" style="display:none;">📧 Email Schedule</button>
+        <button id="reset-button">🔄 Reset Schedule</button>
+    </div>
+    
+
+
+    <div class="calendar-layout">
+
+
+        <!-- ==================================================
+             LEFT SIDEBAR
+             ================================================== -->
+
+        <div class="calendar-sidebar">
+
+
+            <!-- RECOMMENDATIONS -->
+
+            <div class="calendar-panel">
+
+                <h2>⭐ Recommendations</h2>
+
+                <div class="recommendation-section">
+
+                    <h3>🔴 Overdue</h3>
+
+                    <div id="overdue-list">
+                        <p>No overdue clients.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="recommendation-section">
+
+                    <h3>🟡 This Week</h3>
+
+                    <div id="this-week-list">
+                        <p>No clients scheduled this week.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="recommendation-section">
+
+                    <h3>🟢 Upcoming</h3>
+
+                    <div id="upcoming-list">
+                        <p>No upcoming clients.</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CLIENT DIRECTORY -->
+
+            <div class="calendar-panel">
+
+                <h2>👥 Clients</h2>
+
+
+                <!-- WEEKLY -->
+
+                <div class="client-frequency-section">
+
+                    <h3>📆 Weekly</h3>
+
+                    <div id="weekly-clients">
+
+                        <div class="city-client-section">
+                            <h4>Buckner</h4>
+                            <div id="weekly-buckner"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Grain Valley</h4>
+                            <div id="weekly-grain-valley"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Lee's Summit</h4>
+                            <div id="weekly-lees-summit"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Lexington</h4>
+                            <div id="weekly-lexington"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Mayview</h4>
+                            <div id="weekly-mayview"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Odessa</h4>
+                            <div id="weekly-odessa"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Raytown</h4>
+                            <div id="weekly-raytown"></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BI-WEEKLY -->
+
+                <div class="client-frequency-section">
+
+                    <h3>📆 Bi-Weekly</h3>
+
+                    <div id="biweekly-clients">
+
+                        <div class="city-client-section">
+                            <h4>Blue Springs</h4>
+                            <div id="biweekly-blue-springs"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Grain Valley</h4>
+                            <div id="biweekly-grain-valley"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Greenwood</h4>
+                            <div id="biweekly-greenwood"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Higginsville</h4>
+                            <div id="biweekly-higginsville"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Independence</h4>
+                            <div id="biweekly-independence"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Kansas City</h4>
+                            <div id="biweekly-kansas-city"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Lake Lafayette</h4>
+                            <div id="biweekly-lake-lafayette"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Lee's Summit</h4>
+                            <div id="biweekly-lees-summit"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Lexington</h4>
+                            <div id="biweekly-lexington"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Oak Grove</h4>
+                            <div id="biweekly-oak-grove"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Odessa</h4>
+                            <div id="biweekly-odessa"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Raytown</h4>
+                            <div id="biweekly-raytown"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Sedalia</h4>
+                            <div id="biweekly-sedalia"></div>
+                        </div>
+
+                        <div class="city-client-section">
+                            <h4>Warrensburg</h4>
+                            <div id="biweekly-warrensburg"></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==================================================
+             MAIN CALENDAR
+             ================================================== -->
+
+        <div class="calendar-container">
+
+            <div class="week-header">
+
+                <div class="day-column">
+                    <h2>Monday</h2>
+                    <p id="monday-date"></p>
+                </div>
+
+                <div class="day-column">
+                    <h2>Tuesday</h2>
+                    <p id="tuesday-date"></p>
+                </div>
+
+                <div class="day-column">
+                    <h2>Wednesday</h2>
+                    <p id="wednesday-date"></p>
+                </div>
+
+                <div class="day-column">
+                    <h2>Thursday</h2>
+                    <p id="thursday-date"></p>
+                </div>
+
+                <div class="day-column">
+                    <h2>Friday</h2>
+                    <p id="friday-date"></p>
+                </div>
+
+            </div>
+
+
+            <div class="week-body">
+
+                <div class="day-column drop-zone" id="monday"></div>
+
+                <div class="day-column drop-zone" id="tuesday"></div>
+
+                <div class="day-column drop-zone" id="wednesday"></div>
+
+                <div class="day-column drop-zone" id="thursday"></div>
+
+                <div class="day-column drop-zone" id="friday"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==================================================
+             RIGHT SIDEBAR
+             ================================================== -->
+       
+            <div class="completed-sidebar">
+
+                <h2 id="completed-jobs-title">
+                    ✅ Completed Jobs (0)
+                </h2>
+
+                <div id="completed-list">
+                    <p>No completed jobs yet.</p>
+                </div>
+
+
+                <div id="revenue-section" style="display: none;">
+
+                    <hr>
+
+                    <h3>Today's Revenue</h3>
+
+                    <p class="revenue-number" id="daily-revenue">
+                        $0.00
+                    </p>
+
+                    <h3>Weekly Revenue</h3>
+
+                    <p class="revenue-number" id="weekly-revenue">
+                        $0.00
+                    </p>
+
+                    <h3>Monthly Revenue</h3>
+
+                    <p class="revenue-number" id="monthly-revenue">
+                        $0.00
+                    </p>
+
+                </div>
+                <div id="group-routes-section" style="display: none;">
+
+                <hr>
+
+                <h3>🗺️ Group Routes</h3>
+
+                <p>N/A</p>
+
+            </div>
+
+            </div>
+    <!-- =========================================================
+     CLIENT INFORMATION MODAL
+     ========================================================= -->
+
+<div id="client-modal" class="client-modal">
+
+    <div class="client-modal-content">
+
+        <button
+            id="close-client-modal"
+            class="client-modal-close"
+        >
+            ×
+        </button>
+
+        <h2 id="modal-client-name">
+            Client Information
+        </h2>
+
+        <div class="client-modal-details">
+
+            <p>
+                <strong>Additional Name:</strong>
+                <span id="modal-additional-name"></span>
+            </p>
+
+            <p>
+                <strong>Address:</strong>
+                <span id="modal-address"></span>
+            </p>
+
+            <p>
+                <strong>City:</strong>
+                <span id="modal-city"></span>
+            </p>
+
+            <p>
+                <strong>State:</strong>
+                <span id="modal-state"></span>
+            </p>
+
+            <p>
+                <strong>ZIP:</strong>
+                <span id="modal-zip"></span>
+            </p>
+
+            <p>
+                <strong>Recurring:</strong>
+                <span id="modal-recurring"></span>
+            </p>
+
+            <p>
+                <strong>Frequency:</strong>
+                <span id="modal-frequency"></span>
+            </p>
+
+            <p>
+                <strong>Type of Service:</strong>
+                <span id="modal-service"></span>
+            </p>
+
+            <p>
+                <strong>Additional Services:</strong>
+                <span id="modal-additional-service"></span>
+            </p>
+
+            <p>
+                <strong>Client Type:</strong>
+                <span id="modal-type"></span>
+            </p>
+
+            <p>
+                <strong>Quote Price:</strong>
+                $<span id="modal-price"></span>
+            </p>
+
+            <p>
+                <strong>Last Service:</strong>
+                <span id="modal-last-service"></span>
+            </p>
+
+            <p>
+                <strong>Next Service:</strong>
+                <span id="modal-next-service"></span>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   CALENDAR DATES
+   ========================================================= */
+
+function getMonday(date) {
+
+    const d = new Date(date);
+
+    const day = d.getDay();
+
+    const difference = day === 0 ? -6 : 1 - day;
+
+    d.setDate(d.getDate() + difference);
+
+    return d;
+
+}
+
+
+function formatDate(date) {
+
+    const month =
+        String(date.getMonth() + 1).padStart(2, '0');
+
+    const day =
+        String(date.getDate()).padStart(2, '0');
+
+    const year =
+        String(date.getFullYear()).slice(-2);
+
+    return `${month}/${day}/${year}`;
+}
+
+
+function loadCalendarDates() {
+
+    const monday = getMonday(new Date());
+
+    const dates = [
+        monday,
+        new Date(monday.getTime() + 86400000),
+        new Date(monday.getTime() + 172800000),
+        new Date(monday.getTime() + 259200000),
+        new Date(monday.getTime() + 345600000)
+    ];
+
+    document.getElementById('monday-date').textContent =
+        formatDate(dates[0]);
+
+    document.getElementById('tuesday-date').textContent =
+        formatDate(dates[1]);
+
+    document.getElementById('wednesday-date').textContent =
+        formatDate(dates[2]);
+
+    document.getElementById('thursday-date').textContent =
+        formatDate(dates[3]);
+
+    document.getElementById('friday-date').textContent =
+        formatDate(dates[4]);
+
+}
+
+
+/* =========================================================
+   CITY ID HELPER
+   ========================================================= */
+
+function cityToId(city) {
+
+    return String(city || '')
+        .trim()
+        .toLowerCase()
+        .replace(/'/g, '')
+        .replace(/\s+/g, '-');
+
+}
+
+
+    /* =========================================================
+   LOAD CLIENTS + RECOMMENDATIONS
+   ========================================================= */
+
+let allClients = [];
+
+
+function loadClients() {
+
+    fetch('/api/clients/all')
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    `Server returned ${response.status}`
+                );
+            }
+
+            return response.json();
+
+        })
+
+        .then(clients => {
+
+            console.log(
+                'Loaded clients:',
+                clients.length
+            );
+
+            allClients = clients;
+
+            /*
+             * Clear all client sections first.
+             */
+            document
+                .querySelectorAll('.city-client-section > div')
+                .forEach(section => {
+                    section.innerHTML = '';
+                });
+
+
+            /*
+             * Put clients into their
+             * Weekly / Bi-Weekly city sections.
+             */
+            clients.forEach(client => {
+
+                const frequency =
+                    String(
+                        client.frequency || ''
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                const city =
+                    cityToId(client.city);
+
+
+                let prefix = '';
+
+
+                /*
+                 * IMPORTANT:
+                 * Check bi-weekly FIRST because
+                 * "bi-weekly" contains "weekly".
+                 */
+                if (
+                    frequency.includes('bi-weekly') ||
+                    frequency.includes('biweekly')
+                ) {
+
+                    prefix = 'biweekly';
+
+                }
+
+                else if (
+                    frequency.includes('weekly')
+                ) {
+
+                    prefix = 'weekly';
+
+                }
+
+
+                if (!prefix) {
+                    return;
+                }
+
+
+                const sectionId =
+                    `${prefix}-${city}`;
+
+
+                const section =
+                    document.getElementById(
+                        sectionId
+                    );
+
+
+                if (!section) {
+
+                    console.warn(
+                        'Could not find client section:',
+                        sectionId,
+                        client.city
+                    );
+
+                    return;
+                }
+
+
+                section.appendChild(
+                    createClientCard(client)
+                );
+
+            });
+
+
+            /*
+             * Now build the Recommendations section.
+             */
+            renderRecommendations(clients);
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                'Could not load clients:',
+                error
+            );
+
+        });
+
+}
+
+/* =========================================================
+   RECOMMENDATIONS
+   ========================================================= */
+
+function renderRecommendations(clients) {
+
+    const overdueList =
+        document.getElementById(
+            'overdue-list'
+        );
+
+    const thisWeekList =
+        document.getElementById(
+            'this-week-list'
+        );
+
+    const upcomingList =
+        document.getElementById(
+            'upcoming-list'
+        );
+
+
+    /*
+     * Clear the old recommendations.
+     */
+    overdueList.innerHTML = '';
+
+    thisWeekList.innerHTML = '';
+
+    upcomingList.innerHTML = '';
+
+
+    const today = new Date();
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    const monday =
+        getMonday(today);
+
+    monday.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    const friday =
+        new Date(monday);
+
+    friday.setDate(
+        friday.getDate() + 4
+    );
+
+    friday.setHours(
+        23,
+        59,
+        59,
+        999
+    );
+
+
+    /*
+     * Start of next week.
+     */
+    const nextWeek =
+        new Date(monday);
+
+    nextWeek.setDate(
+        nextWeek.getDate() + 7
+    );
+
+    nextWeek.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    let overdueCount = 0;
+
+    let thisWeekCount = 0;
+
+    let upcomingCount = 0;
+
+
+    clients.forEach(client => {
+
+        if (!client.next_service) {
+            return;
+        }
+
+
+        /*
+         * Convert MMDDYY into a Date.
+         */
+        const serviceDate =
+            parseClientDate(
+                client.next_service
+            );
+
+
+        if (!serviceDate) {
+            return;
+        }
+
+
+        /*
+         * OVERDUE
+         */
+        if (serviceDate < monday) {
+
+            overdueList.appendChild(
+                createRecommendationCard(
+                    client
+                )
+            );
+
+            overdueCount++;
+
+        }
+
+
+        /*
+         * THIS WEEK
+         */
+        else if (
+            serviceDate >= monday &&
+            serviceDate <= friday
+        ) {
+
+            thisWeekList.appendChild(
+                createRecommendationCard(
+                    client
+                )
+            );
+
+            thisWeekCount++;
+
+        }
+
+
+        /*
+         * UPCOMING
+         */
+        else if (
+            serviceDate >= nextWeek
+        ) {
+
+            upcomingList.appendChild(
+                createRecommendationCard(
+                    client
+                )
+            );
+
+            upcomingCount++;
+
+        }
+
+    });
+
+
+    /*
+     * Show empty messages when needed.
+     */
+    if (overdueCount === 0) {
+
+        overdueList.innerHTML =
+            '<p>No overdue clients.</p>';
+
+    }
+
+
+    if (thisWeekCount === 0) {
+
+        thisWeekList.innerHTML =
+            '<p>No clients scheduled this week.</p>';
+
+    }
+
+
+    if (upcomingCount === 0) {
+
+        upcomingList.innerHTML =
+            '<p>No upcoming clients.</p>';
+
+    }
+
+}
+/* =========================================================
+   PARSE CLIENT DATE
+   ========================================================= */
+
+function parseClientDate(dateString) {
+
+    const value =
+        String(dateString || '')
+            .trim();
+
+    let month;
+    let day;
+    let year;
+
+
+    // MM/DD/YY
+    if (/^\d{2}\/\d{2}\/\d{2}$/.test(value)) {
+
+        month =
+            parseInt(
+                value.substring(0, 2),
+                10
+            );
+
+        day =
+            parseInt(
+                value.substring(3, 5),
+                10
+            );
+
+        year =
+            2000 +
+            parseInt(
+                value.substring(6, 8),
+                10
+            );
+
+    }
+
+
+    // MMDDYY
+    else if (/^\d{6}$/.test(value)) {
+
+        month =
+            parseInt(
+                value.substring(0, 2),
+                10
+            );
+
+        day =
+            parseInt(
+                value.substring(2, 4),
+                10
+            );
+
+        year =
+            2000 +
+            parseInt(
+                value.substring(4, 6),
+                10
+            );
+
+    }
+
+
+    else {
+
+        return null;
+
+    }
+
+
+    const date =
+        new Date(
+            year,
+            month - 1,
+            day
+        );
+
+
+    date.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    return date;
+
+
+
+    card.addEventListener(
+        'dragend',
+        function() {
+
+            card.classList.remove(
+                'dragging'
+            );
+
+            draggedClient = null;
+
+            dragSource = null;
+
+            draggedRecommendation = null;
+        }
+    );
+
+
+    return card;
+}
+
+/* =========================================================
+   RECOMMENDATION CATEGORY
+   ========================================================= */
+
+function getRecommendationCategory(client) {
+
+    if (!client || !client.next_service) {
+        return null;
+    }
+
+    const parts =
+        String(client.next_service)
+            .trim()
+            .match(/^(\d{2})(\d{2})(\d{2})$/);
+
+    if (!parts) {
+        return null;
+    }
+
+    const serviceDate = new Date(
+        2000 + Number(parts[3]),
+        Number(parts[1]) - 1,
+        Number(parts[2])
+    );
+
+    serviceDate.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const monday = getMonday(today);
+    monday.setHours(0, 0, 0, 0);
+
+    const friday = new Date(monday);
+    friday.setDate(friday.getDate() + 4);
+    friday.setHours(23, 59, 59, 999);
+
+    const nextMonday = new Date(monday);
+    nextMonday.setDate(nextMonday.getDate() + 7);
+    nextMonday.setHours(0, 0, 0, 0);
+
+    if (serviceDate < monday) {
+        return 'overdue';
+    }
+
+    if (
+        serviceDate >= monday &&
+        serviceDate <= friday
+    ) {
+        return 'this-week';
+    }
+
+    if (serviceDate >= nextMonday) {
+        return 'upcoming';
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   DRAG AND DROP SYSTEM
+   ========================================================= */
+
+let draggedClient = null;
+let dragSource = null;
+let draggedRecommendation = null;
+let draggedCard = null;
+
+function formatClientDate(dateString) {
+
+    const date = parseClientDate(dateString);
+
+    if (!date) {
+        return dateString || 'N/A';
+    }
+
+    const month =
+        String(date.getMonth() + 1).padStart(2, '0');
+
+    const day =
+        String(date.getDate()).padStart(2, '0');
+
+    const year =
+        String(date.getFullYear()).slice(-2);
+
+    return `${month}/${day}/${year}`;
+}
+
+
+function getClientServiceInfo(client) {
+
+    const nextService =
+        formatClientDate(
+            client.next_service
+        );
+
+    const frequency =
+        String(
+            client.frequency || 'N/A'
+        ).trim();
+
+    return `
+        <div class="service-info">
+            <div>
+                <strong>Next Service:</strong>
+                ${nextService}
+            </div>
+
+            <div>
+                <strong>Frequency:</strong>
+                ${frequency}
+            </div>
+        </div>
+    `;
+}
+/* =========================================================
+   CREATE CLIENT LIST CARD
+   ========================================================= */
+function createClientCard(client) {
+
+    const card = document.createElement('div');
+
+    card.className = 'calendar-client';
+
+    card.dataset.clientId = client.client_id || '';
+
+    card.dataset.firstName = client.first_name || '';
+    card.dataset.lastName = client.last_name || '';
+    card.dataset.city = client.city || '';
+    card.dataset.frequency = client.frequency || '';
+    card.dataset.nextService = client.next_service || '';
+
+    card.dataset.source = 'client-list';
+
+    card.draggable = true;
+
+
+    card.innerHTML = `
+
+        <strong>
+            ${client.first_name}
+            ${client.last_name}
+        </strong>
+            ${getClientServiceInfo(client)}
+        <br>
+
+
+    `;
+
+
+    /*
+     * CLICK CLIENT
+     */
+
+    card.addEventListener(
+        'click',
+        function(event) {
+
+            /*
+             * Don't open the information
+             * window while dragging.
+             */
+
+            if (draggedClient) {
+                return;
+            }
+
+            openClientModal(client);
+
+        }
+    );
+
+
+    /*
+     * DRAG CLIENT
+     */
+
+   card.addEventListener('dragstart', function (e) {
+
+    draggedClient = client;
+
+    dragSource = card.dataset.source || '';
+    draggedCard = card;
+
+    draggedRecommendation =
+        card.dataset.recommendation || null;
+
+    e.dataTransfer.effectAllowed = 'move';
+
+    e.dataTransfer.setData(
+        'text/plain',
+        client.first_name + '|' + client.last_name
+    );
+
+    card.classList.add('dragging');
+});
+
+
+    card.addEventListener(
+        'dragend',
+        function() {
+
+            card.classList.remove(
+                'being-dragged'
+            );
+
+            draggedClient = null;
+
+            dragSource = null;
+
+        }
+    );
+
+
+    return card;
+
+}
+/* =========================================================
+   RECOMMENDATION DRAG AND DROP
+   ========================================================= */
+
+function setupRecommendationDropZones() {
+
+    const recommendationZones = {
+        overdue: document.getElementById('overdue-list'),
+        'this-week': document.getElementById('this-week-list'),
+        upcoming: document.getElementById('upcoming-list')
+    };
+
+
+    Object.entries(recommendationZones).forEach(
+        ([category, zone]) => {
+
+            if (!zone) {
+                console.warn(
+                    'Recommendation zone not found:',
+                    category
+                );
+
+                return;
+            }
+
+
+            zone.addEventListener(
+                'dragover',
+                function(e) {
+
+                    if (!draggedClient) {
+                        return;
+                    }
+
+
+                    /*
+                     * Determine where this client
+                     * actually belongs.
+                     */
+                    const correctCategory =
+                        getRecommendationCategory(
+                            draggedClient
+                        );
+
+
+                    /*
+                     * Only allow the client into
+                     * its correct recommendation
+                     * section.
+                     */
+                    if (
+                        correctCategory !== category
+                    ) {
+
+                        e.dataTransfer.dropEffect =
+                            'none';
+
+                        return;
+                    }
+
+
+                    e.preventDefault();
+
+                    e.dataTransfer.dropEffect =
+                        'move';
+
+                }
+            );
+
+
+            zone.addEventListener(
+                'drop',
+                function(e) {
+
+                    e.preventDefault();
+
+
+                    if (!draggedClient) {
+                        return;
+                    }
+
+
+                    const correctCategory =
+                        getRecommendationCategory(
+                            draggedClient
+                        );
+
+
+                    /*
+                     * Do not allow the client into
+                     * the wrong recommendation area.
+                     */
+                    if (
+                        correctCategory !== category
+                    ) {
+                        return;
+                    }
+
+
+                    /*
+                     * Don't create a duplicate if
+                     * the client is already here.
+                     */
+                    if (
+                        dragSource ===
+                        'recommendation'
+                    ) {
+                        return;
+                    }
+
+
+                    const card =
+                        createRecommendationCard(
+                            draggedClient
+                        );
+
+
+                    zone.appendChild(card);
+
+
+                    /*
+                     * If the client came from the
+                     * calendar or client section,
+                     * remove the original card.
+                     */
+                    if (
+                        draggedCard &&
+                        draggedCard.parentNode
+                    ) {
+
+                        draggedCard.parentNode
+                            .removeChild(
+                                draggedCard
+                            );
+                    }
+
+
+                    draggedClient = null;
+
+                    dragSource = null;
+
+                    draggedRecommendation = null;
+
+                    draggedCard = null;
+
+                }
+            );
+
+        }
+    );
+}
+function createRecommendationCard(client) {
+
+    const card =
+        document.createElement('div');
+
+    card.className =
+        'calendar-client';
+
+    card.draggable = true;
+
+    card.dataset.source =
+        'recommendation';
+
+    card.dataset.recommendation =
+        getRecommendationCategory(client);
+
+    card.innerHTML = `
+    <strong>
+        ${client.first_name}
+        ${client.last_name}
+    </strong>
+
+    <br>
+
+    ${client.city}
+
+    <br>
+
+    Next Service:
+    ${client.next_service}
+
+    <br>
+
+    Frequency:
+    ${client.frequency || 'N/A'}
+`;
+
+    card.addEventListener(
+        'dragstart',
+        function(e) {
+
+            draggedClient = client;
+
+            dragSource =
+                'recommendation';
+            draggedCard = card;
+
+            draggedRecommendation =
+                getRecommendationCategory(
+                    client
+                );
+
+            e.dataTransfer.effectAllowed =
+                'move';
+
+            card.classList.add(
+                'dragging'
+            );
+        }
+    );
+
+    card.addEventListener(
+        'dragend',
+        function() {
+
+            card.classList.remove(
+                'dragging'
+            );
+
+            draggedClient = null;
+            dragSource = null;
+            draggedRecommendation = null;
+        }
+    );
+
+    return card;
+}
+setupRecommendationDropZones();
+</script>
+<!-- =========================================================
+     MOWING MODE CHECKLIST
+     ========================================================= -->
+
+<div id="mowing-checklist" style="display: none;">
+
+    <h2>✅ This Week's Mowing</h2>
+
+    <div id="monday-jobs">
+        <h3>Monday</h3>
+    </div>
+
+    <div id="tuesday-jobs">
+        <h3>Tuesday</h3>
+    </div>
+
+    <div id="wednesday-jobs">
+        <h3>Wednesday</h3>
+    </div>
+
+    <div id="thursday-jobs">
+        <h3>Thursday</h3>
+    </div>
+
+    <div id="friday-jobs">
+        <h3>Friday</h3>
+    </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   CLIENT INFORMATION MODAL
+   ========================================================= */
+
+function openClientModal(client) {
+
+    document.getElementById(
+        'modal-client-name'
+    ).textContent =
+        `${client.first_name} ${client.last_name}`;
+
+
+    document.getElementById(
+        'modal-additional-name'
+    ).textContent =
+        client.additional_name || 'None';
+
+
+    document.getElementById(
+        'modal-address'
+    ).textContent =
+        client.street_address || '';
+
+
+    document.getElementById(
+        'modal-city'
+    ).textContent =
+        client.city || '';
+
+
+    document.getElementById(
+        'modal-state'
+    ).textContent =
+        client.state || '';
+
+
+    document.getElementById(
+        'modal-zip'
+    ).textContent =
+        client.zip || '';
+
+
+    document.getElementById(
+        'modal-recurring'
+    ).textContent =
+        client.reoccuring || '';
+
+
+    document.getElementById(
+        'modal-frequency'
+    ).textContent =
+        client.frequency || '';
+
+
+    document.getElementById(
+        'modal-service'
+    ).textContent =
+        client.type_of_service || '';
+
+
+    document.getElementById(
+        'modal-additional-service'
+    ).textContent =
+        client.additional_service || '';
+
+
+    document.getElementById(
+        'modal-type'
+    ).textContent =
+        client.type || '';
+
+
+    document.getElementById(
+        'modal-price'
+    ).textContent =
+        client.quote_price || '0.00';
+
+
+    document.getElementById(
+        'modal-last-service'
+    ).textContent =
+        formatClientDate(
+            client.last_service_date
+        );
+
+
+    document.getElementById(
+        'modal-next-service'
+    ).textContent =
+    formatClientDate(
+        client.next_service
+    ); 
+
+
+    document.getElementById(
+        'client-modal'
+    ).classList.add('show');
+
+}
+
+
+/* =========================================================
+   CLOSE CLIENT MODAL
+   ========================================================= */
+
+document
+    .getElementById('close-client-modal')
+    .addEventListener(
+        'click',
+        function() {
+
+            document
+                .getElementById('client-modal')
+                .classList.remove('show');
+
+        }
+    );
+
+
+/*
+ * Close if the user clicks
+ * the dark background.
+ */
+
+document
+    .getElementById('client-modal')
+    .addEventListener(
+        'click',
+        function(event) {
+
+            if (
+                event.target ===
+                document.getElementById(
+                    'client-modal'
+                )
+            ) {
+
+                document
+                    .getElementById('client-modal')
+                    .classList.remove('show');
+
+            }
+
+        }
+    );
+/* =========================================================
+   CREATE CALENDAR CARD
+   ========================================================= */
+
+function createScheduledCard(client) {
+
+    const card = document.createElement('div');
+
+    card.className = 'scheduled-client';
+
+    card.dataset.clientId = client.client_id || '';
+
+    card.dataset.firstName = client.first_name || '';
+    card.dataset.lastName = client.last_name || '';
+    card.dataset.city = client.city || '';
+    card.dataset.frequency = client.frequency || '';
+    card.dataset.nextService = client.next_service || '';
+
+    card.dataset.source = 'calendar';
+
+    card.draggable = true;
+
+
+    card.innerHTML = `
+
+        <div class="scheduled-name">
+
+            <strong>
+                ${client.first_name}
+                ${client.last_name}
+            </strong>
+
+        </div>
+
+        <div>
+            ${client.city},
+            ${client.street_address}
+        </div>
+
+        <div>
+            ${client.additional_service || 'None'}
+            ·
+            ${client.type_of_service || ''}
+        </div>
+
+        <div>
+            <strong>
+                $${client.quote_price}
+            </strong>
+        </div>
+
+    `;
+    card.addEventListener(
+    'click',
+    function() {
+
+        openClientModal(client);
+
+    }
+);
+
+
+    card.addEventListener('dragstart', function(event) {
+
+        draggedClient = client;
+
+        draggedCard = card;
+
+        dragSource = 'calendar';
+
+        event.dataTransfer.effectAllowed = 'move';
+
+        event.dataTransfer.setData(
+            'text/plain',
+            JSON.stringify(client)
+        );
+
+        card.classList.add('being-dragged');
+
+    });
+
+
+    card.addEventListener('dragend', function () {
+
+    card.classList.remove('dragging');
+
+    draggedClient = null;
+    dragSource = null;
+    draggedRecommendation = null;
+    });
+    card.addEventListener(
+    'contextmenu',
+    function(event) {
+
+        event.preventDefault();
+
+        const confirmed =
+            confirm(
+                `Return ${client.first_name} ${client.last_name} to the client list?`
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        /*
+         * Remove this scheduled card
+         * from the calendar.
+         */
+        card.remove();
+
+
+        /*
+         * Determine the client's
+         * original Weekly/Bi-Weekly section.
+         */
+        const frequency =
+            String(
+                client.frequency || ''
+            )
+            .trim()
+            .toLowerCase();
+
+        const city =
+            cityToId(client.city);
+
+        let prefix = '';
+
+
+        if (
+            frequency.includes('bi-weekly') ||
+            frequency.includes('biweekly')
+        ) {
+
+            prefix = 'biweekly';
+
+        }
+
+        else if (
+            frequency.includes('weekly')
+        ) {
+
+            prefix = 'weekly';
+
+        }
+
+
+        if (!prefix) {
+            console.warn(
+                'Could not determine client frequency:',
+                client
+            );
+
+            return;
+        }
+
+
+        const sectionId =
+            `${prefix}-${city}`;
+
+
+        const section =
+            document.getElementById(
+                sectionId
+            );
+
+
+        if (!section) {
+
+            console.warn(
+                'Could not find client section:',
+                sectionId
+            );
+
+            return;
+        }
+
+
+        /*
+         * Put the client back into
+         * their city section.
+         */
+        section.appendChild(
+            createClientCard(client)
+        );
+
+
+        /*
+         * Rebuild recommendations.
+         */
+        renderRecommendations(
+            allClients
+        );
+
+
+        /*
+         * Clear drag state.
+         */
+        draggedClient = null;
+        draggedCard = null;
+        dragSource = null;
+        draggedRecommendation = null;
+
+    }
+);
+
+
+    return card;
+}
+
+
+/* =========================================================
+   CALENDAR DROP ZONES
+   ========================================================= */
+
+document
+    .querySelectorAll('.drop-zone')
+    .forEach(zone => {
+
+        zone.addEventListener(
+            'dragover',
+            function(event) {
+
+                if (!draggedClient) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                zone.classList.add('drag-over');
+
+            }
+        );
+
+
+        zone.addEventListener(
+            'dragleave',
+            function() {
+
+                zone.classList.remove(
+                    'drag-over'
+                );
+
+            }
+        );
+
+
+        zone.addEventListener(
+            'drop',
+            function(event) {
+
+                event.preventDefault();
+
+                zone.classList.remove(
+                    'drag-over'
+                );
+
+
+                if (!draggedClient) {
+                    return;
+                }
+
+
+                /*
+                 * Remove the client from wherever
+                 * they currently are.
+                 */
+
+                removeClientEverywhere(
+                    draggedClient
+                );
+
+
+                /*
+                 * Add them to this calendar day.
+                 */
+
+                const card =
+                    createScheduledCard(
+                        draggedClient
+                    );
+
+
+                zone.appendChild(card);
+                
+                if (
+                    dragSource === 'recommendation' &&
+                    draggedCard &&
+                    draggedCard.parentNode
+                ) {
+                    draggedCard.parentNode.removeChild(
+                        draggedCard
+                    );
+                }
+                draggedClient = null;
+                draggedCard = null;
+                dragSource = null;
+                draggedRecommendation = null;
+
+            }
+
+        );
+
+    });
+
+
+/* =========================================================
+   CLIENT CITY DROP ZONES
+   ========================================================= */
+
+document
+    .querySelectorAll(
+        '.city-client-section > div'
+    )
+    .forEach(section => {
+
+
+        /*
+         * Get the city from the heading
+         *
+         * Example:
+         *
+         * <h4>Buckner</h4>
+         *
+         */
+
+        const cityHeading =
+            section
+                .parentElement
+                .querySelector('h4');
+
+
+        if (!cityHeading) {
+            return;
+        }
+
+
+        const sectionCity =
+            cityHeading.textContent
+                .trim()
+                .toLowerCase();
+
+
+        /*
+         * Make empty sections physically
+         * large enough to drop into.
+         */
+
+        section.classList.add(
+            'client-drop-zone'
+        );
+
+
+        /* -------------------------------------------------
+           DRAG OVER
+           ------------------------------------------------- */
+
+        section.addEventListener(
+            'dragover',
+            function(event) {
+
+
+                /*
+                 * ONLY allow clients that are
+                 * currently on the calendar.
+                 */
+
+                if (
+                    dragSource !== 'calendar' ||
+                    !draggedClient
+                ) {
+
+                    return;
+
+                }
+
+
+                /*
+                 * ONLY allow them back into
+                 * their ORIGINAL city.
+                 */
+
+                const clientCity =
+                    String(
+                        draggedClient.city || ''
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                if (
+                    clientCity !== sectionCity
+                ) {
+
+                    return;
+
+                }
+
+
+                event.preventDefault();
+
+                section.classList.add(
+                    'drag-over'
+                );
+
+            }
+        );
+
+
+        /* -------------------------------------------------
+           DRAG LEAVE
+           ------------------------------------------------- */
+
+        section.addEventListener(
+            'dragleave',
+            function() {
+
+                section.classList.remove(
+                    'drag-over'
+                );
+
+            }
+        );
+
+
+        /* -------------------------------------------------
+           DROP
+           ------------------------------------------------- */
+
+        section.addEventListener(
+            'drop',
+            function(event) {
+
+                event.preventDefault();
+
+                section.classList.remove(
+                    'drag-over'
+                );
+
+
+                if (
+                    dragSource !== 'calendar' ||
+                    !draggedClient
+                ) {
+
+                    return;
+
+                }
+
+
+                const clientCity =
+                    String(
+                        draggedClient.city || ''
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                /*
+                 * Safety check:
+                 *
+                 * Do not allow a client into
+                 * another city's section.
+                 */
+
+                if (
+                    clientCity !== sectionCity
+                ) {
+
+                    alert(
+                        `${draggedClient.first_name} ${draggedClient.last_name} belongs in ${draggedClient.city}.`
+                    );
+
+                    return;
+
+                }
+
+
+                /*
+                 * Remove from calendar.
+                 */
+
+                removeClientEverywhere(
+                    draggedClient
+                );
+
+
+                /*
+                 * Put back into correct city.
+                 */
+
+                const card =
+                    createClientCard(
+                        draggedClient
+                    );
+
+
+                section.appendChild(card);
+
+            }
+
+        );
+
+    });
+
+
+/* =========================================================
+   REMOVE CLIENT FROM CURRENT LOCATION
+   ========================================================= */
+
+function removeClientEverywhere(client) {
+
+    document
+        .querySelectorAll(
+            '.calendar-client, .scheduled-client'
+        )
+        .forEach(card => {
+
+            const firstName =
+                String(
+                    card.dataset.firstName || ''
+                )
+                .trim()
+                .toLowerCase();
+
+
+            const lastName =
+                String(
+                    card.dataset.lastName || ''
+                )
+                .trim()
+                .toLowerCase();
+
+
+            const targetFirst =
+                String(
+                    client.first_name || ''
+                )
+                .trim()
+                .toLowerCase();
+
+
+            const targetLast =
+                String(
+                    client.last_name || ''
+                )
+                .trim()
+                .toLowerCase();
+
+
+            if (
+                firstName === targetFirst &&
+                lastName === targetLast
+            ) {
+
+                card.remove();
+
+            }
+
+        });
+
+}
+/* =========================================================
+   AUTO-SCROLL WHILE DRAGGING
+   ========================================================= */
+
+document.addEventListener(
+    'dragover',
+    function(event) {
+
+        if (!draggedClient) {
+            return;
+        }
+
+        const scrollSpeed = 15;
+        const edgeSize = 100;
+
+        if (event.clientY < edgeSize) {
+
+            window.scrollBy(
+                0,
+                -scrollSpeed
+            );
+
+        }
+
+        else if (
+            event.clientY >
+            window.innerHeight - edgeSize
+        ) {
+
+            window.scrollBy(
+                0,
+                scrollSpeed
+            );
+        }
+
+    }
+);
+/* =========================================================
+   COMPLETED JOBS
+   ========================================================= */
+
+let completedJobs = [];
+
+
+/* =========================================================
+   ADD COMPLETED JOB
+   ========================================================= */
+
+
+
+/* =========================================================
+   RENDER COMPLETED JOBS
+   ========================================================= */
+
+function renderCompletedJobs() {
+
+    const completedList =
+        document.getElementById('completed-list');
+
+    const completedTitle =
+        document.getElementById('completed-jobs-title');
+
+
+    if (!completedList || !completedTitle) {
+        console.error(
+            'Completed jobs section was not found.'
+        );
+
+        return;
+    }
+
+
+    /*
+     * Update the number in the heading.
+     */
+    completedTitle.textContent =
+        `✅ Completed Jobs (${completedJobs.length})`;
+
+
+    /*
+     * Clear the old list.
+     */
+    completedList.innerHTML = '';
+
+
+    /*
+     * Nothing completed yet.
+     */
+    if (completedJobs.length === 0) {
+
+        completedList.innerHTML =
+            '<p>No completed jobs yet.</p>';
+
+        return;
+    }
+
+
+    /*
+     * Create a card for every completed job.
+     */
+    completedJobs.forEach(client => {
+
+        const completedCard =
+            document.createElement('div');
+
+
+        completedCard.className =
+            'completed-job-card';
+
+
+        completedCard.innerHTML = `
+
+            <strong>
+                ${client.first_name || ''}
+                ${client.last_name || ''}
+            </strong>
+
+            <div>
+                ${client.city || ''}
+            </div>
+
+            <div>
+                ${client.type_of_service || 'Mowing'}
+            </div>
+
+            <div>
+                $${client.quote_price || '0.00'}
+            </div>
+
+            <small>
+                Click to view client
+            </small>
+
+        `;
+
+
+        /*
+         * Clicking the completed job opens
+         * the existing client information modal.
+         */
+        completedCard.addEventListener(
+            'click',
+            function() {
+
+                openClientModal(client);
+
+            }
+        );
+
+
+        completedList.appendChild(
+            completedCard
+        );
+
+    });
+
+}
+
+/* =========================================================
+   MOWING CHECKLIST
+   ========================================================= */
+
+function buildMowingChecklist() {
+    
+
+    console.log("===== BUILDING MOWING CHECKLIST =====");
+
+    const checklist =
+        document.getElementById('mowing-checklist');
+
+    console.log(
+        "Checklist element:",
+        checklist
+    );
+
+    if (!checklist) {
+
+        console.error(
+            "ERROR: #mowing-checklist does not exist!"
+        );
+
+        return;
+    }
+
+    // FORCE IT VISIBLE
+    checklist.style.display = 'block';
+
+    console.log(
+        "Checklist display:",
+        checklist.style.display
+    );
+
+    const scheduledCards =
+        document.querySelectorAll('.scheduled-client');
+
+    console.log(
+        "Scheduled cards found:",
+        scheduledCards.length
+    );
+
+
+    const days = [
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday'
+    ];
+
+
+    days.forEach(day => {
+
+        const calendarZone =
+            document.getElementById(day);
+
+
+        const jobsZone =
+            document.getElementById(
+                `${day}-jobs`
+            );
+
+
+        if (!calendarZone || !jobsZone) {
+            return;
+        }
+
+
+        /*
+         * Keep the day heading.
+         *
+         * Remove only the old jobs.
+         */
+        jobsZone
+            .querySelectorAll('.mowing-job')
+            .forEach(job => job.remove());
+
+
+        /*
+         * Find every client scheduled
+         * on this calendar day.
+         */
+        calendarZone
+            .querySelectorAll('.scheduled-client')
+            .forEach(card => {
+
+                const firstName =
+                    card.dataset.firstName || '';
+
+
+                const lastName =
+                    card.dataset.lastName || '';
+
+
+                const city =
+                    card.dataset.city || '';
+
+
+                /*
+                 * Find the actual client object.
+                 */
+                const client =
+                    allClients.find(existingClient =>
+
+                        String(
+                            existingClient.first_name || ''
+                        )
+                        .trim()
+                        .toLowerCase() ===
+                        String(firstName)
+                        .trim()
+                        .toLowerCase()
+
+                        &&
+
+                        String(
+                            existingClient.last_name || ''
+                        )
+                        .trim()
+                        .toLowerCase() ===
+                        String(lastName)
+                        .trim()
+                        .toLowerCase()
+
+                    );
+
+
+                /*
+                 * Create the mowing job.
+                 */
+                const job =
+                    document.createElement('div');
+
+
+                job.className =
+                    'mowing-job';
+
+
+                /*
+                 * Create checkbox.
+                 */
+                const checkbox =
+                    document.createElement('input');
+
+                checkbox.type = 'checkbox';
+
+                checkbox.dataset.clientId =
+                    card.dataset.clientId || '';
+
+
+                /*
+                 * Create label.
+                 */
+                const label =
+                    document.createElement('label');
+
+
+                label.textContent =
+                    `${firstName} ${lastName} — ${city}`;
+
+
+                checkbox.addEventListener(
+                    'change',
+                    async function() {
+
+                        if (!this.checked) {
+                            return;
+                        }
+
+                        const clientId =
+                            this.dataset.clientId;
+
+                        console.log(
+                            'Completing client:',
+                            clientId
+                        );
+
+                        if (!clientId) {
+
+                            console.error(
+                                'No client ID found:',
+                                card.dataset
+                            );
+
+                            alert(
+                                'This client does not have a client ID.'
+                            );
+
+                            this.checked = false;
+
+                            return;
+                        }
+
+                        try {
+
+                            const response =
+                                await fetch(
+                                    '/api/calendar/complete',
+                                    {
+                                        method: 'POST',
+
+                                        headers: {
+                                            'Content-Type':
+                                                'application/json'
+                                        },
+
+                                        body:
+                                            JSON.stringify({
+                                                client_id:
+                                                    clientId
+                                            })
+                                    }
+                                );
+
+                            const result =
+                                await response.json();
+
+                            console.log(
+                                'Complete result:',
+                                result
+                            );
+
+                            if (
+                                !response.ok ||
+                                !result.success
+                            ) {
+
+                                alert(
+                                    result.message ||
+                                    'Could not complete job.'
+                                );
+
+                                this.checked = false;
+
+                                return;
+                            }
+
+                            /*
+                            * Server successfully completed
+                            * the job.
+                            */
+
+                            completeJob(client);
+
+                            /*
+                            * Remove from mowing checklist.
+                            */
+
+                            job.remove();
+
+                            /*
+                            * Remove from calendar.
+                            */
+
+                            card.remove();
+
+                            /*
+                            * Update completed jobs.
+                            */
+
+                            renderCompletedJobs();
+
+                            /*
+                            * Update revenue.
+                            */
+
+                            updateRevenue();
+
+                        }
+
+                        catch (error) {
+
+                            console.error(
+                                'Error completing job:',
+                                error
+                            );
+
+                            this.checked = false;
+
+                            alert(
+                                'Could not connect to the server.'
+                            );
+
+                        }
+
+                    }
+                );
+
+                job.appendChild(checkbox);
+                job.appendChild(label);
+
+                jobsZone.appendChild(job)
+                    
+
+        });
+        ;
+    })
+
+
+
+
+
+    /*
+     * Make sure the completed section
+     * is displayed correctly.
+     */
+    renderCompletedJobs();
+
+
+}
+/* =========================================================
+   ENTER MOWING MODE
+   ========================================================= */
+
+function enterMowingMode() {
+
+    console.log('Entering Mowing Mode...');
+
+    /*
+     * Hide the left sidebar.
+     * This contains both:
+     * - Recommendations
+     * - Clients
+     */
+    const sidebar =
+        document.querySelector('.calendar-sidebar');
+
+    if (sidebar) {
+        sidebar.style.display = 'none';
+    }
+
+
+    /*
+     * Lock all calendar cards.
+     * They can still be clicked to view information,
+     * but they can no longer be dragged.
+     */
+    document
+        .querySelectorAll('.scheduled-client')
+        .forEach(card => {
+
+            card.draggable = false;
+
+            card.classList.add('mowing-mode-locked');
+
+        });
+
+
+    /*
+     * Disable the calendar drop zones.
+     */
+    document
+        .querySelectorAll('.drop-zone')
+        .forEach(zone => {
+
+            zone.classList.add('mowing-mode-locked');
+
+        });
+
+
+    /*
+     * Mark the page as being in Mowing Mode.
+     */
+    document.body.classList.add('mowing-mode');
+
+const checklist = document.getElementById('mowing-checklist');
+
+if (checklist) {
+    checklist.style.display = 'block';
+}
+
+buildMowingChecklist();
+
+
+    console.log('Mowing Mode active.');
+
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+document
+    .getElementById('save-button')
+    .addEventListener(
+        'click',
+        async function() {
+
+            const days = [
+                'monday',
+                'tuesday',
+                'wednesday',
+                'thursday',
+                'friday'
+            ];
+
+            const schedule = {
+                savedAt: new Date().toISOString(),
+                week: {}
+            };
+
+
+            /*
+             * Read every client currently
+             * placed on each calendar day.
+             */
+            days.forEach(day => {
+                console.log(
+                    'CHECKING DAY:',
+                    day
+                );
+
+                const zone =
+                    document.getElementById(day);
+                console.log(
+                'CARDS FOUND ON',
+                day,
+                ':',
+                zone
+                    ? zone.querySelectorAll('.scheduled-client').length
+                    : 'NO ZONE'
+
+                );
+
+                schedule.week[day] = [];
+
+
+                if (!zone) {
+                    return;
+                }
+
+
+                zone
+                    .querySelectorAll(
+                        '.scheduled-client'
+                    )
+                    .forEach(card => {
+                        console.log(
+                            'CARD BEING SAVED:',
+                            card.dataset.clientId
+                        );
+                        schedule.week[day].push({
+
+                            client_id:
+                                card.dataset.clientId || '',
+
+                            first_name:
+                                card.dataset.firstName || '',
+
+                            last_name:
+                                card.dataset.lastName || '',
+
+                            city:
+                                card.dataset.city || '',
+
+                            frequency:
+                                card.dataset.frequency || '',
+
+                            next_service:
+                                card.dataset.nextService || ''
+
+                        });
+
+                    });
+
+            });
+
+
+            console.log(
+                'Schedule being saved:',
+                schedule
+            );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/api/calendar/save',
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    schedule
+                                )
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `Server returned ${response.status}`
+                    );
+
+                }
+
+
+                const result =
+                    await response.json();
+
+
+                if (result.status !== 'success') {
+
+                    throw new Error(
+                        result.message ||
+                        'Schedule could not be saved.'
+                    );
+
+                }
+
+
+                alert(
+                    'Schedule saved successfully!'
+                );
+                enterMowingMode();
+
+
+                /*
+                 * Hide Save and Reset.
+                 */
+                document
+                    .getElementById(
+                        'save-button'
+                    )
+                    .style.display =
+                    'none';
+
+
+                document
+                    .getElementById(
+                        'reset-button'
+                    )
+                    .style.display =
+                    'none';
+
+
+                /*
+                 * Show Edit and Email.
+                 */
+                document
+                    .getElementById(
+                        'edit-button'
+                    )
+                    .style.display =
+                    'inline-block';
+
+
+                document
+                    .getElementById(
+                        'email-button'
+                    )
+                    .style.display =
+                    'inline-block';
+
+                document.getElementById('revenue-section').style.display = 'block';
+
+                const groupRoutesSection =
+                    document.getElementById('group-routes-section');
+
+                if (groupRoutesSection) {
+                    groupRoutesSection.style.display = 'block';
+}
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    'Could not save schedule:',
+                    error
+                );
+
+
+                alert(
+                    'Could not save the schedule.\n\n' +
+                    error.message
+                );
+
+            }
+
+        }
+    );
+
+
+/*
+ * EDIT SCHEDULE
+ */
+document
+    .getElementById('edit-button')
+    .addEventListener(
+        'click',
+        function() {
+
+            document
+                .getElementById(
+                    'save-button'
+                )
+                .style.display =
+                'inline-block';
+
+
+            document
+                .getElementById(
+                    'reset-button'
+                )
+                .style.display =
+                'inline-block';
+
+
+            document
+                .getElementById(
+                    'edit-button'
+                )
+                .style.display =
+                'none';
+
+
+            document
+                .getElementById(
+                    'email-button'
+                )
+                .style.display =
+                'none';
+
+            document.getElementById('revenue-section').style.display = 'none';
+            const groupRoutesSection =
+                document.getElementById('group-routes-section');
+
+            if (groupRoutesSection) {
+                groupRoutesSection.style.display = 'none';
+}
+
+        }
+    );
+
+
+/*
+ * EMAIL SCHEDULE
+ *
+ * We will connect this after
+ * Save is confirmed working.
+ */
+document
+    .getElementById('email-button')
+    .addEventListener(
+        'click',
+        function() {
+
+            alert(
+                'Email feature will be connected next.'
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+loadCalendarDates();
+
+loadClients();
+
+
+
+</script>
+
+</body>
+</html>
+
+
+
+

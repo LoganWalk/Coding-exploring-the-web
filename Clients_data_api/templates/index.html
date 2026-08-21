@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mowing Business Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> 
+</head>
+<body>
+    <nav>
+        <a href="/" style="color: var(--accent); background: var(--accent-soft);">🏠 Dashboard</a>
+        <a href="/revenue-page">💰 Revenue Analytics</a>
+        <a href="/calendar-page">📅 Work Agenda</a>
+        <a href="/client-page">🧑 Clients</a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <img src = "https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw", width = "60", height = "60">
+    </nav>
+
+    <div class="content">
+        <h1>Mowing Business Operations Center</h1>
+        
+        <form id="filter-form">
+            <label for="city-filter">Filter Directory by City:</label>
+            <select id="city-filter">
+                <option value="all">Show All(Show All Clients)</option>
+                <option value="Blue Springs">Blue Springs</option>
+                <option value="Grain Valley">Grain Valley</option>
+                <option value="Independence">Independence</option>
+                <option value="Kansas City">Kansas City</option>
+                <option value="Lee's Summit">Lee's Summit</option>
+                <option value="Lexington">Lexington</option>
+                <option value="Odessa">Odessa</option>
+                <option value="Raytown">Raytown</option>
+                <option value="Richmond">Richmond</option>
+            </select>
+        </form>
+
+        <h2>👥 Active Client Directory</h2>
+        <div id="clients-container">Loading active customer files...</div>
+    </div>
+
+    <script>
+        const container = document.getElementById('clients-container');
+        let allClients = [];
+
+        function renderClients(clients) {
+            container.innerHTML = '';
+            if (clients.length === 0) {
+                container.innerHTML = '<div class="alert">No matching records found.</div>';
+                return;
+            }
+            clients.forEach(client => {
+                const addName = client.additional_name !== 'none' ? ` (${client.additional_name})` : '';
+                const card = `
+                    <div class="post">
+                        <h2>${client.first_name} ${client.last_name}${addName}</h2>
+                        <dl class="student-details">
+                            <dt>Street Address</dt><dd>${client.street_address}</dd>
+                            <dt>Location</dt><dd>${client.city}, ${client.state} ${client.zip}</dd>
+                            <dt>Service Interval</dt><dd>${client.frequency} (${client.reoccuring === 'yes' ? 'Recurring' : 'One-time'})</dd>
+                            <dt>Job Type</dt><dd>${client.type_of_service} [${client.type}]</dd>
+                            <dt>Special Notes</dt><dd>${client.additional_service}</dd>
+                            <dt>Quote Pricing</dt><dd><strong>$${client.quote_price}</strong></dd>
+                        </dl>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        fetch('/api/clients/all')
+            .then(res => res.json())
+            .then(data => {
+                allClients = data;
+                renderClients(allClients);
+            });
+
+        document.getElementById('city-filter').addEventListener('change', (e) => {
+            const city = e.target.value;
+            if (city === 'all') {
+                renderClients(allClients);
+            } else {
+                const filtered = allClients.filter(c => c.city.toLowerCase() === city.toLowerCase());
+                renderClients(filtered);
+            }
+        });
+    </script>
+</body>
+</html>

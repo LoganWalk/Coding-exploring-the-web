@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial & Revenue Metrics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">🏠 Dashboard</a>
+        <a href="/revenue-page" style="color: var(--accent); background: var(--accent-soft);">💰 Revenue Analytics</a>
+        <a href="/calendar-page">📅 Work Agenda</a>
+        <a href="/client-page">🧑 Clients</a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <a></a>
+        <img src = "https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw", width = "60", height = "60">
+    </nav>
+
+    <div class="content">
+        <h1>💰 Business Cash Flow & Profit Centers</h1>
+        
+        <div class="post" style="border-left: 5px solid var(--accent); margin-bottom: 24px;">
+            <h2>Estimated Monthly Gross Income</h2>
+            <p style="font-size: 2.2rem; font-weight: 700; color: var(--accent); margin: 8px 0;" id="monthly-gross">$0.00</p>
+            <p style="color: var(--ink-muted); font-size: 0.9rem;">Calculated pipeline based on active recurring intervals.</p>
+        </div>
+
+        <div class="post">
+            <h2>Financial Breakdown Summary</h2>
+            <dl class="student-details">
+                <dt>Total Combined Quote Value</dt><dd id="total-value">$0.00</dd>
+                <dt>Weekly Rotation Income</dt><dd id="weekly-val">$0.00</dd>
+                <dt>Bi-Weekly Rotation Income</dt><dd id="biweekly-val">$0.00</dd>
+                <dt>Residential Accounts Pool</dt><dd id="residential-val">$0.00</dd>
+                <dt>Commercial Accounts Pool</dt><dd id="commercial-val">$0.00</dd>
+            </dl>
+        </div>
+    </div>
+
+    <script>
+        fetch('/api/revenue')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('monthly-gross').innerText = '$' + data.summary.estimated_monthly_gross_revenue.toFixed(2);
+                document.getElementById('total-value').innerText = '$' + data.summary.total_combined_quote_value.toFixed(2);
+                document.getElementById('weekly-val').innerText = '$' + data.breakdown_by_frequency.weekly_single_rotation_value.toFixed(2);
+                document.getElementById('biweekly-val').innerText = '$' + data.breakdown_by_frequency.bi_weekly_single_rotation_value.toFixed(2);
+                document.getElementById('residential-val').innerText = '$' + data.breakdown_by_client_type.residential_value.toFixed(2);
+                document.getElementById('commercial-val').innerText = '$' + data.breakdown_by_client_type.commercial_value.toFixed(2);
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Client List</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <a href="/">🏠 Dashboard</a>
+    <a href="/revenue-page">💰 Revenue Analytics</a>
+    <a href="/calendar-page">📅 Work Agenda</a>
+    <a href="/client-page"
+       style="color: var(--accent); background: var(--accent-soft);">
+        🧑 Clients
+    </a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <a></a>
+    <img src = "https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw", width = "60", height = "60">
+</nav>
+
+
+<div class="content">
+
+    <h1>🧑 Client Managing Page</h1>
+
+    <h2>Clients:</h2>
+
+    <h3>
+        Client Action Instructions:
+        left click = edit info,
+        right click = remove client,
+        add button = add client
+    </h3>
+
+</div>
+
+
+<div class="client-actions">
+    <button id="add-button">+ Add Client</button>
+</div>
+
+
+<div id="client-list"></div>
+
+
+<script>
+
+const clientList = document.getElementById("client-list");
+const addButton = document.getElementById("add-button");
+
+
+// ======================================================
+// LOAD CLIENTS
+// ======================================================
+
+function loadClients() {
+
+    clientList.innerHTML = "";
+
+    fetch("/api/clients/all")
+        .then(response => response.json())
+        .then(clients => {
+
+            console.log("Loaded clients:", clients.length);
+
+            clients.forEach(client => {
+                createClientCard(client);
+            });
+
+        })
+        .catch(error => {
+
+            console.error("Could not load clients:", error);
+
+            clientList.innerHTML =
+                "<p>Could not load clients.</p>";
+        });
+}
+
+
+// ======================================================
+// CREATE CLIENT CARD
+// ======================================================
+
+function createClientCard(client) {
+
+    const card = document.createElement("div");
+
+    card.className = "client-card";
+
+    card.innerHTML = `
+
+        <div class="client-header">
+            <h2>
+                ${client.first_name}
+                ${client.last_name}
+            </h2>
+        </div>
+
+        <div class="client-info">
+
+            <p>
+                <strong>Additional Name:</strong>
+                ${client.additional_name}
+            </p>
+
+            <p>
+                <strong>Address:</strong>
+                ${client.street_address}
+            </p>
+
+            <p>
+                <strong>City:</strong>
+                ${client.city}
+            </p>
+
+            <p>
+                <strong>State:</strong>
+                ${client.state}
+            </p>
+
+            <p>
+                <strong>ZIP:</strong>
+                ${client.zip}
+            </p>
+
+            <p>
+                <strong>Recurring:</strong>
+                ${client.reoccuring}
+            </p>
+
+            <p>
+                <strong>Frequency:</strong>
+                ${client.frequency}
+            </p>
+
+            <p>
+                <strong>Type of Service:</strong>
+                ${client.type_of_service}
+            </p>
+
+            <p>
+                <strong>Additional Service:</strong>
+                ${client.additional_service}
+            </p>
+
+            <p>
+                <strong>Type:</strong>
+                ${client.type}
+            </p>
+
+            <p>
+                <strong>Quote Price:</strong>
+                $${client.quote_price}
+            </p>
+
+            <p>
+                <strong>Last Service:</strong>
+                ${client.last_service_date}
+            </p>
+
+            <p>
+                <strong>Next Service:</strong>
+                ${client.next_service}
+            </p>
+
+        </div>
+
+    `;
+
+
+    // ==================================================
+    // LEFT CLICK = EDIT
+    // ==================================================
+
+    card.addEventListener("click", function() {
+
+        editClient(card, client);
+
+    });
+
+
+    // ==================================================
+    // RIGHT CLICK = DELETE
+    // ==================================================
+
+    card.addEventListener("contextmenu", function(event) {
+
+        event.preventDefault();
+
+        deleteClient(client);
+
+    });
+
+
+    clientList.appendChild(card);
+}
+
+
+// ======================================================
+// EDIT CLIENT
+// ======================================================
+
+function editClient(card, client) {
+
+    card.innerHTML = `
+
+        <div class="client-edit">
+
+            <h2>Edit Client</h2>
+
+            <label>First Name</label>
+            <input id="edit-first-name" value="${client.first_name}">
+
+            <label>Last Name</label>
+            <input id="edit-last-name" value="${client.last_name}">
+
+            <label>Additional Name</label>
+            <input id="edit-additional-name"
+                   value="${client.additional_name}">
+
+            <label>Street Address</label>
+            <input id="edit-street-address"
+                   value="${client.street_address}">
+
+            <label>City</label>
+            <input id="edit-city"
+                   value="${client.city}">
+
+            <label>State</label>
+            <input id="edit-state"
+                   value="${client.state}">
+
+            <label>ZIP</label>
+            <input id="edit-zip"
+                   value="${client.zip}">
+
+            <label>Recurring</label>
+            <input id="edit-reoccuring"
+                   value="${client.reoccuring}">
+
+            <label>Frequency</label>
+            <input id="edit-frequency"
+                   value="${client.frequency}">
+
+            <label>Type of Service</label>
+            <input id="edit-type-of-service"
+                   value="${client.type_of_service}">
+
+            <label>Additional Service</label>
+            <input id="edit-additional-service"
+                   value="${client.additional_service}">
+
+            <label>Type</label>
+            <input id="edit-type"
+                   value="${client.type}">
+
+            <label>Quote Price</label>
+            <input id="edit-quote-price"
+                   type="number"
+                   step="0.01"
+                   value="${client.quote_price}">
+
+            <label>Last Service Date</label>
+            <input id="edit-last-service-date"
+                   value="${client.last_service_date}">
+
+            <label>Next Service</label>
+            <input id="edit-next-service"
+                   value="${client.next_service}">
+
+            <p>
+                Press <strong>Enter</strong> to save.
+                Press <strong>Escape</strong> to cancel.
+            </p>
+
+        </div>
+
+    `;
+
+
+    const inputs = card.querySelectorAll("input");
+
+
+    // Put cursor in first input
+    inputs[0].focus();
+
+
+    // ==============================================
+    // ENTER = SAVE
+    // ESCAPE = CANCEL
+    // ==============================================
+
+    inputs.forEach(input => {
+
+        input.addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+
+                saveClient(card, client);
+
+            }
+
+            if (event.key === "Escape") {
+
+                loadClients();
+
+            }
+
+        });
+
+    });
+
+}
+
+
+// ======================================================
+// SAVE CLIENT
+// ======================================================
+
+function saveClient(card, oldClient) {
+
+    const updatedClient = {
+
+        old_first_name: oldClient.first_name,
+        old_last_name: oldClient.last_name,
+
+        first_name:
+            document.getElementById("edit-first-name").value,
+
+        last_name:
+            document.getElementById("edit-last-name").value,
+
+        additional_name:
+            document.getElementById("edit-additional-name").value,
+
+        street_address:
+            document.getElementById("edit-street-address").value,
+
+        city:
+            document.getElementById("edit-city").value,
+
+        state:
+            document.getElementById("edit-state").value,
+
+        zip:
+            document.getElementById("edit-zip").value,
+
+        reoccuring:
+            document.getElementById("edit-reoccuring").value,
+
+        frequency:
+            document.getElementById("edit-frequency").value,
+
+        type_of_service:
+            document.getElementById("edit-type-of-service").value,
+
+        additional_service:
+            document.getElementById("edit-additional-service").value,
+
+        type:
+            document.getElementById("edit-type").value,
+
+        quote_price:
+            document.getElementById("edit-quote-price").value,
+
+        last_service_date:
+            document.getElementById("edit-last-service-date").value,
+
+        next_service:
+            document.getElementById("edit-next-service").value
+    };
+
+
+    fetch("/api/client/edit", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(updatedClient)
+
+    })
+
+    .then(response => response.json())
+
+    .then(result => {
+
+        if (result.status === "success") {
+
+            console.log("Client saved.");
+
+            loadClients();
+
+        } else {
+
+            alert(result.message || "Could not save client.");
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error("Error saving client:", error);
+
+        alert("Could not save client.");
+
+    });
+
+}
+
+
+// ======================================================
+// DELETE CLIENT
+// ======================================================
+
+function deleteClient(client) {
+
+    const confirmed = confirm(
+        `Delete ${client.first_name} ${client.last_name}?`
+    );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    fetch("/api/client/remove", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+            first_name: client.first_name,
+            last_name: client.last_name
+
+        })
+
+    })
+
+    .then(response => response.json())
+
+    .then(result => {
+
+        if (result.status === "success") {
+
+            loadClients();
+
+        } else {
+
+            alert(result.message || "Could not remove client.");
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error("Error deleting client:", error);
+
+        alert("Could not remove client.");
+
+    });
+
+}
+
+
+// ======================================================
+// ADD CLIENT
+// ======================================================
+
+addButton.addEventListener("click", function() {
+
+    alert("Add Client functionality coming next.");
+
+});
+
+
+// ======================================================
+// INITIAL LOAD
+// ======================================================
+
+loadClients();
+
+</script>
+
+</body>
+</html>
+
+
+
+

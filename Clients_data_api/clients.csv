@@ -1,0 +1,42 @@
+First Name,Last Name,Additional Name,Street Address,City,State,Zip,Reoccuring,Frequency,Type of Service,Additional Services,Type,Quote Price,Last Service Date,Next Service,Client ID
+Melissa,Holland,none,1513 SE Piccadilly,Blue Springs,MO,64015,yes,bi-weekly,Mowing/Trim,none,Residential,40.0,080426,081826,CL-A1B2C3D4
+Twila,Waggener,none,3001 SW McDaniels Street,Blue Springs,MO,64015,yes,bi-weekly,Mowing/Trim,One time clean up,Residential,40.0,071626,072326,CL-B2C3D4E5
+Sarah,Reinisch,none,124 NW Gaslight Lane,Blue Springs,MO,64014,yes,bi-weekly,Mowing/Trim,Just back Yard,Residential,45.0,072126,080426,CL-C3D4E5F6
+Nate,Scrivner,none,1008 Barley Lane,Buckner,MO,64016,yes,weekly,Mowing/Trim,none,Residential,45.0,080426,081126,CL-D4E5F6G7
+Ashely,Stockdall,none,1222 SW Windcrest Ct,Grain Valley,MO,64029,yes,bi-weekly,Mowing/Trim,none,Residential,70.0,072926,081226,CL-E5F6G7H8
+William,Mathieson,none,649 SW Gateway Ct,Grain Valley,MO,64029,yes,weekly,Mowing/Trim,none,Residential,70.0,080426,081126,CL-F6G7H8I9
+Brent,Chrisjohn,none,1507 Copeland Land,Greenwood,MO,64034,yes,bi-weekly,Mowing/Trim,none,Residential,40.0,072926,082626,CL-G7H8I9J0
+Misty,Vick,none,2201 Shelby Street,Higginsville,MO,64038,yes,bi-weekly,Mowing/Trim,none,Residential,45.0,072826,081126,CL-H8I9J0K1
+Judd,Westenburg,none,3511 Harvard Ave,Independence,MO,64052,yes,bi-weekly,Mowing/Trim,none,Residential,40.0,080426,081826,CL-I9J0K1L2
+Tanner,Scheweppe,none,1915 S Norton Ave,Independence,MO,64052,yes,bi-weekly,Mowing/Trim,none,Residential,35.0,072126,080426,CL-J0K1L2M3
+Erica,Murphy,none,7100 NW Waukomis Drive,Kansas City,MO,64151,yes,bi-weekly,Mowing/Trim,Fridays,Residential,100.0,080426,081826,CL-K1L2M3N4
+Lydia,Aviles,none,5122 Harvard Ave,Kansas City,MO,64133,yes,bi-weekly,Mowing/Trim,none,Residential,45.0,072126,080426,CL-L2M3N4O5
+Cindy,Battaglia,none,Lot 80G Lake Lafayette,Lake Lafayette,MO,64076,yes,bi-weekly,Mowing/Trim,none,Residential,45.0,070626,072026,CL-M3N4O5P6
+Matt,Vanpelt,none,200 NE Maggie Ave,Lee's Summit,MO,64063,yes,bi-weekly,Mowing/Trim,none,Residential,50.0,080526,081926,CL-N4O5P6Q7
+Napa Auto Parts,none,none,959 SE Oldham Pkwy,Lee's Summit,MO,64081,yes,bi-weekly,Mowing/Trim,none,Commerical,100.0,080526,081926,CL-O5P6Q7R8
+Travis,Brown,none,507 NE Magnolia Street,Lee's Summit,MO,64063,yes,bi-weekly,Mowing/Trim,Every other week,Residential,45.0,072226,080526,CL-P6Q7R8S9
+Samantha,Welsek,none,328 NW Gibson Road,Lee's Summit,MO,64063,yes,bi-weekly,Mowing/Trim,none,Residential,40.0,072926,081226,CL-Q7R8S9T0
+Maria,Srader - Check with First,none,911 SE Lea Dr,Lee's Summit,MO,64081,yes,weekly,Mowing/Trim,Every Monday,Residential,40.0,080526,081226,CL-R8S9T0U1
+Grace,Kouba - Check First,none,607 SW 1st Terrace,Lee's Summit,MO,64063,yes,weekly,Mowing/Trim,none,Residential,50.0,080526,081226,CL-S9T0U1V2
+Sally,McNevins,none,5118 SW Pelican Point,Lee's Summit,MO,64082,yes,weekly,Mowing/Trim,Every Thursday,Residential,40.0,080526,081226,CL-T0U1V2W3
+Tamra,Huntsmand,none,819 NW Autumn Lane,Lee's Summit,MO,64081,yes,bi-weekly,Mowing/Trim,Back Gate Code: 0216,Residential,50.0,080526,081926,CL-U1V2W3X4
+Ann,Heeter,none,310 NE Main Street,Lee's Summit,MO,64063,yes,bi-weekly,Mowing/Trim,none,Residential,45.0,080526,081926,CL-V2W3X4Y5
+Rebecca,Hendricks,none,600 NE Sundown Drive,Lee's Summit,Mo,64064,yes,bi-weekly,Mowing/Trim,7/14 or 7/15,Residential,50.0,072926,081226,CL-W3X4Y5Z6
+Eric,Cole,none,1833 NE Ravenwood,Lee's Summit,MO,64086,yes,weekly,Mowing/Trim,none,Residential,50.0,080526,081226,CL-X4Y5Z6A7
+Linda,Butcher,none,5114 SE Pelican Point,Lee's Summit,MO,64082,yes,weekly,Mowing/Trim,none,Residential,45.0,080526,081226,CL-Y5Z6A7B8
+Lora,Egar,none,509 NE Magnolia St,Lee's Summit,MO,64063,yes,weekly,Mowing/Trim,none,Residential,45.0,080526,081226,CL-Z6A7B8C9
+Nicholas,Helm,816 Renovations LLC,913 Roncelli Rad,Lexington,MO,64067,yes,bi-weekly,Mowing/Trim,$60 1st Time $45 After,Residential,60.0,072826,081126,CL-A7B8C9D0
+Debbie,Norris,none,36 Country Club Terr,Lexington,MO,64067,yes,weekly,Mowing/Trim,none,Residential,45.0,080426,081126,CL-B8C9D0E1
+Greg,Maupin,none,1633 High Drive,Lexington,MO,64067,yes,weekly,Mowing/Trim,Every Friday,Residential,45.0,072826,080426,CL-C9D0E1F2
+James,Brummett,none,2650 Old Stage Road,Mayview,MO,64071,yes,weekly,Mowing/Trim,none,Residential,100.0,080226,080926,CL-D0E1F2G3
+Mimi,Krasovec,none,415 S Russell,Oak Grove,MO,64075,yes,bi-weekly,Mowing/Trim,none,Residential,45.0,072826,081126,CL-E1F2G3H4
+Ashleigh,Carroll,none,305 SE 19th Street,Oak Grove,MO,64075,yes,bi-weekly,Mowing/Trim,none,Residential,45.0,080426,081826,CL-F2G3H4I5
+Billy,Smith,none,807 S 1st Street Terrace,Odessa,MO,64076,yes,bi-weekly,Mowing/Trim,none,Residential,40.0,080526,081926,CL-G3H4I5J6
+Lori,Seigler,none,U Hwy,Odessa,MO,64076,yes,bi-weekly,Mowing/Trim,none,Residential,70.0,072726,081026,CL-H4I5J6K7
+Seth,Howerton,none,712 W Main Street,Odessa,MO,64076,yes,bi-weekly,Mowing/Trim,none,Residential,45.0,080326,081726,CL-I5J6K7L8
+Shawn,Cramer,none,719 S Dryden,Odessa,MO,64076,yes,bi-weekly,Mowing/Trim,none,Residential,40.0,072826,081126,CL-J6K7L8M9
+Mike,Rudd,none,414 East Lawn Cr,Odessa,MO,64076,yes,weekly,Mowing/Trim,7-8 Days Mother's name Marica Rudd,Residential,45.0,080226,080926,CL-K7L8M9N0
+Heather,Reilly,none,9107 E 72nd Terr,Raytown,MO,64133,yes,bi-weekly,Mowing/Trim,none,Residential,40.0,080426,081826,CL-L8M9N0O1
+Eclipse Bar & Grill,none,none,6512 Raytown Rd,Raytown,MO,64133,yes,weekly,Mowing/Trim,none,Commerical,45.0,072926,080526,CL-M9N0O1P2
+VL Resotration LLC,none,none,1004 E 16th St,Sedalia,MO,65301,yes,bi-weekly,Mowing/Trim,none,Residential,50.0,073026,081326,CL-N0O1P2Q3
+Chris,Medina,none,206 E North Street,Warrensburg,MO,64093,yes,bi-weekly,Mowing/Trim,Only Front Yard,Residential,30.0,080326,081726,CL-O1P2Q3R4
