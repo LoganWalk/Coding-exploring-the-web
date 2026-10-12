@@ -1,0 +1,167 @@
+:root {
+  --neutral-color: #b9d4e6;
+  --primary-color: #ff2e3a;
+  --secondary-color: #2d3748;
+  --background-color: #faf6ee;
+  --shadow-xs: 1px 3px 1px #0a0a0a;
+  --shadow-sm: 3px 4px 2px #0a0a0a;
+  --shadow-md: 4px 6px 2px #0a0a0a;
+}
+.content {
+  animation: pageEnter 1s ease-out forwards;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 95px; /* Pushes page content down so it doesn't overlap the 75px navbar */
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  color: var(--neutral-color);
+  font-family: fantasy, monospace;
+  text-decoration: none;
+  font-size: 1.8em;
+  padding: 5px;
+  width: max-content;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+  transition-delay: 0s;
+  visibility: hidden;
+}
+.header:hover {
+  border: 1px solid var(--primary-color);
+  border-radius: 30px;
+  box-shadow: var(--shadow-xs);
+  font-size: 1.82em;
+  filter: brightness(0.95);
+  cursor: pointer;
+}
+.selected {
+  background-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+  color: var(--neutral-color);
+  font-family: fantasy, monospace;
+  text-decoration: none;
+  font-size: 1.85em;
+  padding: 5px;
+  border-radius: 30px;
+  filter: brightness(0.9);
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+  transition-delay: 0s;
+  visibility: hidden;
+}
+
+.buttons {
+  /* 1. FIX: Pull it out of the regular document flow and snap it to the right edge */
+  position: absolute;
+  right: 10px; /* 👈 Anchors the right edge 10px away from the screen wall */
+  top: 10px; /* Adjust vertical placement as needed */
+
+  display: flex;
+  width: 75px;
+  height: 75px;
+  justify-content: space-around;
+  align-items: center;
+  background-color: var(--secondary-color);
+  border-radius: 37.5px;
+  box-shadow: var(--shadow-md);
+  padding: 5px;
+  box-sizing: border-box;
+  flex-direction: row-reverse; /* Keeps inside items loaded right-to-left */
+  transition:
+    width 0.4s ease,
+    border-radius 0.4s ease;
+  overflow: hidden;
+  /* margin-right: 10px; Remove this since right: 10px replaces it */
+  /* margin-top: 10px;   Remove this since top: 10px replaces it */
+  z-index: 100;
+}
+.buttons:hover {
+  width: 100%;
+  border-radius: 37.5px;
+}
+.buttons:hover .header {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0.2s;
+}
+.buttons:hover .selected {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0.2s;
+}
+.circle-lines {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  width: 30px;
+  height: 20px;
+
+  /* =========================================================
+     FIX: EXPLORING CORNER BOUNDS
+     ========================================================= */
+  top: 38px; /* 👈 Pushes the lines 15px down from the top edge */
+  right: 32px; /* 👈 Pushes the lines 15px in from the right edge */
+
+  /* Remove old centering overrides completely */
+  bottom: auto;
+  margin: 0;
+  transform: none;
+
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+  z-index: 101;
+}
+
+/* Styling the individual horizontal bars */
+.circle-lines span {
+  display: block;
+  width: 100%;
+  height: 3px; /* Thickness of the lines */
+  background-color: var(--neutral-color); /* Uses your high-contrast gold */
+  border-radius: 2px;
+}
+
+/* =========================================================
+   HOVER HOOKS (THE MAGIC INTERACTIONS)
+   ========================================================= */
+
+/* 3. Hide the lines instantly when the user hovers over the navbar wrapper */
+.buttons:hover .circle-lines {
+  opacity: 0;
+  visibility: hidden;
+  transition-delay: 0s; /* Vanishes right away so buttons can slide in */
+}
+
+html {
+  background: var(--background-color);
+}
+.page {
+  border: 3px solid var(--secondary-color);
+  background-color: var(--primary-color);
+  color: var(--neutral-color);
+  font-family: fantasy, monospace;
+  border-radius: 15px;
+  padding: 5px;
+  width: fit-content;
+  height: fit-content;
+  box-shadow: var(--shadow-sm);
+}
