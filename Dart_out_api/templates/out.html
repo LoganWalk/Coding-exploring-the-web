@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dart Outs Out Page</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <nav>
+      <div class="circle-lines">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="buttons">
+        <a href="/statistics-page" class="header" id="head3">📊 Statistics</a>
+        <a href="/outs-page" class="selected" id="head2">🎯 Outs</a>
+        <a href="/" class="header" id="head1">🏠 Dashboard</a>
+      </div>
+      <nav>
+        <div class="content">
+          <h1 class="page">🎯 Outs</h1>
+
+
+          <div id = "start-num-box">
+            <input id = "start" placeholder = "Enter your starting number"> Enter your starting number</input>
+            <button type = "button" id = "startSubmit" name = "start">Submit</button>
+          </div>
+
+
+          <div id = "button-box" style = "display:none;">
+            <div>
+              <button type = "button" id = "steel-tip" name = "steel"> Steel Tip</button>
+            </div>
+            <div>
+              <button type = "button" id = "soft-tip" name = "soft">Soft Tip</button>
+            </div>
+          </div>
+
+          <div id = "input-box-steel">
+            <div id = "steel-box1"style = "display:none;">
+              <input id = "steel-input1"> Enter what you hit</input>
+              <button type = "button" id = "steel1Submit" name = "steel1">Submit</button>
+            </div>
+            <div id = "steel-box2"style = "display:none;">
+              <input id = "steel-input2"> Enter what you hit</input>
+              <button type = "button" id = "steel2Submit" name = "steel2">Submit</button>
+            </div>
+            <div id = "steel-box3"style = "display:none;">
+              <input id = "steel-input3"> Enter what you hit</input>
+              <button type = "button" id = "steel3Submit" name = "steel3">Submit</button>
+            </div>
+          </div>
+
+          <div id = "input-box-soft">
+            <div id = "soft-box1"style = "display:none;">
+              <input id = "soft-input1"> Enter what you hit</input>
+              <button type = "button" id = "soft1Submit" name = "soft1">Submit</button>
+            </div>
+            <div id = "soft-box2"style = "display:none;">
+              <input id = "soft-input2"> Enter what you hit</input>
+              <button type = "button" id = "soft2Submit" name = "soft2">Submit</button>
+            </div>
+            <div id = "soft-box3"style = "display:none;">
+              <input id = "soft-input3"> Enter what you hit</input>
+              <button type = "button" id = "soft3Submit" name = "soft3">Submit</button>
+            </div>
+          </div>
+          
+
+          
+            
+        </div>
+
+      </nav>
+    </nav>
+    <script src="{{ url_for('static', filename='server.js') }}"></script>
+  </body>
+</html>
