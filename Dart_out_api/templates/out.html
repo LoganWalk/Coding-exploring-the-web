@@ -21,63 +21,105 @@
         <a href="/outs-page" class="selected" id="head2">🎯 Outs</a>
         <a href="/" class="header" id="head1">🏠 Dashboard</a>
       </div>
-      <nav>
-        <div class="content">
-          <h1 class="page">🎯 Outs</h1>
-
-
-          <div id = "start-num-box">
-            <input id = "start" placeholder = "Enter your starting number"> Enter your starting number</input>
-            <button type = "button" id = "startSubmit" name = "start">Submit</button>
-          </div>
-
-
-          <div id = "button-box" style = "display:none;">
-            <div>
-              <button type = "button" id = "steel-tip" name = "steel"> Steel Tip</button>
-            </div>
-            <div>
-              <button type = "button" id = "soft-tip" name = "soft">Soft Tip</button>
-            </div>
-          </div>
-
-          <div id = "input-box-steel">
-            <div id = "steel-box1"style = "display:none;">
-              <input id = "steel-input1"> Enter what you hit</input>
-              <button type = "button" id = "steel1Submit" name = "steel1">Submit</button>
-            </div>
-            <div id = "steel-box2"style = "display:none;">
-              <input id = "steel-input2"> Enter what you hit</input>
-              <button type = "button" id = "steel2Submit" name = "steel2">Submit</button>
-            </div>
-            <div id = "steel-box3"style = "display:none;">
-              <input id = "steel-input3"> Enter what you hit</input>
-              <button type = "button" id = "steel3Submit" name = "steel3">Submit</button>
-            </div>
-          </div>
-
-          <div id = "input-box-soft">
-            <div id = "soft-box1"style = "display:none;">
-              <input id = "soft-input1"> Enter what you hit</input>
-              <button type = "button" id = "soft1Submit" name = "soft1">Submit</button>
-            </div>
-            <div id = "soft-box2"style = "display:none;">
-              <input id = "soft-input2"> Enter what you hit</input>
-              <button type = "button" id = "soft2Submit" name = "soft2">Submit</button>
-            </div>
-            <div id = "soft-box3"style = "display:none;">
-              <input id = "soft-input3"> Enter what you hit</input>
-              <button type = "button" id = "soft3Submit" name = "soft3">Submit</button>
-            </div>
-          </div>
-          
-
-          
-            
-        </div>
-
-      </nav>
     </nav>
+
+    <main class="content">
+      <h1 class="page">🎯 Outs</h1>
+
+      <!-- Step 1: out type -->
+      <form action="/out-type" method="POST">
+        <div id="button-box">
+          <div>
+            <button
+              type="submit"
+              id="double-out"
+              name="out_type"
+              value="double"
+            >
+              Double Out
+            </button>
+          </div>
+          <div>
+            <button
+              type="submit"
+              id="straight-out"
+              name="out_type"
+              value="straight"
+            >
+              Straight Out
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Step 2: starting number -->
+      <form action="/first-num" method="POST">
+        <div id="start-num-box" style="display: none">
+          <label for="start">Enter your starting number</label>
+          <input
+            id="start"
+            name="start"
+            type="number"
+            min="2"
+            max="501"
+            placeholder="Enter your starting number"
+            required
+          />
+          <button type="submit" id="startSubmit">Submit</button>
+        </div>
+      </form>
+
+      <!-- Steps 3-5: double out darts -->
+      <div id="input-box-double">
+        <form action="/first-dart-double" method="POST">
+          <div id="double-box1" style="display: none">
+            <label for="double-input1">Enter what you hit</label>
+            <input id="double-input1" name="hitDouble1" required />
+            <button type="submit" id="double-Submit1">Submit</button>
+          </div>
+        </form>
+        <form action="/second-dart-double" method="POST">
+          <div id="double-box2" style="display: none">
+            <label for="double-input2">Enter what you hit</label>
+            <input id="double-input2" name="hitDouble2" required />
+            <button type="submit" id="double-Submit2">Submit</button>
+          </div>
+        </form>
+        <form action="/third-dart-double" method="POST">
+          <div id="double-box3" style="display: none">
+            <label for="double-input3">Enter what you hit</label>
+            <input id="double-input3" name="hitDouble3" required />
+            <button type="submit" id="double-Submit3">Submit</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Steps 3-5: straight out darts -->
+      <div id="input-box-straight">
+        <form action="/first-dart-straight" method="POST">
+          <div id="straight-box1" style="display: none">
+            <label for="straight-input1">Enter what you hit</label>
+            <input id="straight-input1" name="hitStraight1" required />
+            <button type="submit" id="straight-Submit1">Submit</button>
+          </div>
+        </form>
+        <form action="/second-dart-straight" method="POST">
+          <div id="straight-box2" style="display: none">
+            <label for="straight-input2">Enter what you hit</label>
+            <input id="straight-input2" name="hitStraight2" required />
+            <button type="submit" id="straight-Submit2">Submit</button>
+          </div>
+        </form>
+        <form action="/third-dart-straight" method="POST">
+          <div id="straight-box3" style="display: none">
+            <label for="straight-input3">Enter what you hit</label>
+            <input id="straight-input3" name="hitStraight3" required />
+            <button type="submit" id="straight-Submit3">Submit</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
     <script src="{{ url_for('static', filename='server.js') }}"></script>
   </body>
 </html>
