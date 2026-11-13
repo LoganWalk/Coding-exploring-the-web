@@ -15,31 +15,7 @@
     <a href="/revenue-page">💰 Revenue Analytics</a>
     <a href="/" style="color: var(--accent); background: var(--accent-soft);">📅 Work Agenda</a>
     <a href="/client-page">🧑 Clients</a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <img src = "https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw", width = "60", height = "60">
+    <img id = "image" src = "https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw", width = "60", height = "60">
 </nav>
 
 
@@ -51,6 +27,7 @@
         <button id="save-button">💾 Save Schedule</button>
         <button id="edit-button" style="display:none;">✏️ Edit Schedule</button>
         <button id="email-button" style="display:none;">📧 Email Schedule</button>
+        <button id="finish-week-button" style="display:none;">✅ Finish Week</button>
         <button id="reset-button">🔄 Reset Schedule</button>
     </div>
     
@@ -339,6 +316,12 @@
                         $0.00
                     </p>
 
+                    <h3>Money Owed (Unpaid)</h3>
+
+                    <p class="revenue-number" id="unpaid-revenue">
+                        $0.00
+                    </p>
+
                 </div>
                 <div id="group-routes-section" style="display: none;">
 
@@ -346,7 +329,9 @@
 
                 <h3>🗺️ Group Routes</h3>
 
-                <p>N/A</p>
+                <div id="group-routes-list">
+                    <p>No scheduled clients yet.</p>
+                </div>
 
             </div>
 
@@ -379,7 +364,7 @@
 
             <p>
                 <strong>Address:</strong>
-                <span id="modal-address"></span>
+                <a id="modal-address" class="map-link" href="#" target="_blank" rel="noopener"></a>
             </p>
 
             <p>
@@ -435,6 +420,11 @@
             <p>
                 <strong>Next Service:</strong>
                 <span id="modal-next-service"></span>
+            </p>
+
+            <p>
+                <strong>Payment:</strong>
+                <span id="modal-payment"></span>
             </p>
 
         </div>
@@ -536,7 +526,7 @@ let allClients = [];
 
 function loadClients() {
 
-    fetch('/api/clients/all')
+    return fetch('/api/clients/all')
 
         .then(response => {
 
@@ -951,26 +941,6 @@ function parseClientDate(dateString) {
 
     return date;
 
-
-
-    card.addEventListener(
-        'dragend',
-        function() {
-
-            card.classList.remove(
-                'dragging'
-            );
-
-            draggedClient = null;
-
-            dragSource = null;
-
-            draggedRecommendation = null;
-        }
-    );
-
-
-    return card;
 }
 
 /* =========================================================
@@ -1457,6 +1427,22 @@ setupRecommendationDropZones();
    CLIENT INFORMATION MODAL
    ========================================================= */
 
+function mapsUrl(client) {
+
+    const parts = [
+        client.street_address,
+        client.city,
+        client.state,
+        client.zip
+    ]
+        .map(part => String(part || '').trim())
+        .filter(Boolean);
+
+    return 'https://www.google.com/maps/search/?api=1&query=' +
+        encodeURIComponent(parts.join(', '));
+}
+
+
 function openClientModal(client) {
 
     document.getElementById(
@@ -1471,10 +1457,15 @@ function openClientModal(client) {
         client.additional_name || 'None';
 
 
-    document.getElementById(
-        'modal-address'
-    ).textContent =
-        client.street_address || '';
+    const modalAddress = document.getElementById('modal-address');
+
+    modalAddress.textContent = client.street_address || '';
+
+    if (client.street_address) {
+        modalAddress.href = mapsUrl(client);
+    } else {
+        modalAddress.removeAttribute('href');
+    }
 
 
     document.getElementById(
@@ -1529,6 +1520,25 @@ function openClientModal(client) {
         'modal-price'
     ).textContent =
         client.quote_price || '0.00';
+
+
+    const paymentEl = document.getElementById('modal-payment');
+
+    if (!client.job_count) {
+
+        paymentEl.textContent = 'No completed jobs yet';
+
+    } else if (client.unpaid_count > 0) {
+
+        paymentEl.textContent =
+            'Owes $' + Number(client.unpaid_total).toFixed(2) +
+            ' (' + client.unpaid_count + ' unpaid ' +
+            (client.unpaid_count === 1 ? 'job' : 'jobs') + ')';
+
+    } else {
+
+        paymentEl.textContent = 'Paid up';
+    }
 
 
     document.getElementById(
@@ -1634,7 +1644,9 @@ function createScheduledCard(client) {
 
         <div>
             ${client.city},
-            ${client.street_address}
+            ${client.street_address
+                ? `<a class="map-link" href="${mapsUrl(client)}" target="_blank" rel="noopener" draggable="false" onclick="event.stopPropagation()">${client.street_address}</a>`
+                : ''}
         </div>
 
         <div>
@@ -2214,6 +2226,70 @@ let completedJobs = [];
    RENDER COMPLETED JOBS
    ========================================================= */
 
+/* =========================================================
+   PAID / UNPAID
+
+   Marks one completed job paid or unpaid on the server (which
+   updates both the current list and the permanent history),
+   then refreshes the list and the revenue numbers.
+   ========================================================= */
+
+async function setJobPaid(job, paid) {
+
+    if (!job.job_id) {
+        alert('This job has no ID yet — refresh the page and try again.');
+        return;
+    }
+
+    try {
+
+        const response = await fetch('/api/jobs/paid', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                job_id: job.job_id,
+                paid: paid
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.status !== 'success') {
+            alert(result.message || 'Could not update payment.');
+            return;
+        }
+
+        job.paid = paid;
+
+        /*
+         * Keep this client's payment status in step, so their
+         * info popup doesn't show stale numbers.
+         */
+        const owner = findClientById(job.client_id);
+
+        if (owner) {
+
+            const amount = Number(job.amount || 0);
+
+            owner.unpaid_count =
+                Math.max(0, (owner.unpaid_count || 0) + (paid ? -1 : 1));
+
+            owner.unpaid_total =
+                Math.max(0, (owner.unpaid_total || 0) + (paid ? -amount : amount));
+        }
+
+        renderCompletedJobs();
+
+        refreshRevenueDisplay();
+
+    } catch (error) {
+
+        console.error('Error updating payment:', error);
+        alert('Could not update payment.');
+    }
+}
+
+
 function renderCompletedJobs() {
 
     const completedList =
@@ -2286,8 +2362,19 @@ function renderCompletedJobs() {
             </div>
 
             <div>
-                $${client.quote_price || '0.00'}
+                $${Number(
+                    client.amount !== undefined
+                        ? client.amount
+                        : client.quote_price || 0
+                ).toFixed(2)}
+                <span class="paid-badge ${client.paid ? 'paid' : 'unpaid'}">
+                    ${client.paid ? 'Paid' : 'Unpaid'}
+                </span>
             </div>
+
+            <button type="button" class="paid-toggle">
+                ${client.paid ? 'Mark unpaid' : 'Mark paid'}
+            </button>
 
             <small>
                 Click to view client
@@ -2295,16 +2382,35 @@ function renderCompletedJobs() {
 
         `;
 
+        completedCard
+            .querySelector('.paid-toggle')
+            .addEventListener(
+                'click',
+                function(event) {
+
+                    // Don't also open the client popup.
+                    event.stopPropagation();
+
+                    setJobPaid(client, !client.paid);
+
+                }
+            );
+
 
         /*
-         * Clicking the completed job opens
-         * the existing client information modal.
+         * Clicking the completed job opens the client info
+         * modal. The completed-job record itself only stores
+         * a handful of fields (name, city, service, amount,
+         * date) — look up the full client record by ID so the
+         * modal isn't full of blanks.
          */
         completedCard.addEventListener(
             'click',
             function() {
 
-                openClientModal(client);
+                const fullClient = findClientById(client.client_id);
+
+                openClientModal(fullClient || client);
 
             }
         );
@@ -2561,7 +2667,7 @@ function buildMowingChecklist() {
                             * the job.
                             */
 
-                            completeJob(client);
+                            
 
                             /*
                             * Remove from mowing checklist.
@@ -2577,15 +2683,27 @@ function buildMowingChecklist() {
 
                             /*
                             * Update completed jobs.
+                            *
+                            * Re-fetch the full list from the
+                            * server rather than guessing the
+                            * shape locally, so it always
+                            * matches what's actually persisted.
                             */
 
-                            renderCompletedJobs();
+                            loadCompletedJobs();
 
                             /*
                             * Update revenue.
                             */
 
-                            updateRevenue();
+                            refreshRevenueDisplay();
+
+                            /*
+                            * Update Group Routes, since the set
+                            * of scheduled clients just changed.
+                            */
+
+                            buildGroupRoutes();
 
                         }
 
@@ -2696,6 +2814,58 @@ buildMowingChecklist();
     console.log('Mowing Mode active.');
 
 }
+
+
+/* =========================================================
+   EXIT MOWING MODE
+
+   Reverses enterMowingMode() so the schedule is editable
+   again. Scheduled clients that are already marked done were
+   already removed from the calendar by the checkbox handler,
+   so whatever's still on the board — the not-yet-done
+   clients — is simply left exactly where it is.
+   ========================================================= */
+
+function exitMowingMode() {
+
+    console.log('Exiting Mowing Mode...');
+
+    const sidebar =
+        document.querySelector('.calendar-sidebar');
+
+    if (sidebar) {
+        sidebar.style.display = '';
+    }
+
+    document
+        .querySelectorAll('.scheduled-client')
+        .forEach(card => {
+
+            card.draggable = true;
+
+            card.classList.remove('mowing-mode-locked');
+
+        });
+
+    document
+        .querySelectorAll('.drop-zone')
+        .forEach(zone => {
+
+            zone.classList.remove('mowing-mode-locked');
+
+        });
+
+    document.body.classList.remove('mowing-mode');
+
+    const checklist = document.getElementById('mowing-checklist');
+
+    if (checklist) {
+        checklist.style.display = 'none';
+    }
+
+    console.log('Mowing Mode exited — schedule is editable again.');
+}
+
 
 /* =========================================================
    BUTTONS
@@ -2880,14 +3050,23 @@ document
                     .style.display =
                     'inline-block';
 
+                document
+                    .getElementById(
+                        'finish-week-button'
+                    )
+                    .style.display =
+                    'inline-block';
+
                 document.getElementById('revenue-section').style.display = 'block';
+                refreshRevenueDisplay();
 
                 const groupRoutesSection =
                     document.getElementById('group-routes-section');
 
                 if (groupRoutesSection) {
                     groupRoutesSection.style.display = 'block';
-}
+                    buildGroupRoutes();
+                }
 
             }
 
@@ -2918,6 +3097,8 @@ document
     .addEventListener(
         'click',
         function() {
+
+            exitMowingMode();
 
             document
                 .getElementById(
@@ -2950,6 +3131,13 @@ document
                 .style.display =
                 'none';
 
+            document
+                .getElementById(
+                    'finish-week-button'
+                )
+                .style.display =
+                'none';
+
             document.getElementById('revenue-section').style.display = 'none';
             const groupRoutesSection =
                 document.getElementById('group-routes-section');
@@ -2962,11 +3150,415 @@ document
     );
 
 
+/* =========================================================
+   CLIENT LOOKUP HELPERS
+   ========================================================= */
+
+function findClientById(clientId) {
+
+    if (!clientId) {
+        return null;
+    }
+
+    return allClients.find(
+        c => c.client_id === clientId
+    ) || null;
+}
+
+
+function findClientByName(firstName, lastName) {
+
+    const first =
+        String(firstName || '').trim().toLowerCase();
+
+    const last =
+        String(lastName || '').trim().toLowerCase();
+
+    if (!first && !last) {
+        return null;
+    }
+
+    return allClients.find(c =>
+        String(c.first_name || '').trim().toLowerCase() === first &&
+        String(c.last_name || '').trim().toLowerCase() === last
+    ) || null;
+}
+
+
+/* =========================================================
+   LOAD SAVED SCHEDULE (persistence across page refresh)
+
+   Rebuilds the calendar from whatever is currently saved
+   for this week. Each saved entry only carries a few fields
+   (client_id, name, city, frequency, next_service), so it's
+   merged with the full client record from allClients to get
+   everything createScheduledCard() needs (address, price,
+   etc).
+
+   If this week was already saved (savedAt is set), the page
+   resumes the "saved" UI state — Mowing Mode included —
+   instead of showing it as freshly editable.
+   ========================================================= */
+
+async function loadSavedSchedule() {
+
+    let data;
+
+    try {
+
+        const response = await fetch('/api/calendar/schedule');
+
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+        }
+
+        data = await response.json();
+
+    } catch (error) {
+
+        console.error('Could not load saved schedule:', error);
+        return;
+    }
+
+    const schedule = data.schedule || {};
+
+    const days = [
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday'
+    ];
+
+    let anyScheduled = false;
+
+    days.forEach(day => {
+
+        const entries = schedule[day];
+
+        if (!Array.isArray(entries) || entries.length === 0) {
+            return;
+        }
+
+        const zone = document.getElementById(day);
+
+        if (!zone) {
+            return;
+        }
+
+        entries.forEach(entry => {
+
+            const fullClient =
+                findClientById(entry.client_id) ||
+                findClientByName(entry.first_name, entry.last_name);
+
+            const client = fullClient
+                ? Object.assign({}, fullClient, entry)
+                : entry;
+
+            /*
+             * This client is already on the calendar —
+             * remove them from the client directory and
+             * Recommendations so they aren't shown twice.
+             *
+             * This MUST happen before the scheduled card is
+             * added: removeClientEverywhere() also matches
+             * .scheduled-client cards, so running it after
+             * would delete the card we just built.
+             */
+            removeClientEverywhere(client);
+
+            const card = createScheduledCard(client);
+
+            zone.appendChild(card);
+
+            anyScheduled = true;
+
+        });
+
+    });
+
+    if (anyScheduled) {
+        buildGroupRoutes();
+    }
+
+    /*
+     * If this week was already saved before the refresh,
+     * resume the saved/Mowing Mode UI state instead of
+     * leaving it as freshly editable.
+     */
+    if (data.savedAt) {
+
+        document.getElementById('save-button').style.display = 'none';
+        document.getElementById('reset-button').style.display = 'none';
+        document.getElementById('edit-button').style.display = 'inline-block';
+        document.getElementById('email-button').style.display = 'inline-block';
+        document.getElementById('finish-week-button').style.display = 'inline-block';
+
+        const revenueSection = document.getElementById('revenue-section');
+
+        if (revenueSection) {
+            revenueSection.style.display = 'block';
+        }
+
+        const groupRoutesSection = document.getElementById('group-routes-section');
+
+        if (groupRoutesSection) {
+            groupRoutesSection.style.display = 'block';
+        }
+
+        enterMowingMode();
+    }
+}
+
+
+/* =========================================================
+   LOAD COMPLETED JOBS (persist across refresh / restart)
+   ========================================================= */
+
+async function loadCompletedJobs() {
+
+    try {
+
+        const response = await fetch('/api/completed-jobs');
+
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+        }
+
+        completedJobs = await response.json();
+
+    } catch (error) {
+
+        console.error('Could not load completed jobs:', error);
+        completedJobs = [];
+    }
+
+    renderCompletedJobs();
+}
+
+
+/* =========================================================
+   REFRESH REVENUE DISPLAY (the mini panel in the calendar
+   sidebar — separate from the full Revenue Analytics page)
+   ========================================================= */
+
+async function refreshRevenueDisplay() {
+
+    let data;
+
+    try {
+
+        const response = await fetch('/api/revenue/actual');
+
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+        }
+
+        data = await response.json();
+
+    } catch (error) {
+
+        console.error('Could not load revenue totals:', error);
+        return;
+    }
+
+    const dailyEl = document.getElementById('daily-revenue');
+    const weeklyEl = document.getElementById('weekly-revenue');
+    const monthlyEl = document.getElementById('monthly-revenue');
+
+    if (dailyEl) {
+        dailyEl.textContent = '$' + Number(data.today_revenue).toFixed(2);
+    }
+
+    if (weeklyEl) {
+        weeklyEl.textContent = '$' + Number(data.week_revenue).toFixed(2);
+    }
+
+    if (monthlyEl) {
+        monthlyEl.textContent = '$' + Number(data.month_revenue).toFixed(2);
+    }
+
+    const unpaidEl = document.getElementById('unpaid-revenue');
+
+    if (unpaidEl) {
+        unpaidEl.textContent = '$' + Number(data.unpaid_total || 0).toFixed(2);
+    }
+}
+
+
+/* =========================================================
+   GROUP ROUTES
+
+   Groups this week's scheduled clients by city, per day, as
+   a first pass toward route planning. Ordering stops within
+   a city (for actual driving order) is a further step once
+   you have real address/routing data to sort by.
+   ========================================================= */
+
+function buildGroupRoutes() {
+
+    const container = document.getElementById('group-routes-list');
+
+    if (!container) {
+        return;
+    }
+
+    const days = [
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday'
+    ];
+
+    const dayLabels = {
+        monday: 'Monday',
+        tuesday: 'Tuesday',
+        wednesday: 'Wednesday',
+        thursday: 'Thursday',
+        friday: 'Friday'
+    };
+
+    let html = '';
+
+    days.forEach(day => {
+
+        const zone = document.getElementById(day);
+
+        if (!zone) {
+            return;
+        }
+
+        const cards = zone.querySelectorAll('.scheduled-client');
+
+        if (cards.length === 0) {
+            return;
+        }
+
+        /*
+         * Group this day's clients by city.
+         */
+        const byCity = {};
+
+        cards.forEach(card => {
+
+            const city = card.dataset.city || 'Unknown';
+
+            if (!byCity[city]) {
+                byCity[city] = [];
+            }
+
+            byCity[city].push(
+                `${card.dataset.firstName} ${card.dataset.lastName}`
+            );
+
+        });
+
+        html += `<h4>${dayLabels[day]}</h4>`;
+
+        Object.keys(byCity)
+            .sort()
+            .forEach(city => {
+
+                html += `
+                    <div class="route-group">
+                        <strong>${city}</strong>
+                        <ul>
+                            ${byCity[city]
+                                .map(name => `<li>${name}</li>`)
+                                .join('')}
+                        </ul>
+                    </div>
+                `;
+
+            });
+
+    });
+
+    container.innerHTML =
+        html || '<p>No scheduled clients yet.</p>';
+}
+
+
+/* =========================================================
+   GENERATE EMAIL INFO FROM THE SAVED SCHEDULE
+
+   Builds the day-by-day client info an email would need
+   (name, address, service type, next service date) from
+   whatever is currently on the calendar. Actually SENDING
+   email is a separate step for later — this just prepares
+   the data and gives you a readable preview of it.
+   ========================================================= */
+
+function buildEmailInfo() {
+
+    const days = [
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday'
+    ];
+
+    const emailInfo = {};
+
+    days.forEach(day => {
+
+        const zone = document.getElementById(day);
+
+        if (!zone) {
+            return;
+        }
+
+        const dayEntries = [];
+
+        zone
+            .querySelectorAll('.scheduled-client')
+            .forEach(card => {
+
+                const fullClient =
+                    findClientById(card.dataset.clientId) ||
+                    findClientByName(
+                        card.dataset.firstName,
+                        card.dataset.lastName
+                    );
+
+                dayEntries.push({
+                    first_name: card.dataset.firstName || '',
+                    last_name: card.dataset.lastName || '',
+                    city: card.dataset.city || '',
+                    street_address:
+                        fullClient
+                            ? fullClient.street_address || ''
+                            : '',
+                    type_of_service:
+                        fullClient
+                            ? fullClient.type_of_service || ''
+                            : '',
+                    next_service: card.dataset.nextService || ''
+                });
+
+            });
+
+        if (dayEntries.length > 0) {
+            emailInfo[day] = dayEntries;
+        }
+
+    });
+
+    return emailInfo;
+}
+
+
 /*
  * EMAIL SCHEDULE
  *
- * We will connect this after
- * Save is confirmed working.
+ * Generates the info needed for client emails from the
+ * saved schedule. Actually sending these is a later step —
+ * for now this logs the structured data (ready to hand to
+ * whatever email system gets connected) and shows a quick
+ * readable summary.
  */
 document
     .getElementById('email-button')
@@ -2974,9 +3566,84 @@ document
         'click',
         function() {
 
+            const emailInfo = buildEmailInfo();
+
+            const dayKeys = Object.keys(emailInfo);
+
+            if (dayKeys.length === 0) {
+                alert('No scheduled clients to generate email info for.');
+                return;
+            }
+
+            console.log('Email info generated:', emailInfo);
+
+            const summaryLines = dayKeys.map(day => {
+
+                const names = emailInfo[day]
+                    .map(entry => `${entry.first_name} ${entry.last_name}`)
+                    .join(', ');
+
+                return `${day.charAt(0).toUpperCase()}${day.slice(1)}: ${names}`;
+
+            });
+
             alert(
-                'Email feature will be connected next.'
+                'Email info generated (see console for full details):\n\n' +
+                summaryLines.join('\n')
             );
+
+        }
+    );
+
+
+/*
+ * FINISH WEEK
+ *
+ * Clears the Completed Jobs list so next week starts fresh.
+ * Revenue totals (This Month, Total) are unaffected — they're
+ * tracked separately in a permanent history that this never
+ * touches.
+ */
+document
+    .getElementById('finish-week-button')
+    .addEventListener(
+        'click',
+        async function() {
+
+            const confirmed = confirm(
+                'Finish this week?\n\n' +
+                'This clears the Completed Jobs list so next ' +
+                'week starts fresh. Revenue totals (This Month, ' +
+                'Total) are not affected.'
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+
+                const response = await fetch('/api/finish-week', {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (result.status !== 'success') {
+                    alert(result.message || 'Could not finish the week.');
+                    return;
+                }
+
+                completedJobs = [];
+                renderCompletedJobs();
+
+                alert('Week finished. Completed jobs list has been reset.');
+
+            } catch (error) {
+
+                console.error('Error finishing week:', error);
+                alert('Could not finish the week.');
+            }
 
         }
     );
@@ -2988,7 +3655,18 @@ document
 
 loadCalendarDates();
 
-loadClients();
+loadClients()
+    .then(() => loadSavedSchedule())
+    .catch(error => {
+        console.error(
+            'Could not initialize calendar from saved data:',
+            error
+        );
+    });
+
+loadCompletedJobs();
+
+refreshRevenueDisplay();
 
 
 
@@ -2996,7 +3674,3 @@ loadClients();
 
 </body>
 </html>
-
-
-
-

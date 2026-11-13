@@ -1,127 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Client List</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
 
-<body>
-
-<nav>
-    <a href="/">🏠 Dashboard</a>
-    <a href="/revenue-page">💰 Revenue Analytics</a>
-    <a href="/calendar-page">📅 Work Agenda</a>
-    <a href="/client-page"
-       style="color: var(--accent); background: var(--accent-soft);">
+  <body>
+    <nav>
+      <a href="/">🏠 Dashboard</a>
+      <a href="/revenue-page">💰 Revenue Analytics</a>
+      <a href="/calendar-page">📅 Work Agenda</a>
+      <a
+        href="/client-page"
+        style="color: var(--accent); background: var(--accent-soft)"
+      >
         🧑 Clients
-    </a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <a></a>
-    <img src = "https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw", width = "60", height = "60">
-</nav>
+      </a>
+      <img
+        id="image"
+        src="https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw"
+        ,
+        width="60"
+        ,
+        height="60"
+      />
+    </nav>
 
+    <div class="content">
+      <h1>🧑 Client Managing Page</h1>
 
-<div class="content">
+      <h2>Clients:</h2>
 
-    <h1>🧑 Client Managing Page</h1>
+      <h3>
+        Client Action Instructions: left click = edit info, right click = remove
+        client, add button = add client
+      </h3>
+    </div>
 
-    <h2>Clients:</h2>
+    <div class="client-actions">
+      <button id="add-button">+ Add Client</button>
+    </div>
 
-    <h3>
-        Client Action Instructions:
-        left click = edit info,
-        right click = remove client,
-        add button = add client
-    </h3>
+    <div id="client-list"></div>
 
-</div>
+    <script>
+      const clientList = document.getElementById("client-list");
+      const addButton = document.getElementById("add-button");
 
+      // ======================================================
+      // PAID / UNPAID BADGE
+      // ======================================================
 
-<div class="client-actions">
-    <button id="add-button">+ Add Client</button>
-</div>
+      function paymentBadge(client) {
+        if (!client.job_count) {
+          return "";
+        }
 
+        if (client.unpaid_count > 0) {
+          const jobs = client.unpaid_count === 1 ? "job" : "jobs";
 
-<div id="client-list"></div>
+          return `<span class="paid-badge unpaid" title="${client.unpaid_count} unpaid ${jobs}">Owes $${Number(client.unpaid_total).toFixed(2)}</span>`;
+        }
 
+        return `<span class="paid-badge paid">Paid up</span>`;
+      }
 
-<script>
+      // ======================================================
+      // GOOGLE MAPS LINK
+      // ======================================================
 
-const clientList = document.getElementById("client-list");
-const addButton = document.getElementById("add-button");
+      function mapsUrl(client) {
+        const parts = [
+          client.street_address,
+          client.city,
+          client.state,
+          client.zip,
+        ]
+          .map((part) => String(part || "").trim())
+          .filter(Boolean);
 
+        return (
+          "https://www.google.com/maps/search/?api=1&query=" +
+          encodeURIComponent(parts.join(", "))
+        );
+      }
 
-// ======================================================
-// LOAD CLIENTS
-// ======================================================
+      // ======================================================
+      // LOAD CLIENTS
+      // ======================================================
 
-function loadClients() {
+      function loadClients() {
+        clientList.innerHTML = "";
 
-    clientList.innerHTML = "";
-
-    fetch("/api/clients/all")
-        .then(response => response.json())
-        .then(clients => {
-
+        fetch("/api/clients/all")
+          .then((response) => response.json())
+          .then((clients) => {
             console.log("Loaded clients:", clients.length);
 
-            clients.forEach(client => {
-                createClientCard(client);
+            clients.forEach((client) => {
+              createClientCard(client);
             });
-
-        })
-        .catch(error => {
-
+          })
+          .catch((error) => {
             console.error("Could not load clients:", error);
 
-            clientList.innerHTML =
-                "<p>Could not load clients.</p>";
-        });
-}
+            clientList.innerHTML = "<p>Could not load clients.</p>";
+          });
+      }
 
+      // ======================================================
+      // CREATE CLIENT CARD
+      // ======================================================
 
-// ======================================================
-// CREATE CLIENT CARD
-// ======================================================
+      function createClientCard(client) {
+        const card = document.createElement("div");
 
-function createClientCard(client) {
+        card.className = "client-card";
 
-    const card = document.createElement("div");
-
-    card.className = "client-card";
-
-    card.innerHTML = `
+        card.innerHTML = `
 
         <div class="client-header">
             <h2>
                 ${client.first_name}
                 ${client.last_name}
+                ${paymentBadge(client)}
             </h2>
         </div>
 
@@ -134,7 +143,7 @@ function createClientCard(client) {
 
             <p>
                 <strong>Address:</strong>
-                ${client.street_address}
+                <a class="map-link" href="${mapsUrl(client)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${client.street_address}</a>
             </p>
 
             <p>
@@ -196,42 +205,33 @@ function createClientCard(client) {
 
     `;
 
+        // ==================================================
+        // LEFT CLICK = EDIT
+        // ==================================================
 
-    // ==================================================
-    // LEFT CLICK = EDIT
-    // ==================================================
+        card.addEventListener("click", function () {
+          editClient(card, client);
+        });
 
-    card.addEventListener("click", function() {
+        // ==================================================
+        // RIGHT CLICK = DELETE
+        // ==================================================
 
-        editClient(card, client);
+        card.addEventListener("contextmenu", function (event) {
+          event.preventDefault();
 
-    });
+          deleteClient(client);
+        });
 
+        clientList.appendChild(card);
+      }
 
-    // ==================================================
-    // RIGHT CLICK = DELETE
-    // ==================================================
+      // ======================================================
+      // EDIT CLIENT
+      // ======================================================
 
-    card.addEventListener("contextmenu", function(event) {
-
-        event.preventDefault();
-
-        deleteClient(client);
-
-    });
-
-
-    clientList.appendChild(card);
-}
-
-
-// ======================================================
-// EDIT CLIENT
-// ======================================================
-
-function editClient(card, client) {
-
-    card.innerHTML = `
+      function editClient(card, client) {
+        card.innerHTML = `
 
         <div class="client-edit">
 
@@ -306,223 +306,284 @@ function editClient(card, client) {
 
     `;
 
+        const inputs = card.querySelectorAll("input");
 
-    const inputs = card.querySelectorAll("input");
+        // Put cursor in first input
+        inputs[0].focus();
 
+        // ==============================================
+        // ENTER = SAVE
+        // ESCAPE = CANCEL
+        // ==============================================
 
-    // Put cursor in first input
-    inputs[0].focus();
-
-
-    // ==============================================
-    // ENTER = SAVE
-    // ESCAPE = CANCEL
-    // ==============================================
-
-    inputs.forEach(input => {
-
-        input.addEventListener("keydown", function(event) {
-
+        inputs.forEach((input) => {
+          input.addEventListener("keydown", function (event) {
             if (event.key === "Enter") {
-
-                saveClient(card, client);
-
+              saveClient(card, client);
             }
 
             if (event.key === "Escape") {
+              loadClients();
+            }
+          });
+        });
+      }
 
-                loadClients();
+      // ======================================================
+      // SAVE CLIENT
+      // ======================================================
 
+      function saveClient(card, oldClient) {
+        const updatedClient = {
+          old_first_name: oldClient.first_name,
+          old_last_name: oldClient.last_name,
+
+          first_name: document.getElementById("edit-first-name").value,
+
+          last_name: document.getElementById("edit-last-name").value,
+
+          additional_name: document.getElementById("edit-additional-name")
+            .value,
+
+          street_address: document.getElementById("edit-street-address").value,
+
+          city: document.getElementById("edit-city").value,
+
+          state: document.getElementById("edit-state").value,
+
+          zip: document.getElementById("edit-zip").value,
+
+          reoccuring: document.getElementById("edit-reoccuring").value,
+
+          frequency: document.getElementById("edit-frequency").value,
+
+          type_of_service: document.getElementById("edit-type-of-service")
+            .value,
+
+          additional_service: document.getElementById("edit-additional-service")
+            .value,
+
+          type: document.getElementById("edit-type").value,
+
+          quote_price: document.getElementById("edit-quote-price").value,
+
+          last_service_date: document.getElementById("edit-last-service-date")
+            .value,
+
+          next_service: document.getElementById("edit-next-service").value,
+        };
+
+        fetch("/api/client/edit", {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify(updatedClient),
+        })
+          .then((response) => response.json())
+
+          .then((result) => {
+            if (result.status === "success") {
+              console.log("Client saved.");
+
+              loadClients();
+            } else {
+              alert(result.message || "Could not save client.");
+            }
+          })
+
+          .catch((error) => {
+            console.error("Error saving client:", error);
+
+            alert("Could not save client.");
+          });
+      }
+
+      // ======================================================
+      // DELETE CLIENT
+      // ======================================================
+
+      function deleteClient(client) {
+        const confirmed = confirm(
+          `Delete ${client.first_name} ${client.last_name}?`,
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        fetch("/api/client/remove", {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            first_name: client.first_name,
+            last_name: client.last_name,
+          }),
+        })
+          .then((response) => response.json())
+
+          .then((result) => {
+            if (result.status === "success") {
+              loadClients();
+            } else {
+              alert(result.message || "Could not remove client.");
+            }
+          })
+
+          .catch((error) => {
+            console.error("Error deleting client:", error);
+
+            alert("Could not remove client.");
+          });
+      }
+
+      // ======================================================
+      // ADD CLIENT
+      // ======================================================
+
+      addButton.addEventListener("click", function () {
+        const card = document.createElement("div");
+        card.className = "client-card";
+
+        card.innerHTML = `
+          <div class="client-edit">
+              <h2>Add New Client</h2>
+
+              <label>First Name</label>
+              <input id="add-first-name" value="">
+
+              <label>Last Name</label>
+              <input id="add-last-name" value="">
+
+              <label>Additional Name</label>
+              <input id="add-additional-name" value="none">
+
+              <label>Street Address</label>
+              <input id="add-street-address" value="">
+
+              <label>City</label>
+              <input id="add-city" value="">
+
+              <label>State</label>
+              <input id="add-state" value="MO">
+
+              <label>ZIP</label>
+              <input id="add-zip" value="">
+
+              <label>Recurring (yes/no)</label>
+              <input id="add-reoccuring" value="yes">
+
+              <label>Frequency (weekly/bi-weekly)</label>
+              <input id="add-frequency" value="weekly">
+
+              <label>Type of Service</label>
+              <input id="add-type-of-service" value="Mowing/Trim">
+
+              <label>Additional Service</label>
+              <input id="add-additional-service" value="none">
+
+              <label>Type (Residential/Commerical)</label>
+              <input id="add-type" value="Residential">
+
+              <label>Quote Price</label>
+              <input id="add-quote-price" type="number" step="0.01" value="0">
+
+              <label>Last Service Date (MMDDYY)</label>
+              <input id="add-last-service-date" value="">
+
+              <label>Next Service (MMDDYY)</label>
+              <input id="add-next-service" value="">
+
+              <p>
+                  Press <strong>Enter</strong> to save.
+                  Press <strong>Escape</strong> to cancel.
+              </p>
+          </div>
+        `;
+
+        clientList.prepend(card);
+
+        const inputs = card.querySelectorAll("input");
+        inputs[0].focus();
+
+        inputs.forEach((input) => {
+          input.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+              saveNewClient(card);
             }
 
+            if (event.key === "Escape") {
+              card.remove();
+            }
+          });
         });
+      });
 
-    });
+      function saveNewClient(card) {
+        const newClient = {
+          first_name: document.getElementById("add-first-name").value,
+          last_name: document.getElementById("add-last-name").value,
+          additional_name: document.getElementById("add-additional-name").value,
+          street_address: document.getElementById("add-street-address").value,
+          city: document.getElementById("add-city").value,
+          state: document.getElementById("add-state").value,
+          zip: document.getElementById("add-zip").value,
+          reoccuring: document.getElementById("add-reoccuring").value,
+          frequency: document.getElementById("add-frequency").value,
+          type_of_service: document.getElementById("add-type-of-service").value,
+          additional_service: document.getElementById("add-additional-service")
+            .value,
+          type: document.getElementById("add-type").value,
+          quote_price: document.getElementById("add-quote-price").value,
+          last_service_date: document.getElementById("add-last-service-date")
+            .value,
+          next_service: document.getElementById("add-next-service").value,
+        };
 
-}
-
-
-// ======================================================
-// SAVE CLIENT
-// ======================================================
-
-function saveClient(card, oldClient) {
-
-    const updatedClient = {
-
-        old_first_name: oldClient.first_name,
-        old_last_name: oldClient.last_name,
-
-        first_name:
-            document.getElementById("edit-first-name").value,
-
-        last_name:
-            document.getElementById("edit-last-name").value,
-
-        additional_name:
-            document.getElementById("edit-additional-name").value,
-
-        street_address:
-            document.getElementById("edit-street-address").value,
-
-        city:
-            document.getElementById("edit-city").value,
-
-        state:
-            document.getElementById("edit-state").value,
-
-        zip:
-            document.getElementById("edit-zip").value,
-
-        reoccuring:
-            document.getElementById("edit-reoccuring").value,
-
-        frequency:
-            document.getElementById("edit-frequency").value,
-
-        type_of_service:
-            document.getElementById("edit-type-of-service").value,
-
-        additional_service:
-            document.getElementById("edit-additional-service").value,
-
-        type:
-            document.getElementById("edit-type").value,
-
-        quote_price:
-            document.getElementById("edit-quote-price").value,
-
-        last_service_date:
-            document.getElementById("edit-last-service-date").value,
-
-        next_service:
-            document.getElementById("edit-next-service").value
-    };
-
-
-    fetch("/api/client/edit", {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(updatedClient)
-
-    })
-
-    .then(response => response.json())
-
-    .then(result => {
-
-        if (result.status === "success") {
-
-            console.log("Client saved.");
-
-            loadClients();
-
-        } else {
-
-            alert(result.message || "Could not save client.");
-
+        if (!newClient.first_name.trim() || !newClient.last_name.trim()) {
+          alert("First and last name are required.");
+          return;
         }
 
-    })
+        fetch("/api/client/add", {
+          method: "POST",
 
-    .catch(error => {
+          headers: {
+            "Content-Type": "application/json",
+          },
 
-        console.error("Error saving client:", error);
-
-        alert("Could not save client.");
-
-    });
-
-}
-
-
-// ======================================================
-// DELETE CLIENT
-// ======================================================
-
-function deleteClient(client) {
-
-    const confirmed = confirm(
-        `Delete ${client.first_name} ${client.last_name}?`
-    );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    fetch("/api/client/remove", {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-
-            first_name: client.first_name,
-            last_name: client.last_name
-
+          body: JSON.stringify(newClient),
         })
+          .then((response) => response.json())
 
-    })
+          .then((result) => {
+            if (result.status === "success") {
+              console.log("Client added:", result.client_id);
 
-    .then(response => response.json())
+              loadClients();
+            } else {
+              alert(result.message || "Could not add client.");
+            }
+          })
 
-    .then(result => {
+          .catch((error) => {
+            console.error("Error adding client:", error);
 
-        if (result.status === "success") {
+            alert("Could not add client.");
+          });
+      }
 
-            loadClients();
+      // ======================================================
+      // INITIAL LOAD
+      // ======================================================
 
-        } else {
-
-            alert(result.message || "Could not remove client.");
-
-        }
-
-    })
-
-    .catch(error => {
-
-        console.error("Error deleting client:", error);
-
-        alert("Could not remove client.");
-
-    });
-
-}
-
-
-// ======================================================
-// ADD CLIENT
-// ======================================================
-
-addButton.addEventListener("click", function() {
-
-    alert("Add Client functionality coming next.");
-
-});
-
-
-// ======================================================
-// INITIAL LOAD
-// ======================================================
-
-loadClients();
-
-</script>
-
-</body>
+      loadClients();
+    </script>
+  </body>
 </html>
-
-
-
-
