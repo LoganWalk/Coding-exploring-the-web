@@ -11,7 +11,7 @@
   </head>
   <body>
     <nav>
-      <div class="buttons"  id = "buttons">
+      <div class="buttons" id="buttons">
         <a href="/" class="header" id="head1">🏠 Home</a>
         <a href="/workout-page" class="selected" id="head2">🏋️ Workouts</a>
         <a href="/exercise-page" class="header" id="head3">💪 Exercises</a>
@@ -19,29 +19,63 @@
         <a href="/about-page" class="header" id="head5">📚 About</a>
         <a href="/schedule-page" class="header" id="head6">🗓️ Schedule</a>
       </div>
-      <div id="signin-box">
-        <form action="/signin-page" method="GET">
-          <button type="submit" id="signin-button">🔐 Sign-in</button>
-        </form>
-      </div>
       <div class="button-box">
         <button id="button"></button>
       </div>
-      <nav>
-        <div class="content">
-            <h1 class="page">🏋️ Workout Page</h1>
-
-            <div class="addButton">
-                <button id="addWorkout">+ Add Workout</button>
-            </div>
-        </div>
-
-        <div id="box">
-            <h4>Social media links</h4>
-        </div>
-        </div>
-      </nav>
     </nav>
+
+    <main class="content">
+      <h1 class="page">🏋️ Workout Page</h1>
+
+      <div class="addButton">
+        <button id="addWorkout">Workout</button>
+      </div>
+
+      <!-- WORKOUT BUILDER (hidden until the Workout button is clicked) -->
+      <section id="builder" hidden>
+        <div id="builder-left">
+          <div id="title-box" hidden>
+            <input type="text" id="workout-title" placeholder="Workout name" />
+          </div>
+
+          <div id="supersets-container" hidden>
+            <!-- JS adds super sets here -->
+          </div>
+
+          <div id="add-superset-box" hidden>
+            <button id="add-superset">+ Add Super Set</button>
+          </div>
+
+          <div id="save-box" hidden>
+            <button id="save-workout">Save Workout</button>
+          </div>
+        </div>
+
+        <aside id="exercise-panel" hidden>
+          <h2>Exercises</h2>
+          <div id="exercise-list">
+            <!-- JS adds exercises here -->
+          </div>
+        </aside>
+      </section>
+
+      <div id="box">
+        <h4>Social media links</h4>
+      </div>
+    </main>
+
+    <!-- One super set: JS copies this each time "Add" is clicked -->
+    <template id="superset-template">
+      <div class="superset">
+        <h3 class="superset-label"></h3>
+        <div class="superset-slots">
+          <div class="slot slot-one"></div>
+          <div class="slot slot-two"></div>
+        </div>
+        <button class="remove-superset">✕</button>
+      </div>
+    </template>
+
     <script src="{{ url_for('static', filename='server.js') }}"></script>
   </body>
 </html>

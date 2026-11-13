@@ -116,6 +116,52 @@ def workout_exercises():
 @app.route('/signin-page', methods = ['GET'])
 def signin():
     return render_template('signin.html')
+@app.route('/api/exercises', methods=['GET'])
+def get_exercises():
+    try:
+        with open("exercises.json", "r") as file:
+            saved_exercises = json.load(file)
+    except FileNotFoundError:
+        saved_exercises = []
+
+    exercise_dicts = []
+    for item in saved_exercises:
+        name, rep_amount, weight, type_of_exercise, muscle = item
+        exercise_dicts.append({
+            "name": name,
+            "type": type_of_exercise,
+            "muscle": muscle
+        })
+
+    return jsonify(exercise_dicts)
+
+
+@app.route('/api/workouts', methods=['POST'])
+def save_workout():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data received"}), 400
+
+    title = (data.get("title") or "").strip()
+    supersets = data.get("supersets", [])
+
+    if not title:
+        return jsonify({"error": "Title required"}), 400
+    if not supersets:
+        return jsonify({"error": "Add at least one super set"}), 400
+
+    try:
+        with open("workouts.json", "r") as file:
+            workouts = json.load(file)
+    except FileNotFoundError:
+        workouts = []
+
+    workouts.append({"title": title, "supersets": supersets})
+
+    with open("workouts.json", "w") as file:
+        json.dump(workouts, file, indent=4)
+
+    return jsonify({"message": "Saved"}), 201
     
     
 
