@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Workout App Exercise Page</title>
+    <title>Workout App Progress Page</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
@@ -11,19 +11,31 @@
   </head>
   <body>
     <nav>
-      <div class="logo">WORKOUT APP</div>
-
-      <a href="/" class="header">🏠 Home</a>
-      <a href="/workout-page" class="header">🏋️ Workouts</a>
-      <a href="/exercise-page" class="header">💪 Exercises</a>
-      <a href="/progress-page" class="selected">📊 Progress</a>
-      <a href="/about-page" class="header">📚 About</a>
-
+      <div class="buttons" id="buttons">
+        <a href="/" class="header" id="head1">🏠 Home</a>
+        <a href="/workout-page" class="header" id="head2">🏋️ Workouts</a>
+        <a href="/exercise-page" class="header" id="head3">💪 Exercises</a>
+        <a href="/progress-page" class="selected" id="head4">📊 Progress</a>
+        <a href="/about-page" class="header" id="head5">📚 About</a>
+        <a href="/schedule-page" class="header" id="head6">🗓️ Schedule</a>
+      </div>
+      <div id="signin-box">
+        <form action="/signin-page" method="GET">
+          <button type="submit" id="signin-button">🔐 Sign-in</button>
+        </form>
+      </div>
+      <div class="button-box">
+        <button id="button"></button>
+      </div>
       <nav>
         <div class="content">
           <h1 class="page">📊 Progress Page</h1>
         </div>
+        <div id="box">
+          <h4>Social media links</h4>
+        </div>
       </nav>
     </nav>
+    <script src="{{ url_for('static', filename='server.js') }}"></script>
   </body>
 </html>

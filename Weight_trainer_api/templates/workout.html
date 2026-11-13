@@ -11,23 +11,37 @@
   </head>
   <body>
     <nav>
-      <div class="logo">WORKOUT APP</div>
-
-      <a href="/" class="header">🏠 Home</a>
-      <a href="/workout-page" class="selected">🏋️ Workouts</a>
-      <a href="/exercise-page" class="header">💪 Exercises</a>
-      <a href="/progress-page" class="header">📊 Progress</a>
-      <a href="/about-page" class="header">📚 About</a>
-
+      <div class="buttons"  id = "buttons">
+        <a href="/" class="header" id="head1">🏠 Home</a>
+        <a href="/workout-page" class="selected" id="head2">🏋️ Workouts</a>
+        <a href="/exercise-page" class="header" id="head3">💪 Exercises</a>
+        <a href="/progress-page" class="header" id="head4">📊 Progress</a>
+        <a href="/about-page" class="header" id="head5">📚 About</a>
+        <a href="/schedule-page" class="header" id="head6">🗓️ Schedule</a>
+      </div>
+      <div id="signin-box">
+        <form action="/signin-page" method="GET">
+          <button type="submit" id="signin-button">🔐 Sign-in</button>
+        </form>
+      </div>
+      <div class="button-box">
+        <button id="button"></button>
+      </div>
       <nav>
         <div class="content">
-          <h1 class="page">🏋️ Workout Page</h1>
+            <h1 class="page">🏋️ Workout Page</h1>
+
+            <div class="addButton">
+                <button id="addWorkout">+ Add Workout</button>
+            </div>
         </div>
 
-        <div class="addButton">
-          <button id="addButton">+ Add Workout</button>
+        <div id="box">
+            <h4>Social media links</h4>
+        </div>
         </div>
       </nav>
     </nav>
+    <script src="{{ url_for('static', filename='server.js') }}"></script>
   </body>
 </html>
