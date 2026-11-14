@@ -3,585 +3,291 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Client List</title>
-
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
+    <title>Client Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <style>
+      .client-page-intro { margin-bottom: 22px; }
+      .client-page-intro p { color: var(--ink-muted); }
+      .client-actions { display: flex; justify-content: flex-end; margin: 0 32px 20px; }
+      #add-button, .client-action-button {
+        border: 0; border-radius: 9px; padding: 10px 16px;
+        background: var(--accent); color: white; font-weight: 700;
+      }
+      #add-button:hover, .client-action-button:hover { background: var(--accent-hover); }
+      .client-action-button.secondary { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--border); }
+      .client-action-button.danger { background: var(--danger); }
+      #client-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px; padding: 0 32px 32px; }
+      .client-card { padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+      .client-card:hover { transform: translateY(-2px); }
+      .client-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+      .client-header h2 { color: var(--accent); font-family: "Sora", sans-serif; font-size: 1.15rem; }
+      .client-info p { margin: 7px 0; overflow-wrap: anywhere; }
+      .client-info strong { color: var(--ink-muted); }
+      .client-buttons, .client-form-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+      .client-edit { width: 100%; }
+      .client-edit h2 { margin-bottom: 16px; color: var(--accent); }
+      .client-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .client-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+      .client-field.full { grid-column: 1 / -1; }
+      .client-field label { color: var(--ink-muted); font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+      .client-field input, .client-field select {
+        width: 100%; min-width: 0; padding: 9px 11px; border: 1px solid var(--border);
+        border-radius: 8px; background: var(--bg); color: var(--ink);
+      }
+      .client-field input:focus, .client-field select:focus { outline: 2px solid var(--olive); outline-offset: 1px; }
+      .client-form-hint { margin-top: 12px; color: var(--ink-muted); font-size: .82rem; }
+      .client-empty, .client-status { grid-column: 1 / -1; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+      .client-status.error { border-color: var(--danger); color: var(--danger); }
+      .map-link { color: var(--accent); }
+      @media (max-width: 600px) {
+        .client-page-intro { padding: 24px 18px !important; }
+        .client-actions { margin: 0 18px 16px; }
+        #client-list { padding: 0 18px 24px; grid-template-columns: 1fr; }
+        .client-form-grid { grid-template-columns: 1fr; }
+        .client-field.full { grid-column: auto; }
+      }
+    </style>
   </head>
-
   <body>
     <nav>
       <a href="/">🏠 Dashboard</a>
       <a href="/revenue-page">💰 Revenue Analytics</a>
       <a href="/calendar-page">📅 Work Agenda</a>
-      <a
-        href="/client-page"
-        style="color: var(--accent); background: var(--accent-soft)"
-      >
-        🧑 Clients
-      </a>
-      <img
-        id="image"
-        src="https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw"
-        ,
-        width="60"
-        ,
-        height="60"
-      />
+      <a href="/client-page" style="color: var(--accent); background: var(--accent-soft)">🧑 Clients</a>
+      <img id="image" src="https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw" width="60" height="60" alt="Business logo" />
     </nav>
 
-    <div class="content">
-      <h1>🧑 Client Managing Page</h1>
-
-      <h2>Clients:</h2>
-
-      <h3>
-        Client Action Instructions: left click = edit info, right click = remove
-        client, add button = add client
-      </h3>
+    <div class="content client-page-intro">
+      <h1>🧑 Client Management</h1>
+      <p>Add clients, update their information, and keep their service details organized.</p>
     </div>
 
     <div class="client-actions">
-      <button id="add-button">+ Add Client</button>
+      <button id="add-button" type="button">+ Add Client</button>
     </div>
 
-    <div id="client-list"></div>
+    <div id="client-list" aria-live="polite">
+      <div class="client-empty">Loading clients...</div>
+    </div>
 
     <script>
       const clientList = document.getElementById("client-list");
       const addButton = document.getElementById("add-button");
 
-      // ======================================================
-      // PAID / UNPAID BADGE
-      // ======================================================
+      const fieldDefinitions = [
+        { key: "first_name", label: "First Name", type: "text", required: true },
+        { key: "last_name", label: "Last Name", type: "text", required: true },
+        { key: "additional_name", label: "Additional Name", type: "text", defaultValue: "none" },
+        { key: "street_address", label: "Street Address", type: "text" },
+        { key: "city", label: "City", type: "text" },
+        { key: "state", label: "State", type: "text", defaultValue: "MO" },
+        { key: "zip", label: "ZIP", type: "text" },
+        { key: "reoccuring", label: "Recurring", type: "select", options: [["yes", "Yes"], ["no", "No"]] },
+        { key: "frequency", label: "Frequency", type: "select", options: [["weekly", "Weekly"], ["bi-weekly", "Bi-weekly"]] },
+        { key: "type_of_service", label: "Type of Service", type: "text", defaultValue: "Mowing/Trim" },
+        { key: "additional_service", label: "Additional Service", type: "text", defaultValue: "none" },
+        { key: "type", label: "Client Type", type: "select", options: [["Residential", "Residential"], ["Commerical", "Commercial"]] },
+        { key: "quote_price", label: "Quote Price ($)", type: "number", required: true, min: "0", step: "0.01", defaultValue: "0" },
+        { key: "last_service_date", label: "Last Service Date (MMDDYY)", type: "text", date: true },
+        { key: "next_service", label: "Next Service Date (MMDDYY)", type: "text", date: true }
+      ];
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[character]);
+      }
 
       function paymentBadge(client) {
-        if (!client.job_count) {
-          return "";
-        }
-
+        if (!client.job_count) return "";
         if (client.unpaid_count > 0) {
           const jobs = client.unpaid_count === 1 ? "job" : "jobs";
-
           return `<span class="paid-badge unpaid" title="${client.unpaid_count} unpaid ${jobs}">Owes $${Number(client.unpaid_total).toFixed(2)}</span>`;
         }
-
-        return `<span class="paid-badge paid">Paid up</span>`;
+        return '<span class="paid-badge paid">Paid up</span>';
       }
-
-      // ======================================================
-      // GOOGLE MAPS LINK
-      // ======================================================
 
       function mapsUrl(client) {
-        const parts = [
-          client.street_address,
-          client.city,
-          client.state,
-          client.zip,
-        ]
-          .map((part) => String(part || "").trim())
-          .filter(Boolean);
-
-        return (
-          "https://www.google.com/maps/search/?api=1&query=" +
-          encodeURIComponent(parts.join(", "))
-        );
+        const parts = [client.street_address, client.city, client.state, client.zip]
+          .map(part => String(part || "").trim()).filter(Boolean);
+        return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(parts.join(", "));
       }
 
-      // ======================================================
-      // LOAD CLIENTS
-      // ======================================================
-
-      function loadClients() {
-        clientList.innerHTML = "";
-
-        fetch("/api/clients/all")
-          .then((response) => response.json())
-          .then((clients) => {
-            console.log("Loaded clients:", clients.length);
-
-            clients.forEach((client) => {
-              createClientCard(client);
-            });
-          })
-          .catch((error) => {
-            console.error("Could not load clients:", error);
-
-            clientList.innerHTML = "<p>Could not load clients.</p>";
-          });
+      function showStatus(message, isError = false) {
+        const status = document.createElement("div");
+        status.className = "client-status" + (isError ? " error" : "");
+        status.textContent = message;
+        clientList.prepend(status);
+        window.setTimeout(() => status.remove(), 4000);
       }
 
-      // ======================================================
-      // CREATE CLIENT CARD
-      // ======================================================
+      async function loadClients() {
+        clientList.innerHTML = '<div class="client-empty">Loading clients...</div>';
+        try {
+          const response = await fetch("/api/clients/all");
+          if (!response.ok) throw new Error("Server returned " + response.status);
+          const clients = await response.json();
+          clientList.innerHTML = "";
+          if (!clients.length) {
+            clientList.innerHTML = '<div class="client-empty">No clients yet. Select “Add Client” to get started.</div>';
+            return;
+          }
+          clients.forEach(createClientCard);
+        } catch (error) {
+          console.error("Could not load clients:", error);
+          clientList.innerHTML = '<div class="client-status error">Could not load clients. Please refresh and try again.</div>';
+        }
+      }
 
       function createClientCard(client) {
-        const card = document.createElement("div");
-
+        const card = document.createElement("article");
         card.className = "client-card";
-
         card.innerHTML = `
-
-        <div class="client-header">
-            <h2>
-                ${client.first_name}
-                ${client.last_name}
-                ${paymentBadge(client)}
-            </h2>
-        </div>
-
-        <div class="client-info">
-
-            <p>
-                <strong>Additional Name:</strong>
-                ${client.additional_name}
-            </p>
-
-            <p>
-                <strong>Address:</strong>
-                <a class="map-link" href="${mapsUrl(client)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${client.street_address}</a>
-            </p>
-
-            <p>
-                <strong>City:</strong>
-                ${client.city}
-            </p>
-
-            <p>
-                <strong>State:</strong>
-                ${client.state}
-            </p>
-
-            <p>
-                <strong>ZIP:</strong>
-                ${client.zip}
-            </p>
-
-            <p>
-                <strong>Recurring:</strong>
-                ${client.reoccuring}
-            </p>
-
-            <p>
-                <strong>Frequency:</strong>
-                ${client.frequency}
-            </p>
-
-            <p>
-                <strong>Type of Service:</strong>
-                ${client.type_of_service}
-            </p>
-
-            <p>
-                <strong>Additional Service:</strong>
-                ${client.additional_service}
-            </p>
-
-            <p>
-                <strong>Type:</strong>
-                ${client.type}
-            </p>
-
-            <p>
-                <strong>Quote Price:</strong>
-                $${client.quote_price}
-            </p>
-
-            <p>
-                <strong>Last Service:</strong>
-                ${client.last_service_date}
-            </p>
-
-            <p>
-                <strong>Next Service:</strong>
-                ${client.next_service}
-            </p>
-
-        </div>
-
-    `;
-
-        // ==================================================
-        // LEFT CLICK = EDIT
-        // ==================================================
-
-        card.addEventListener("click", function () {
-          editClient(card, client);
-        });
-
-        // ==================================================
-        // RIGHT CLICK = DELETE
-        // ==================================================
-
-        card.addEventListener("contextmenu", function (event) {
-          event.preventDefault();
-
-          deleteClient(client);
-        });
-
+          <div class="client-header">
+            <h2>${escapeHtml(client.first_name)} ${escapeHtml(client.last_name)} ${paymentBadge(client)}</h2>
+          </div>
+          <div class="client-info">
+            <p><strong>Additional Name:</strong> ${escapeHtml(client.additional_name || "none")}</p>
+            <p><strong>Address:</strong> <a class="map-link" href="${mapsUrl(client)}" target="_blank" rel="noopener">${escapeHtml(client.street_address || "Not provided")}</a></p>
+            <p><strong>Location:</strong> ${escapeHtml(client.city)}, ${escapeHtml(client.state)} ${escapeHtml(client.zip)}</p>
+            <p><strong>Service:</strong> ${escapeHtml(client.type_of_service)}</p>
+            <p><strong>Additional Service:</strong> ${escapeHtml(client.additional_service || "none")}</p>
+            <p><strong>Schedule:</strong> ${client.reoccuring === "yes" ? "Recurring" : "One-time"} · ${escapeHtml(client.frequency)}</p>
+            <p><strong>Client Type:</strong> ${client.type === "Commerical" ? "Commercial" : escapeHtml(client.type)}</p>
+            <p><strong>Quote Price:</strong> $${Number(client.quote_price || 0).toFixed(2)}</p>
+            <p><strong>Last Service:</strong> ${escapeHtml(client.last_service_date || "Not set")}</p>
+            <p><strong>Next Service:</strong> ${escapeHtml(client.next_service || "Not set")}</p>
+          </div>
+          <div class="client-buttons">
+            <button class="client-action-button" type="button" data-action="edit">Edit Client</button>
+            <button class="client-action-button danger" type="button" data-action="delete">Delete Client</button>
+          </div>
+        `;
+        card.querySelector('[data-action="edit"]').addEventListener("click", () => showClientForm(card, client, false));
+        card.querySelector('[data-action="delete"]').addEventListener("click", () => deleteClient(client));
         clientList.appendChild(card);
       }
 
-      // ======================================================
-      // EDIT CLIENT
-      // ======================================================
-
-      function editClient(card, client) {
-        card.innerHTML = `
-
-        <div class="client-edit">
-
-            <h2>Edit Client</h2>
-
-            <label>First Name</label>
-            <input id="edit-first-name" value="${client.first_name}">
-
-            <label>Last Name</label>
-            <input id="edit-last-name" value="${client.last_name}">
-
-            <label>Additional Name</label>
-            <input id="edit-additional-name"
-                   value="${client.additional_name}">
-
-            <label>Street Address</label>
-            <input id="edit-street-address"
-                   value="${client.street_address}">
-
-            <label>City</label>
-            <input id="edit-city"
-                   value="${client.city}">
-
-            <label>State</label>
-            <input id="edit-state"
-                   value="${client.state}">
-
-            <label>ZIP</label>
-            <input id="edit-zip"
-                   value="${client.zip}">
-
-            <label>Recurring</label>
-            <input id="edit-reoccuring"
-                   value="${client.reoccuring}">
-
-            <label>Frequency</label>
-            <input id="edit-frequency"
-                   value="${client.frequency}">
-
-            <label>Type of Service</label>
-            <input id="edit-type-of-service"
-                   value="${client.type_of_service}">
-
-            <label>Additional Service</label>
-            <input id="edit-additional-service"
-                   value="${client.additional_service}">
-
-            <label>Type</label>
-            <input id="edit-type"
-                   value="${client.type}">
-
-            <label>Quote Price</label>
-            <input id="edit-quote-price"
-                   type="number"
-                   step="0.01"
-                   value="${client.quote_price}">
-
-            <label>Last Service Date</label>
-            <input id="edit-last-service-date"
-                   value="${client.last_service_date}">
-
-            <label>Next Service</label>
-            <input id="edit-next-service"
-                   value="${client.next_service}">
-
-            <p>
-                Press <strong>Enter</strong> to save.
-                Press <strong>Escape</strong> to cancel.
-            </p>
-
-        </div>
-
-    `;
-
-        const inputs = card.querySelectorAll("input");
-
-        // Put cursor in first input
-        inputs[0].focus();
-
-        // ==============================================
-        // ENTER = SAVE
-        // ESCAPE = CANCEL
-        // ==============================================
-
-        inputs.forEach((input) => {
-          input.addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-              saveClient(card, client);
-            }
-
-            if (event.key === "Escape") {
-              loadClients();
-            }
-          });
-        });
-      }
-
-      // ======================================================
-      // SAVE CLIENT
-      // ======================================================
-
-      function saveClient(card, oldClient) {
-        const updatedClient = {
-          old_first_name: oldClient.first_name,
-          old_last_name: oldClient.last_name,
-
-          first_name: document.getElementById("edit-first-name").value,
-
-          last_name: document.getElementById("edit-last-name").value,
-
-          additional_name: document.getElementById("edit-additional-name")
-            .value,
-
-          street_address: document.getElementById("edit-street-address").value,
-
-          city: document.getElementById("edit-city").value,
-
-          state: document.getElementById("edit-state").value,
-
-          zip: document.getElementById("edit-zip").value,
-
-          reoccuring: document.getElementById("edit-reoccuring").value,
-
-          frequency: document.getElementById("edit-frequency").value,
-
-          type_of_service: document.getElementById("edit-type-of-service")
-            .value,
-
-          additional_service: document.getElementById("edit-additional-service")
-            .value,
-
-          type: document.getElementById("edit-type").value,
-
-          quote_price: document.getElementById("edit-quote-price").value,
-
-          last_service_date: document.getElementById("edit-last-service-date")
-            .value,
-
-          next_service: document.getElementById("edit-next-service").value,
-        };
-
-        fetch("/api/client/edit", {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify(updatedClient),
-        })
-          .then((response) => response.json())
-
-          .then((result) => {
-            if (result.status === "success") {
-              console.log("Client saved.");
-
-              loadClients();
-            } else {
-              alert(result.message || "Could not save client.");
-            }
-          })
-
-          .catch((error) => {
-            console.error("Error saving client:", error);
-
-            alert("Could not save client.");
-          });
-      }
-
-      // ======================================================
-      // DELETE CLIENT
-      // ======================================================
-
-      function deleteClient(client) {
-        const confirmed = confirm(
-          `Delete ${client.first_name} ${client.last_name}?`,
-        );
-
-        if (!confirmed) {
-          return;
+      function fieldMarkup(field, value, mode) {
+        const id = mode + "-" + field.key.replaceAll("_", "-");
+        const safeValue = escapeHtml(value ?? field.defaultValue ?? "");
+        const required = field.required ? "required" : "";
+        let control;
+        if (field.type === "select") {
+          control = `<select id="${id}" name="${field.key}" ${required}>${field.options.map(([optionValue, label]) =>
+            `<option value="${escapeHtml(optionValue)}" ${String(value ?? field.defaultValue ?? field.options[0][0]) === optionValue ? "selected" : ""}>${label}</option>`
+          ).join("")}</select>`;
+        } else {
+          control = `<input id="${id}" name="${field.key}" type="${field.type}" value="${safeValue}" ${field.min ? `min="${field.min}"` : ""} ${field.step ? `step="${field.step}"` : ""} ${required} ${field.date ? 'maxlength="6" inputmode="numeric" placeholder="MMDDYY"' : ""}>`;
         }
-
-        fetch("/api/client/remove", {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            first_name: client.first_name,
-            last_name: client.last_name,
-          }),
-        })
-          .then((response) => response.json())
-
-          .then((result) => {
-            if (result.status === "success") {
-              loadClients();
-            } else {
-              alert(result.message || "Could not remove client.");
-            }
-          })
-
-          .catch((error) => {
-            console.error("Error deleting client:", error);
-
-            alert("Could not remove client.");
-          });
+        return `<div class="client-field"><label for="${id}">${field.label}</label>${control}</div>`;
       }
 
-      // ======================================================
-      // ADD CLIENT
-      // ======================================================
-
-      addButton.addEventListener("click", function () {
-        const card = document.createElement("div");
-        card.className = "client-card";
-
+      function showClientForm(card, client = {}, isNew = false) {
+        const mode = isNew ? "add" : "edit";
         card.innerHTML = `
-          <div class="client-edit">
-              <h2>Add New Client</h2>
-
-              <label>First Name</label>
-              <input id="add-first-name" value="">
-
-              <label>Last Name</label>
-              <input id="add-last-name" value="">
-
-              <label>Additional Name</label>
-              <input id="add-additional-name" value="none">
-
-              <label>Street Address</label>
-              <input id="add-street-address" value="">
-
-              <label>City</label>
-              <input id="add-city" value="">
-
-              <label>State</label>
-              <input id="add-state" value="MO">
-
-              <label>ZIP</label>
-              <input id="add-zip" value="">
-
-              <label>Recurring (yes/no)</label>
-              <input id="add-reoccuring" value="yes">
-
-              <label>Frequency (weekly/bi-weekly)</label>
-              <input id="add-frequency" value="weekly">
-
-              <label>Type of Service</label>
-              <input id="add-type-of-service" value="Mowing/Trim">
-
-              <label>Additional Service</label>
-              <input id="add-additional-service" value="none">
-
-              <label>Type (Residential/Commerical)</label>
-              <input id="add-type" value="Residential">
-
-              <label>Quote Price</label>
-              <input id="add-quote-price" type="number" step="0.01" value="0">
-
-              <label>Last Service Date (MMDDYY)</label>
-              <input id="add-last-service-date" value="">
-
-              <label>Next Service (MMDDYY)</label>
-              <input id="add-next-service" value="">
-
-              <p>
-                  Press <strong>Enter</strong> to save.
-                  Press <strong>Escape</strong> to cancel.
-              </p>
-          </div>
+          <form class="client-edit" novalidate>
+            <h2>${isNew ? "Add New Client" : "Edit Client"}</h2>
+            <div class="client-form-grid">
+              ${fieldDefinitions.map(field => fieldMarkup(field, client[field.key], mode)).join("")}
+            </div>
+            <p class="client-form-hint">Dates must use MMDDYY format. Required fields are marked by your browser.</p>
+            <div class="client-form-actions">
+              <button class="client-action-button" type="submit">${isNew ? "Save Client" : "Save Changes"}</button>
+              <button class="client-action-button secondary" type="button" data-action="cancel">Cancel</button>
+            </div>
+          </form>
         `;
 
-        clientList.prepend(card);
-
-        const inputs = card.querySelectorAll("input");
-        inputs[0].focus();
-
-        inputs.forEach((input) => {
-          input.addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-              saveNewClient(card);
-            }
-
-            if (event.key === "Escape") {
-              card.remove();
-            }
+        const form = card.querySelector("form");
+        form.addEventListener("submit", event => {
+          event.preventDefault();
+          if (!form.reportValidity()) return;
+          const values = {};
+          fieldDefinitions.forEach(field => {
+            values[field.key] = form.elements[field.key].value.trim();
           });
+          if (!values.first_name || !values.last_name) {
+            alert("First and last name are required.");
+            return;
+          }
+          const price = Number(values.quote_price);
+          if (!Number.isFinite(price) || price < 0) {
+            alert("Quote price must be a valid amount of $0 or more.");
+            return;
+          }
+          for (const field of fieldDefinitions.filter(item => item.date)) {
+            if (values[field.key] && !isValidDate(values[field.key])) {
+              alert(field.label + " must be a real date in MMDDYY format.");
+              form.elements[field.key].focus();
+              return;
+            }
+          }
+          if (isNew) addClient(values);
+          else saveClient(values, client);
         });
-      });
-
-      function saveNewClient(card) {
-        const newClient = {
-          first_name: document.getElementById("add-first-name").value,
-          last_name: document.getElementById("add-last-name").value,
-          additional_name: document.getElementById("add-additional-name").value,
-          street_address: document.getElementById("add-street-address").value,
-          city: document.getElementById("add-city").value,
-          state: document.getElementById("add-state").value,
-          zip: document.getElementById("add-zip").value,
-          reoccuring: document.getElementById("add-reoccuring").value,
-          frequency: document.getElementById("add-frequency").value,
-          type_of_service: document.getElementById("add-type-of-service").value,
-          additional_service: document.getElementById("add-additional-service")
-            .value,
-          type: document.getElementById("add-type").value,
-          quote_price: document.getElementById("add-quote-price").value,
-          last_service_date: document.getElementById("add-last-service-date")
-            .value,
-          next_service: document.getElementById("add-next-service").value,
-        };
-
-        if (!newClient.first_name.trim() || !newClient.last_name.trim()) {
-          alert("First and last name are required.");
-          return;
-        }
-
-        fetch("/api/client/add", {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify(newClient),
-        })
-          .then((response) => response.json())
-
-          .then((result) => {
-            if (result.status === "success") {
-              console.log("Client added:", result.client_id);
-
-              loadClients();
-            } else {
-              alert(result.message || "Could not add client.");
-            }
-          })
-
-          .catch((error) => {
-            console.error("Error adding client:", error);
-
-            alert("Could not add client.");
-          });
+        card.querySelector('[data-action="cancel"]').addEventListener("click", () => {
+          if (isNew) card.remove();
+          else loadClients();
+        });
+        form.elements.first_name.focus();
       }
 
-      // ======================================================
-      // INITIAL LOAD
-      // ======================================================
+      function isValidDate(value) {
+        if (!/^\d{6}$/.test(value)) return false;
+        const month = Number(value.slice(0, 2));
+        const day = Number(value.slice(2, 4));
+        const year = 2000 + Number(value.slice(4, 6));
+        const date = new Date(year, month - 1, day);
+        return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+      }
+
+      async function sendClientRequest(url, payload, successMessage, fallbackMessage) {
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          const result = await response.json();
+          if (!response.ok || result.status !== "success") {
+            throw new Error(result.message || fallbackMessage);
+          }
+          await loadClients();
+          showStatus(successMessage);
+        } catch (error) {
+          console.error(fallbackMessage, error);
+          alert(error.message || fallbackMessage);
+        }
+      }
+
+      function saveClient(values, oldClient) {
+        sendClientRequest("/api/client/edit", {
+          old_first_name: oldClient.first_name,
+          old_last_name: oldClient.last_name,
+          ...values
+        }, "Client information updated.", "Could not save client.");
+      }
+
+      function addClient(values) {
+        sendClientRequest("/api/client/add", values, "New client added.", "Could not add client.");
+      }
+
+      function deleteClient(client) {
+        const confirmed = confirm(`Delete ${client.first_name} ${client.last_name}? This cannot be undone.`);
+        if (!confirmed) return;
+        sendClientRequest("/api/client/remove", {
+          first_name: client.first_name,
+          last_name: client.last_name
+        }, "Client deleted.", "Could not delete client.");
+      }
+
+      addButton.addEventListener("click", () => {
+        const card = document.createElement("article");
+        card.className = "client-card";
+        clientList.prepend(card);
+        showClientForm(card, {}, true);
+      });
 
       loadClients();
     </script>
