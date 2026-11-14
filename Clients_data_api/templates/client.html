@@ -203,9 +203,10 @@
         form.addEventListener("submit", event => {
           event.preventDefault();
           if (!form.reportValidity()) return;
+          const formData = new FormData(form);
           const values = {};
           fieldDefinitions.forEach(field => {
-            values[field.key] = form.elements[field.key].value.trim();
+            values[field.key] = String(formData.get(field.key) ?? "").trim();
           });
           if (!values.first_name || !values.last_name) {
             alert("First and last name are required.");
