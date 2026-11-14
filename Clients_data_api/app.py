@@ -1,5 +1,10 @@
 import csv
 import re
+import os
+
+# Keep all relative data-file paths inside this app's folder.
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+os.chdir(APP_DIR)
 from flask import Flask, request, jsonify, render_template
 import client_generator as sg
 from Client import Client
