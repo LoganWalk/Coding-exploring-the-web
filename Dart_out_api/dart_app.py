@@ -1,1400 +1,831 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session
 from datetime import datetime, timedelta
- 
+def render_checkout(score, routes):
+    # Make sure there are always three route options.
+    routes = routes or ("", "", "")
+    route_one, route_two, route_three = routes
+
+    # Use the first route for the original route variable too.
+    route = route_one
+
+    # Set the message based on the remaining score.
+    if score == 0:
+        message = "Checked out!"
+
+    elif score < 0:
+        message = "Bust! Score doesn't count."
+
+    elif score == 1 and session.get("out_type") == "double":
+        message = "Bust! You can't be left on 1 in double out."
+
+    elif route_one or route_two or route_three:
+        message = f"{score} left. Your out:"
+
+    else:
+        message = f"{score} left. No checkout route available."
+
+    # Send the checkout information to the HTML page.
+    return render_template(
+        "out.html",
+        message=message,
+        route=route,
+        route_one=route_one,
+        route_two=route_two,
+        route_three=route_three,
+        left_over=score
+    )
 app = Flask(__name__)
+app.secret_key = "replace-this-with-a-long-random-secret"
 app.config["DEBUG"] = True
- 
-# variables (names no longer match any function name)
-out_type = None
-start_num = None
-first_double_hit = None
-second_double_hit = None
-third_double_hit = None
-first_straight_hit = None
-second_straight_hit = None
-third_straight_hit = None
-left_over = None
+
+# Variables
 out_path_one = []
 out_path_two = []
 out_path_three = []
- 
- 
+
+
 @app.route('/', methods=['GET'])
 def index():
     return render_template('dashboard.html')
- 
- 
+
+
 @app.route('/outs-page', methods=['GET'])
 def outs_page():
-    return render_template('out.html')
- 
- 
+    return render_template('out.html', route="", route_one="", route_two="", route_three="", left_over="")
+
+
 @app.route('/statistics-page', methods=['GET'])
 def statistics_page():
     return render_template('statistics.html')
- 
- 
+
+
 @app.route("/out-type", methods=["POST"])
 def select_out_type():
-    global out_type
     chosen = request.form.get("out_type")
-    if chosen == "straight":
-        out_type = "straight"
-    elif chosen == "double":
-        out_type = "double"
-    return render_template('out.html')
- 
- 
 
-# D = double, T = triple, S = single. Paste below your imports / global variables.
- 
-def respond(message, route="", left=""):
-    return render_template("out.html", message=message, route=route, left_over=left)
- 
- 
-# ======================= START NUMBER =======================
- 
-@app.route("/first-num", methods=["POST"])   # 3 darts left
+    if chosen == "straight":
+        session.clear()
+        session["out_type"] = "straight"
+    elif chosen == "double":
+        session.clear()
+        session["out_type"] = "double"
+
+    return render_template('out.html', route="", route_one="", route_two="", route_three="", left_over="")
+
+
+STRAIGHT_START_OUTS={
+    1:("S1","",""),
+    2:("D1","",""),
+    3:("T1","S1 S1 S1",""),
+    4:("D2","D1 S1 S1","S2 S1 S1"),
+    5:("S5","S3 S1 S1","T1 S1 S1"),
+    6:("T2","D2 S1 S1","S4 S1 S1"),
+    7:("S7","S5 S1 S1","D2 D1 S1"),
+    8:("D4","D3 S1 S1","S6 S1 S1"),
+    9:("T3","S7 S1 S1","D3 D1 S1"),
+    10:("D5","D4 S1 S1","S8 S1 S1"),
+    11:("S11","S9 S1 S1","T3 S1 S1"),
+    12:("T4","D5 S1 S1","S10 S1 S1"),
+    13:("S13","S11 S1 S1","D5 D1 S1"),
+    14:("D7","D6 S1 S1","S12 S1 S1"),
+    15:("T5","S13 S1 S1","D6 D1 S1"),
+    16:("D8","D7 S1 S1","S14 S1 S1"),
+    17:("S17","S15 S1 S1","T5 S1 S1"),
+    18:("T6","D8 S1 S1","S16 S1 S1"),
+    19:("S19","S17 S1 S1","D8 D1 S1"),
+    20:("D10","D9 S1 S1","S18 S1 S1"),
+    21:("T7","S19 S1 S1","D9 D1 S1"),
+    22:("D11","D10 S1 S1","S20 S1 S1"),
+    23:("D11 S1","T7 S1 S1","D10 D1 S1"),
+    24:("T8","D11 S1 S1","T7 D1 S1"),
+    25:("Outer Bull","D11 D1 S1","D11 S2 S1"),
+    26:("D13","D12 S1 S1","T8 S1 S1"),
+    27:("T9","Outer Bull S1 S1","D12 D1 S1"),
+    28:("D14","D13 S1 S1","Outer Bull D1 S1"),
+    29:("D14 S1","T9 S1 S1","D13 D1 S1"),
+    30:("T10","D14 S1 S1","T9 D1 S1"),
+    31:("T10 S1","D14 D1 S1","D14 S2 S1"),
+    32:("D16","D15 S1 S1","T10 S1 S1"),
+    33:("T11","D15 D1 S1","D15 S2 S1"),
+    34:("D17","D16 S1 S1","D15 S3 S1"),
+    35:("D17 S1","T11 S1 S1","D16 D1 S1"),
+    36:("T12","D17 S1 S1","T11 D1 S1"),
+    37:("T12 S1","D17 D1 S1","D17 S2 S1"),
+    38:("D19","D18 S1 S1","T12 S1 S1"),
+    39:("T13","D18 D1 S1","D18 S2 S1"),
+    40:("D20","D19 S1 S1","D18 S3 S1"),
+    41:("D20 S1","T13 S1 S1","D19 D1 S1"),
+    42:("T14","D20 S1 S1","T13 D1 S1"),
+    43:("T14 S1","D20 D1 S1","D20 S2 S1"),
+    44:("T14 D1","T14 S1 S1","D20 S3 S1"),
+    45:("T15","T14 D1 S1","T14 S2 S1"),
+    46:("T15 S1","T14 S3 S1","T14 T1 S1"),
+    47:("T15 D1","T15 S1 S1","T14 D2 S1"),
+    48:("T16","T15 D1 S1","T15 S2 S1"),
+    49:("T16 S1","T15 S3 S1","T15 T1 S1"),
+    50:("Bull","T16 S1 S1","T15 D2 S1"),
+    51:("T17","T16 D1 S1","T16 S2 S1"),
+    52:("T17 S1","Bull S1 S1","T16 S3 S1"),
+    53:("T17 D1","T17 S1 S1","Bull D1 S1"),
+    54:("T18","T17 D1 S1","T17 S2 S1"),
+    55:("T18 S1","T17 S3 S1","T17 T1 S1"),
+    56:("T18 D1","T18 S1 S1","T17 D2 S1"),
+    57:("T19","T18 D1 S1","T18 S2 S1"),
+    58:("T19 S1","T18 S3 S1","T18 T1 S1"),
+    59:("T19 D1","T19 S1 S1","T18 D2 S1"),
+    60:("T20","T19 D1 S1","T19 S2 S1"),
+    61:("T20 S1","T19 S3 S1","T19 T1 S1"),
+    62:("T20 D1","T20 S1 S1","T19 D2 S1"),
+    63:("T20 T1","T20 D1 S1","T20 S2 S1"),
+    64:("T20 D2","T20 S3 S1","T20 T1 S1"),
+    65:("T20 S5","T20 D2 S1","T20 S4 S1"),
+    66:("T20 T2","T20 S5 S1","T20 D2 D1"),
+    67:("T20 S7","T20 D3 S1","T20 S6 S1"),
+    68:("T20 D4","T20 S7 S1","T20 D3 D1"),
+    69:("T20 T3","T20 D4 S1","T20 S8 S1"),
+    70:("T20 D5","T20 S9 S1","T20 T3 S1"),
+    71:("T20 S11","T20 D5 S1","T20 S10 S1"),
+    72:("T20 T4","T20 S11 S1","T20 D5 D1"),
+    73:("T20 S13","T20 D6 S1","T20 S12 S1"),
+    74:("T20 D7","T20 S13 S1","T20 D6 D1"),
+    75:("T20 T5","T20 D7 S1","T20 S14 S1"),
+    76:("T20 D8","T20 S15 S1","T20 T5 S1"),
+    77:("T20 S17","T20 D8 S1","T20 S16 S1"),
+    78:("T20 T6","T20 S17 S1","T20 D8 D1"),
+    79:("T20 S19","T20 D9 S1","T20 S18 S1"),
+    80:("T20 D10","T20 S19 S1","T20 D9 D1"),
+    81:("T20 T7","T20 D10 S1","T20 S20 S1"),
+    82:("T20 D11","T20 T7 S1","T20 D10 D1"),
+    83:("T19 D13","T20 D11 S1","T20 T7 D1"),
+    84:("T20 T8","T20 D11 D1","T20 D11 S2"),
+    85:("T20 Outer Bull","T20 D12 S1","T20 T8 S1"),
+    86:("T20 D13","T20 Outer Bull S1","T20 D12 D1"),
+    87:("T20 T9","T20 D13 S1","T20 Outer Bull D1"),
+    88:("T20 D14","T20 T9 S1","T20 D13 D1"),
+    89:("T19 D16","T20 D14 S1","T20 T9 D1"),
+    90:("T20 T10","T20 D14 D1","T20 D14 S2"),
+    91:("T19 D17","T20 D15 S1","T20 T10 S1"),
+    92:("T20 D16","T20 D15 D1","T20 D15 S2"),
+    93:("T20 T11","T20 D16 S1","T20 D15 S3"),
+    94:("T20 D17","T20 T11 S1","T20 D16 D1"),
+    95:("T19 D19","T20 D17 S1","T20 T11 D1"),
+    96:("T20 T12","T20 D17 D1","T20 D17 S2"),
+    97:("T19 D20","T20 D18 S1","T20 T12 S1"),
+    98:("T20 D19","T20 D18 D1","T20 D18 S2"),
+    99:("T20 T13","T20 D19 S1","T20 D18 S3"),
+    100:("T20 D20","T20 T13 S1","T20 D19 D1"),
+    101:("T17 Bull","T20 D20 S1","T20 T13 D1"),
+    102:("T20 T14","T20 D20 D1","T20 D20 S2"),
+    103:("T20 T14 S1","T20 D20 S3","T20 D20 T1"),
+    104:("T18 Bull","T20 T14 D1","T20 T14 S2"),
+    105:("T20 T15","T20 T14 S3","T20 T14 T1"),
+    106:("T20 T15 S1","T20 T14 D2","T20 T14 S4"),
+    107:("T19 Bull","T20 T15 D1","T20 T15 S2"),
+    108:("T20 T16","T20 T15 S3","T20 T15 T1"),
+    109:("T20 T16 S1","T20 T15 D2","T20 T15 S4"),
+    110:("T20 Bull","T20 T16 D1","T20 T16 S2"),
+    111:("T20 T17","T20 Bull S1","T20 T16 S3"),
+    112:("T20 T17 S1","T20 Bull D1","T20 Bull S2"),
+    113:("T20 T17 D1","T20 T17 S2","T20 Bull S3"),
+    114:("T20 T18","T20 T17 S3","T20 T17 T1"),
+    115:("T20 T18 S1","T20 T17 D2","T20 T17 S4"),
+    116:("T20 T18 D1","T20 T18 S2","T20 T17 S5"),
+    117:("T20 T19","T20 T18 S3","T20 T18 T1"),
+    118:("T20 T19 S1","T20 T18 D2","T20 T18 S4"),
+    119:("T20 T19 D1","T20 T19 S2","T20 T18 S5"),
+    120:("T20 T20","T20 T19 S3","T20 T19 T1"),
+    121:("T20 T20 S1","T20 T19 D2","T20 T19 S4"),
+    122:("T20 T20 D1","T20 T20 S2","T20 T19 S5"),
+    123:("T20 T20 T1","T20 T20 S3","T20 T19 D3"),
+    124:("T20 T20 D2","T20 T20 S4","T20 T19 S7"),
+    125:("T20 T20 S5","T20 T19 D4","T20 T19 S8"),
+    126:("T20 T20 T2","T20 T20 D3","T20 T20 S6"),
+    127:("T20 T20 S7","T20 T19 D5","T20 T19 S10"),
+    128:("T20 T20 D4","T20 T20 S8","T20 T19 S11"),
+    129:("T20 T20 T3","T20 T20 S9","T20 T19 D6"),
+    130:("T20 T20 D5","T20 T20 S10","T20 T19 S13"),
+    131:("T20 T20 S11","T20 T19 D7","T20 T19 S14"),
+    132:("T20 T20 T4","T20 T20 D6","T20 T20 S12"),
+    133:("T20 T20 S13","T20 T19 D8","T20 T19 S16"),
+    134:("T20 T20 D7","T20 T20 S14","T20 T19 S17"),
+    135:("T20 T20 T5","T20 T20 S15","T20 T19 D9"),
+    136:("T20 T20 D8","T20 T20 S16","T20 T19 S19"),
+    137:("T20 T20 S17","T20 T19 D10","T20 T19 S20"),
+    138:("T20 T20 T6","T20 T20 D9","T20 T20 S18"),
+    139:("T20 T20 S19","T20 T19 D11","T20 T18 Outer Bull"),
+    140:("T20 T20 D10","T20 T20 S20","T20 T18 D13"),
+    141:("T20 T20 T7","T20 T19 D12","T20 T19 T8"),
+    142:("T20 T20 D11","T20 T19 Outer Bull","T20 T18 D14"),
+    143:("T20 T19 D13","T20 T17 D16","T20 Bull T11"),
+    144:("T20 T20 T8","T20 T20 D12","T20 T19 T9"),
+    145:("T20 T20 Outer Bull","T20 T19 D14","T20 T17 D17"),
+    146:("T20 T20 D13","T20 T18 D16","T20 Bull D18"),
+    147:("T20 T20 T9","T20 T19 D15","T20 T19 T10"),
+    148:("T20 T20 D14","T20 T18 D17","T20 Bull D19"),
+    149:("T20 T19 D16","T20 T17 D19","T20 Bull T13"),
+    150:("T20 T20 T10","T20 T20 D15","T20 T19 T11"),
+    151:("T20 T19 D17","T20 T17 D20","T20 D20 T17"),
+    152:("T20 T20 D16","T20 T18 D19","T20 Bull T14"),
+    153:("T20 T20 T11","T20 T19 D18","T20 T19 T12"),
+    154:("T20 T20 D17","T20 T18 D20","T20 D20 T18"),
+    155:("T20 T19 D19","T20 Bull T15","T20 T15 Bull"),
+    156:("T20 T20 T12","T20 T20 D18","T20 T19 T13"),
+    157:("T20 T19 D20","T20 D20 T19","T19 T20 D20"),
+    158:("T20 T20 D19","T20 Bull T16","T20 T16 Bull"),
+    159:("T20 T20 T13","T20 T19 T14","T20 T18 T15"),
+    160:("T20 T20 D20","T20 Bull Bull","T20 D20 T20"),
+    161:("T20 T17 Bull","T20 Bull T17","T19 T18 Bull"),
+    162:("T20 T20 T14","T20 T19 T15","T20 T18 T16"),
+    164:("T20 T18 Bull","T20 Bull T18","T19 T19 Bull"),
+    165:("T20 T20 T15","T20 T19 T16","T20 T18 T17"),
+    167:("T20 T19 Bull","T20 Bull T19","T19 T20 Bull"),
+    168:("T20 T20 T16","T20 T19 T17","T20 T18 T18"),
+    170:("T20 T20 Bull","T20 Bull T20","Bull T20 T20"),
+    171:("T20 T20 T17","T20 T19 T18","T20 T18 T19"),
+    174:("T20 T20 T18","T20 T19 T19","T20 T18 T20"),
+    177:("T20 T20 T19","T20 T19 T20","T19 T20 T20"),
+    180:("T20 T20 T20","",""),
+}
+
+DOUBLE_START_OUTS={
+    2:("D1","",""),
+    3:("S1 D1","",""),
+    4:("D2","S1 S1 D1",""),
+    5:("T1 D1","D1 S1 D1","S2 S1 D1"),
+    6:("D3","S3 S1 D1","T1 S1 D1"),
+    7:("S5 D1","D2 S1 D1","S4 S1 D1"),
+    8:("D4","S5 S1 D1","D2 D1 D1"),
+    9:("S7 D1","D3 S1 D1","S6 S1 D1"),
+    10:("D5","S7 S1 D1","D3 D1 D1"),
+    11:("T3 D1","D4 S1 D1","S8 S1 D1"),
+    12:("D6","S9 S1 D1","T3 S1 D1"),
+    13:("S11 D1","D5 S1 D1","S10 S1 D1"),
+    14:("D7","S11 S1 D1","D5 D1 D1"),
+    15:("S13 D1","D6 S1 D1","S12 S1 D1"),
+    16:("D8","S13 S1 D1","D6 D1 D1"),
+    17:("T5 D1","D7 S1 D1","S14 S1 D1"),
+    18:("D9","S15 S1 D1","T5 S1 D1"),
+    19:("S17 D1","D8 S1 D1","S16 S1 D1"),
+    20:("D10","S17 S1 D1","D8 D1 D1"),
+    21:("S19 D1","D9 S1 D1","S18 S1 D1"),
+    22:("D11","S19 S1 D1","D9 D1 D1"),
+    23:("T7 D1","D10 S1 D1","S20 S1 D1"),
+    24:("D12","T7 S1 D1","D10 D1 D1"),
+    25:("T7 D2","D11 S1 D1","T7 D1 D1"),
+    26:("D13","D11 D1 D1","D11 S2 D1"),
+    27:("Outer Bull D1","D12 S1 D1","T8 S1 D1"),
+    28:("D14","Outer Bull S1 D1","D12 D1 D1"),
+    29:("T9 D1","D13 S1 D1","Outer Bull D1 D1"),
+    30:("D15","T9 S1 D1","D13 D1 D1"),
+    31:("T9 D2","D14 S1 D1","T9 D1 D1"),
+    32:("D16","D14 D1 D1","D14 S2 D1"),
+    33:("T9 D3","D15 S1 D1","T10 S1 D1"),
+    34:("D17","D15 D1 D1","D15 S2 D1"),
+    35:("T11 D1","D16 S1 D1","D15 S3 D1"),
+    36:("D18","T11 S1 D1","D16 D1 D1"),
+    37:("T11 D2","D17 S1 D1","T11 D1 D1"),
+    38:("D19","D17 D1 D1","D17 S2 D1"),
+    39:("T11 D3","D18 S1 D1","T12 S1 D1"),
+    40:("D20","D18 D1 D1","D18 S2 D1"),
+    41:("T13 D1","D19 S1 D1","D18 S3 D1"),
+    42:("D20 D1","T13 S1 D1","D19 D1 D1"),
+    43:("T13 D2","D20 S1 D1","T13 D1 D1"),
+    44:("T14 D1","D20 D1 D1","D20 S2 D1"),
+    45:("T13 D3","T14 S1 D1","D20 S3 D1"),
+    46:("T14 D2","T14 D1 D1","T14 S2 D1"),
+    47:("T15 D1","T14 S3 D1","T14 T1 D1"),
+    48:("T14 D3","T15 S1 D1","T14 D2 D1"),
+    49:("T15 D2","T15 D1 D1","T15 S2 D1"),
+    50:("Bull","T15 S3 D1","T15 T1 D1"),
+    51:("T15 D3","T16 S1 D1","T15 D2 D1"),
+    52:("Bull D1","T16 D1 D1","T16 S2 D1"),
+    53:("T17 D1","Bull S1 D1","T16 S3 D1"),
+    54:("Bull D2","T17 S1 D1","Bull D1 D1"),
+    55:("T17 D2","T17 D1 D1","T17 S2 D1"),
+    56:("T18 D1","T17 S3 D1","T17 T1 D1"),
+    57:("T17 D3","T18 S1 D1","T17 D2 D1"),
+    58:("T18 D2","T18 D1 D1","T18 S2 D1"),
+    59:("T19 D1","T18 S3 D1","T18 T1 D1"),
+    60:("T18 D3","T19 S1 D1","T18 D2 D1"),
+    61:("T19 D2","T19 D1 D1","T19 S2 D1"),
+    62:("T20 D1","T19 S3 D1","T19 T1 D1"),
+    63:("T19 D3","T20 S1 D1","T19 D2 D1"),
+    64:("T20 D2","T20 D1 D1","T20 S2 D1"),
+    65:("T19 D4","T20 S3 D1","T20 T1 D1"),
+    66:("T20 D3","T20 D2 D1","T20 S4 D1"),
+    67:("T19 D5","T20 S5 D1","T20 S3 D2"),
+    68:("T20 D4","T20 D3 D1","T20 S6 D1"),
+    69:("T19 D6","T20 S7 D1","T20 S5 D2"),
+    70:("T20 D5","T20 D4 D1","T20 S8 D1"),
+    71:("T19 D7","T20 S9 D1","T20 T3 D1"),
+    72:("T20 D6","T20 D5 D1","T20 S10 D1"),
+    73:("T19 D8","T20 S11 D1","T20 S9 D2"),
+    74:("T20 D7","T20 D6 D1","T20 S12 D1"),
+        75:("T19 D9","T20 S13 D1","T20 S11 D2"),
+    76:("T20 D8","T20 D7 D1","T20 S14 D1"),
+    77:("T19 D10","T20 S15 D1","T20 T5 D1"),
+    78:("T20 D9","T20 D8 D1","T20 S16 D1"),
+    79:("T19 D11","T20 S17 D1","T20 S15 D2"),
+    80:("T20 D10","T20 D9 D1","T20 S18 D1"),
+    81:("T19 D12","T20 S19 D1","T20 S17 D2"),
+    82:("T20 D11","T20 D10 D1","T20 S20 D1"),
+    83:("T19 D13","T20 T7 D1","T20 S19 D2"),
+    84:("T20 D12","T20 D11 D1","T20 D10 D2"),
+    85:("T19 D14","T20 T7 D2","T20 S19 D3"),
+    86:("T20 D13","T20 D12 D1","T20 T8 D1"),
+    87:("T19 D15","T20 Outer Bull D1","T20 T7 D3"),
+    88:("T20 D14","T20 D13 D1","T20 D12 D2"),
+    89:("T19 D16","T20 T9 D1","T20 Outer Bull D2"),
+    90:("T20 D15","T20 D14 D1","T20 D13 D2"),
+    91:("T19 D17","T20 T9 D2","T20 Outer Bull D3"),
+    92:("T20 D16","T20 D15 D1","T20 T10 D1"),
+    93:("T19 D18","T20 T9 D3","T20 Outer Bull D4"),
+    94:("T20 D17","T20 D16 D1","T20 D15 D2"),
+    95:("T19 D19","T20 T11 D1","T20 T9 D4"),
+    96:("T20 D18","T20 D17 D1","T20 D16 D2"),
+    97:("T19 D20","T20 T11 D2","T20 T9 D5"),
+    98:("T20 D19","T20 D18 D1","T20 T12 D1"),
+    99:("T20 T11 D3","T20 T9 D6","T20 Outer Bull D7"),
+    100:("T20 D20","T20 D19 D1","T20 D18 D2"),
+    101:("T17 Bull","T20 T13 D1","T20 T11 D4"),
+    102:("T20 D20 D1","T20 D19 D2","T20 D18 D3"),
+    103:("T20 T13 D2","T20 T11 D5","T20 T9 D8"),
+    104:("T18 Bull","T20 T14 D1","T20 D20 D2"),
+    105:("T20 T13 D3","T20 T11 D6","T20 T9 D9"),
+    106:("T20 T14 D2","T20 D20 D3","T20 D19 D4"),
+    107:("T19 Bull","T20 T15 D1","T20 T13 D4"),
+    108:("T20 T14 D3","T20 D20 D4","T20 D19 D5"),
+    109:("T20 T15 D2","T20 T13 D5","T20 T11 D8"),
+    110:("T20 Bull","T20 T16 D1","T20 T14 D4"),
+    111:("T20 T15 D3","T20 T13 D6","T20 T11 D9"),
+    112:("T20 Bull D1","T20 T16 D2","T20 T14 D5"),
+    113:("T20 T17 D1","T20 T15 D4","T20 T13 D7"),
+    114:("T20 Bull D2","T20 T16 D3","T20 T14 D6"),
+    115:("T20 T17 D2","T20 T15 D5","T20 T13 D8"),
+    116:("T20 T18 D1","T20 Bull D3","T20 T16 D4"),
+    117:("T20 T17 D3","T20 T15 D6","T20 T13 D9"),
+    118:("T20 T18 D2","T20 Bull D4","T20 T16 D5"),
+    119:("T20 T19 D1","T20 T17 D4","T20 T15 D7"),
+    120:("T20 T18 D3","T20 Bull D5","T20 T16 D6"),
+    121:("T20 T19 D2","T20 T17 D5","T20 T15 D8"),
+    122:("T20 T20 D1","T20 T18 D4","T20 Bull D6"),
+    123:("T20 T19 D3","T20 T17 D6","T20 T15 D9"),
+    124:("T20 T20 D2","T20 T18 D5","T20 Bull D7"),
+    125:("T20 T19 D4","T20 T17 D7","T20 T15 D10"),
+    126:("T20 T20 D3","T20 T18 D6","T20 Bull D8"),
+    127:("T20 T19 D5","T20 T17 D8","T20 T15 D11"),
+    128:("T20 T20 D4","T20 T18 D7","T20 Bull D9"),
+    129:("T20 T19 D6","T20 T17 D9","T20 T15 D12"),
+    130:("T20 T20 D5","T20 T18 D8","T20 Bull D10"),
+    131:("T20 T19 D7","T20 T17 D10","T20 T15 D13"),
+    132:("T20 T20 D6","T20 T18 D9","T20 Bull D11"),
+    133:("T20 T19 D8","T20 T17 D11","T20 T15 D14"),
+    134:("T20 T20 D7","T20 T18 D10","T20 Bull D12"),
+    135:("T20 T19 D9","T20 T17 D12","T20 T15 D15"),
+    136:("T20 T20 D8","T20 T18 D11","T20 Bull D13"),
+    137:("T20 T19 D10","T20 T17 D13","T20 T15 D16"),
+    138:("T20 T20 D9","T20 T18 D12","T20 Bull D14"),
+    139:("T20 T19 D11","T20 T17 D14","T20 T15 D17"),
+    140:("T20 T20 D10","T20 T18 D13","T20 Bull D15"),
+    141:("T20 T19 D12","T20 T17 D15","T20 T15 D18"),
+    142:("T20 T20 D11","T20 T18 D14","T20 Bull D16"),
+    143:("T20 T19 D13","T20 T17 D16","T20 T15 D19"),
+    144:("T20 T20 D12","T20 T18 D15","T20 Bull D17"),
+    145:("T20 T19 D14","T20 T17 D17","T20 T15 D20"),
+    146:("T20 T20 D13","T20 T18 D16","T20 Bull D18"),
+    147:("T20 T19 D15","T20 T17 D18","T19 T20 D15"),
+    148:("T20 T20 D14","T20 T18 D17","T20 Bull D19"),
+    149:("T20 T19 D16","T20 T17 D19","T20 T13 Bull"),
+    150:("T20 T20 D15","T20 T18 D18","T20 Bull D20"),
+    151:("T20 T19 D17","T20 T17 D20","T19 T20 D17"),
+    152:("T20 T20 D16","T20 T18 D19","T20 T14 Bull"),
+    153:("T20 T19 D18","T19 T20 D18",""),
+    154:("T20 T20 D17","T20 T18 D20","T19 T19 D20"),
+    155:("T20 T19 D19","T20 T15 Bull","T19 T20 D19"),
+    156:("T20 T20 D18","",""),
+    157:("T20 T19 D20","T19 T20 D20","T19 Bull Bull"),
+    158:("T20 T20 D19","T20 T16 Bull","T19 T17 Bull"),
+    160:("T20 T20 D20","T20 Bull Bull","Bull T20 Bull"),
+    161:("T20 T17 Bull","T19 T18 Bull","T18 T19 Bull"),
+    164:("T20 T18 Bull","T19 T19 Bull","T18 T20 Bull"),
+    167:("T20 T19 Bull","T19 T20 Bull",""),
+    170:("T20 T20 Bull","",""),
+}
+
+FIRST_DART_DOUBLE_OUTS={
+    2:("D1","",""),
+    3:("S1 D1","",""),
+    4:("D2","D1 D1","S2 D1"),
+    5:("T1 D1","S3 D1","S1 D2"),
+    6:("D3","D2 D1","S4 D1"),
+    7:("S5 D1","S3 D2","T1 D2"),
+    8:("D4","D3 D1","S6 D1"),
+    9:("S7 D1","S5 D2","S3 D3"),
+    10:("D5","D4 D1","S8 D1"),
+    11:("T3 D1","S9 D1","S7 D2"),
+    12:("D6","D5 D1","S10 D1"),
+    13:("S11 D1","S9 D2","T3 D2"),
+    14:("D7","D6 D1","S12 D1"),
+    15:("S13 D1","S11 D2","S9 D3"),
+    16:("D8","D7 D1","S14 D1"),
+    17:("T5 D1","S15 D1","S13 D2"),
+    18:("D9","D8 D1","S16 D1"),
+    19:("S17 D1","S15 D2","T5 D2"),
+    20:("D10","D9 D1","S18 D1"),
+    21:("S19 D1","S17 D2","S15 D3"),
+    22:("D11","D10 D1","S20 D1"),
+    23:("T7 D1","S19 D2","S17 D3"),
+    24:("D12","D11 D1","D10 D2"),
+    25:("T7 D2","S19 D3","S17 D4"),
+    26:("D13","D12 D1","T8 D1"),
+    27:("Outer Bull D1","T7 D3","S19 D4"),
+    28:("D14","D13 D1","D12 D2"),
+    29:("T9 D1","Outer Bull D2","T7 D4"),
+    30:("D15","D14 D1","D13 D2"),
+    31:("T9 D2","Outer Bull D3","T7 D5"),
+    32:("D16","D15 D1","T10 D1"),
+    33:("T9 D3","Outer Bull D4","T7 D6"),
+    34:("D17","D16 D1","D15 D2"),
+    35:("T11 D1","T9 D4","Outer Bull D5"),
+    36:("D18","D17 D1","D16 D2"),
+    37:("T11 D2","T9 D5","Outer Bull D6"),
+    38:("D19","D18 D1","T12 D1"),
+    39:("T11 D3","T9 D6","Outer Bull D7"),
+    40:("D20","D19 D1","D18 D2"),
+    41:("T13 D1","T11 D4","T9 D7"),
+    42:("D20 D1","D19 D2","D18 D3"),
+    43:("T13 D2","T11 D5","T9 D8"),
+    44:("T14 D1","D20 D2","D19 D3"),
+    45:("T13 D3","T11 D6","T9 D9"),
+    46:("T14 D2","D20 D3","D19 D4"),
+    47:("T15 D1","T13 D4","T11 D7"),
+    48:("T14 D3","D20 D4","D19 D5"),
+    49:("T15 D2","T13 D5","T11 D8"),
+    50:("Bull","T16 D1","T14 D4"),
+    51:("T15 D3","T13 D6","T11 D9"),
+    52:("Bull D1","T16 D2","T14 D5"),
+    53:("T17 D1","T15 D4","T13 D7"),
+    54:("Bull D2","T16 D3","T14 D6"),
+    55:("T17 D2","T15 D5","T13 D8"),
+    56:("T18 D1","Bull D3","T16 D4"),
+    57:("T17 D3","T15 D6","T13 D9"),
+    58:("T18 D2","Bull D4","T16 D5"),
+    59:("T19 D1","T17 D4","T15 D7"),
+    60:("T18 D3","Bull D5","T16 D6"),
+    61:("T19 D2","T17 D5","T15 D8"),
+    62:("T20 D1","T18 D4","Bull D6"),
+    63:("T19 D3","T17 D6","T15 D9"),
+    64:("T20 D2","T18 D5","Bull D7"),
+    65:("T19 D4","T17 D7","T15 D10"),
+    66:("T20 D3","T18 D6","Bull D8"),
+    67:("T19 D5","T17 D8","T15 D11"),
+    68:("T20 D4","T18 D7","Bull D9"),
+    69:("T19 D6","T17 D9","T15 D12"),
+    70:("T20 D5","T18 D8","Bull D10"),
+    71:("T19 D7","T17 D10","T15 D13"),
+    72:("T20 D6","T18 D9","Bull D11"),
+    73:("T19 D8","T17 D11","T15 D14"),
+    74:("T20 D7","T18 D10","Bull D12"),
+    75:("T19 D9","T17 D12","T15 D15"),
+    76:("T20 D8","T18 D11","Bull D13"),
+    77:("T19 D10","T17 D13","T15 D16"),
+    78:("T20 D9","T18 D12","Bull D14"),
+    79:("T19 D11","T17 D14","T15 D17"),
+    80:("T20 D10","T18 D13","Bull D15"),
+    81:("T19 D12","T17 D15","T15 D18"),
+    82:("T20 D11","T18 D14","Bull D16"),
+    83:("T19 D13","T17 D16","T15 D19"),
+    84:("T20 D12","T18 D15","Bull D17"),
+    85:("T19 D14","T17 D17","T15 D20"),
+    86:("T20 D13","T18 D16","Bull D18"),
+    87:("T19 D15","T17 D18",""),
+    88:("T20 D14","T18 D17","Bull D19"),
+    89:("T19 D16","T17 D19","T13 Bull"),
+    90:("T20 D15","T18 D18","Bull D20"),
+    91:("T19 D17","T17 D20",""),
+    92:("T20 D16","T18 D19","T14 Bull"),
+    93:("T19 D18","",""),
+    94:("T20 D17","T18 D20",""),
+    95:("T19 D19","T15 Bull",""),
+    96:("T20 D18","",""),
+    97:("T19 D20","",""),
+    98:("T20 D19","T16 Bull",""),
+    100:("T20 D20","Bull Bull",""),
+    101:("T17 Bull","",""),
+    104:("T18 Bull","",""),
+    107:("T19 Bull","",""),
+    110:("T20 Bull","",""),
+}
+
+SECOND_DART_DOUBLE_OUTS={
+    2:("D1","",""),
+    4:("D2","",""),
+    6:("D3","",""),
+    8:("D4","",""),
+    10:("D5","",""),
+    12:("D6","",""),
+    14:("D7","",""),
+    16:("D8","",""),
+    18:("D9","",""),
+    20:("D10","",""),
+    22:("D11","",""),
+    24:("D12","",""),
+    26:("D13","",""),
+    28:("D14","",""),
+    30:("D15","",""),
+    32:("D16","",""),
+    34:("D17","",""),
+    36:("D18","",""),
+    38:("D19","",""),
+    40:("D20","",""),
+    50:("Bull","",""),
+}
+
+FIRST_DART_STRAIGHT_OUTS={
+    1:("S1","",""),
+    2:("D1","S1 S1",""),
+    3:("T1","D1 S1","S2 S1"),
+    4:("D2","S3 S1","T1 S1"),
+    5:("S5","D2 S1","S4 S1"),
+    6:("T2","S5 S1","D2 D1"),
+    7:("S7","D3 S1","S6 S1"),
+    8:("D4","S7 S1","D3 D1"),
+    9:("T3","D4 S1","S8 S1"),
+    10:("D5","S9 S1","T3 S1"),
+    11:("S11","D5 S1","S10 S1"),
+    12:("T4","S11 S1","D5 D1"),
+    13:("S13","D6 S1","S12 S1"),
+    14:("D7","S13 S1","D6 D1"),
+    15:("T5","D7 S1","S14 S1"),
+    16:("D8","S15 S1","T5 S1"),
+    17:("S17","D8 S1","S16 S1"),
+    18:("T6","S17 S1","D8 D1"),
+    19:("S19","D9 S1","S18 S1"),
+    20:("D10","S19 S1","D9 D1"),
+    21:("T7","D10 S1","S20 S1"),
+    22:("D11","T7 S1","D10 D1"),
+    23:("D11 S1","T7 D1","T7 S2"),
+    24:("T8","D11 D1","D11 S2"),
+    25:("Outer Bull","D12 S1","T8 S1"),
+    26:("D13","Outer Bull S1","D12 D1"),
+    27:("T9","D13 S1","Outer Bull D1"),
+    28:("D14","T9 S1","D13 D1"),
+    29:("D14 S1","T9 D1","T9 S2"),
+    30:("T10","D14 D1","D14 S2"),
+    31:("T10 S1","D15 S1","D14 S3"),
+    32:("D16","D15 D1","D15 S2"),
+    33:("T11","D16 S1","D15 S3"),
+    34:("D17","T11 S1","D16 D1"),
+    35:("D17 S1","T11 D1","T11 S2"),
+    36:("T12","D17 D1","D17 S2"),
+    37:("T12 S1","D18 S1","D17 S3"),
+    38:("D19","D18 D1","D18 S2"),
+    39:("T13","D19 S1","D18 S3"),
+    40:("D20","T13 S1","D19 D1"),
+    41:("D20 S1","T13 D1","T13 S2"),
+    42:("T14","D20 D1","D20 S2"),
+    43:("T14 S1","D20 S3","D20 T1"),
+    44:("T14 D1","T14 S2","D20 D2"),
+    45:("T15","T14 S3","T14 T1"),
+    46:("T15 S1","T14 D2","T14 S4"),
+    47:("T15 D1","T15 S2","T14 S5"),
+    48:("T16","T15 S3","T15 T1"),
+    49:("T16 S1","T15 D2","T15 S4"),
+    50:("Bull","T16 D1","T16 S2"),
+    51:("T17","Bull S1","T16 S3"),
+    52:("T17 S1","Bull D1","Bull S2"),
+    53:("T17 D1","T17 S2","Bull S3"),
+    54:("T18","T17 S3","T17 T1"),
+    55:("T18 S1","T17 D2","T17 S4"),
+    56:("T18 D1","T18 S2","T17 S5"),
+    57:("T19","T18 S3","T18 T1"),
+    58:("T19 S1","T18 D2","T18 S4"),
+    59:("T19 D1","T19 S2","T18 S5"),
+    60:("T20","T19 S3","T19 T1"),
+    61:("T20 S1","T19 D2","T19 S4"),
+    62:("T20 D1","T20 S2","T19 S5"),
+    63:("T20 T1","T20 S3","T19 D3"),
+    64:("T20 D2","T20 S4","T19 S7"),
+    65:("T20 S5","T19 D4","T19 S8"),
+    66:("T20 T2","T20 D3","T20 S6"),
+    67:("T20 S7","T19 D5","T19 S10"),
+    68:("T20 D4","T20 S8","T19 S11"),
+    69:("T20 T3","T20 S9","T19 D6"),
+    70:("T20 D5","T20 S10","T19 S13"),
+    71:("T20 S11","T19 D7","T19 S14"),
+    72:("T20 T4","T20 D6","T20 S12"),
+    73:("T20 S13","T19 D8","T19 S16"),
+    74:("T20 D7","T20 S14","T19 S17"),
+    75:("T20 T5","T20 S15","T19 D9"),
+    76:("T20 D8","T20 S16","T19 S19"),
+    77:("T20 S17","T19 D10","T19 S20"),
+    78:("T20 T6","T20 D9","T20 S18"),
+    79:("T20 S19","T19 D11","T18 Outer Bull"),
+    80:("T20 D10","T20 S20","T18 D13"),
+    81:("T20 T7","T19 D12","T19 T8"),
+    82:("T20 D11","T19 Outer Bull","T18 D14"),
+    83:("T19 D13","T17 D16","Bull T11"),
+    84:("T20 T8","T20 D12","T19 T9"),
+    85:("T20 Outer Bull","T19 D14","T17 D17"),
+    86:("T20 D13","T18 D16","Bull D18"),
+    87:("T20 T9","T19 D15","T19 T10"),
+    88:("T20 D14","T18 D17","Bull D19"),
+    89:("T19 D16","T17 D19","Bull T13"),
+    90:("T20 T10","T20 D15","T19 T11"),
+    91:("T19 D17","T17 D20","D20 T17"),
+    92:("T20 D16","T18 D19","Bull T14"),
+    93:("T20 T11","T19 D18","T19 T12"),
+    94:("T20 D17","T18 D20","D20 T18"),
+        95: ("T19 D19", "Bull T15", "T15 Bull"),
+    96: ("T20 T12", "T20 D18", "T19 T13"),
+    97: ("T19 D20", "D20 T19", ""),
+    98: ("T20 D19", "Bull T16", "T16 Bull"),
+    99: ("T20 T13", "T19 T14", "T18 T15"),
+    100: ("T20 D20", "Bull Bull", "D20 T20"),
+    101: ("T17 Bull", "Bull T17", ""),
+    102: ("T20 T14", "T19 T15", "T18 T16"),
+    104: ("T18 Bull", "Bull T18", ""),
+    105: ("T20 T15", "T19 T16", "T18 T17"),
+    107: ("T19 Bull", "Bull T19", ""),
+    108: ("T20 T16", "T19 T17", "T18 T18"),
+    110: ("T20 Bull", "Bull T20", ""),
+    111: ("T20 T17", "T19 T18", "T18 T19"),
+    114: ("T20 T18", "T19 T19", "T18 T20"),
+    117: ("T20 T19", "T19 T20", ""),
+    120: ("T20 T20", "", ""),
+}
+
+# ================= SECOND DART STRAIGHT OUTS =================
+
+SECOND_DART_STRAIGHT_OUTS = {
+    1: ("S1", "", ""),
+    2: ("D1", "S2", ""),
+    3: ("T1", "S3", ""),
+    4: ("D2", "S4", ""),
+    5: ("S5", "", ""),
+    6: ("T2", "D3", "S6"),
+    7: ("S7", "", ""),
+    8: ("D4", "S8", ""),
+    9: ("T3", "S9", ""),
+    10: ("D5", "S10", ""),
+    11: ("S11", "", ""),
+    12: ("T4", "D6", "S12"),
+    13: ("S13", "", ""),
+    14: ("D7", "S14", ""),
+    15: ("T5", "S15", ""),
+    16: ("D8", "S16", ""),
+    17: ("S17", "", ""),
+    18: ("T6", "D9", "S18"),
+    19: ("S19", "", ""),
+    20: ("D10", "S20", ""),
+    21: ("T7", "", ""),
+    22: ("D11", "", ""),
+    24: ("T8", "D12", ""),
+    25: ("Outer Bull", "", ""),
+    26: ("D13", "", ""),
+    27: ("T9", "", ""),
+    28: ("D14", "", ""),
+    30: ("T10", "D15", ""),
+    32: ("D16", "", ""),
+    33: ("T11", "", ""),
+    34: ("D17", "", ""),
+    36: ("T12", "D18", ""),
+    38: ("D19", "", ""),
+    39: ("T13", "", ""),
+    40: ("D20", "", ""),
+    42: ("T14", "", ""),
+    45: ("T15", "", ""),
+    48: ("T16", "", ""),
+    50: ("Bull", "", ""),
+    51: ("T17", "", ""),
+    54: ("T18", "", ""),
+    57: ("T19", "", ""),
+    60: ("T20", "", ""),
+}
+
+# ================= SECOND DART DOUBLE OUT =================
+
+# The remaining route handlers use the session values
+# saved by the earlier routes.
+
+@app.route("/first-num", methods=["POST"])
 def enter_start_num():
-    global start_num
     start_num = int(request.form.get("start"))
- 
+    session["start_num"] = start_num
+
+    out_type = session.get("out_type")
+
     if out_type == "straight":
-        match start_num:
-            case n if n < 1:
-                return respond("Enter a number of 1 or more.", "", n)
-            case 1:
-                return respond("1 left. Your out:", "S1", 1)
-            case 2:
-                return respond("2 left. Your out:", "D1", 2)
-            case 3:
-                return respond("3 left. Your out:", "T1", 3)
-            case 4:
-                return respond("4 left. Your out:", "D2", 4)
-            case 5:
-                return respond("5 left. Your out:", "S5", 5)
-            case 6:
-                return respond("6 left. Your out:", "T2", 6)
-            case 7:
-                return respond("7 left. Your out:", "S7", 7)
-            case 8:
-                return respond("8 left. Your out:", "D4", 8)
-            case 9:
-                return respond("9 left. Your out:", "T3", 9)
-            case 10:
-                return respond("10 left. Your out:", "D5", 10)
-            case 11:
-                return respond("11 left. Your out:", "S11", 11)
-            case 12:
-                return respond("12 left. Your out:", "T4", 12)
-            case 13:
-                return respond("13 left. Your out:", "S13", 13)
-            case 14:
-                return respond("14 left. Your out:", "D7", 14)
-            case 15:
-                return respond("15 left. Your out:", "T5", 15)
-            case 16:
-                return respond("16 left. Your out:", "D8", 16)
-            case 17:
-                return respond("17 left. Your out:", "S17", 17)
-            case 18:
-                return respond("18 left. Your out:", "T6", 18)
-            case 19:
-                return respond("19 left. Your out:", "S19", 19)
-            case 20:
-                return respond("20 left. Your out:", "D10", 20)
-            case 21:
-                return respond("21 left. Your out:", "T7", 21)
-            case 22:
-                return respond("22 left. Your out:", "D11", 22)
-            case 23:
-                return respond("23 left. Your out:", "D11 S1", 23)
-            case 24:
-                return respond("24 left. Your out:", "T8", 24)
-            case 25:
-                return respond("25 left. Your out:", "Outer Bull", 25)
-            case 26:
-                return respond("26 left. Your out:", "D13", 26)
-            case 27:
-                return respond("27 left. Your out:", "T9", 27)
-            case 28:
-                return respond("28 left. Your out:", "D14", 28)
-            case 29:
-                return respond("29 left. Your out:", "D14 S1", 29)
-            case 30:
-                return respond("30 left. Your out:", "T10", 30)
-            case 31:
-                return respond("31 left. Your out:", "T10 S1", 31)
-            case 32:
-                return respond("32 left. Your out:", "D16", 32)
-            case 33:
-                return respond("33 left. Your out:", "T11", 33)
-            case 34:
-                return respond("34 left. Your out:", "D17", 34)
-            case 35:
-                return respond("35 left. Your out:", "D17 S1", 35)
-            case 36:
-                return respond("36 left. Your out:", "T12", 36)
-            case 37:
-                return respond("37 left. Your out:", "T12 S1", 37)
-            case 38:
-                return respond("38 left. Your out:", "D19", 38)
-            case 39:
-                return respond("39 left. Your out:", "T13", 39)
-            case 40:
-                return respond("40 left. Your out:", "D20", 40)
-            case 41:
-                return respond("41 left. Your out:", "D20 S1", 41)
-            case 42:
-                return respond("42 left. Your out:", "T14", 42)
-            case 43:
-                return respond("43 left. Your out:", "T14 S1", 43)
-            case 44:
-                return respond("44 left. Your out:", "T14 D1", 44)
-            case 45:
-                return respond("45 left. Your out:", "T15", 45)
-            case 46:
-                return respond("46 left. Your out:", "T15 S1", 46)
-            case 47:
-                return respond("47 left. Your out:", "T15 D1", 47)
-            case 48:
-                return respond("48 left. Your out:", "T16", 48)
-            case 49:
-                return respond("49 left. Your out:", "T16 S1", 49)
-            case 50:
-                return respond("50 left. Your out:", "Bull", 50)
-            case 51:
-                return respond("51 left. Your out:", "T17", 51)
-            case 52:
-                return respond("52 left. Your out:", "T17 S1", 52)
-            case 53:
-                return respond("53 left. Your out:", "T17 D1", 53)
-            case 54:
-                return respond("54 left. Your out:", "T18", 54)
-            case 55:
-                return respond("55 left. Your out:", "T18 S1", 55)
-            case 56:
-                return respond("56 left. Your out:", "T18 D1", 56)
-            case 57:
-                return respond("57 left. Your out:", "T19", 57)
-            case 58:
-                return respond("58 left. Your out:", "T19 S1", 58)
-            case 59:
-                return respond("59 left. Your out:", "T19 D1", 59)
-            case 60:
-                return respond("60 left. Your out:", "T20", 60)
-            case 61:
-                return respond("61 left. Your out:", "T20 S1", 61)
-            case 62:
-                return respond("62 left. Your out:", "T20 D1", 62)
-            case 63:
-                return respond("63 left. Your out:", "T20 T1", 63)
-            case 64:
-                return respond("64 left. Your out:", "T20 D2", 64)
-            case 65:
-                return respond("65 left. Your out:", "T20 S5", 65)
-            case 66:
-                return respond("66 left. Your out:", "T20 T2", 66)
-            case 67:
-                return respond("67 left. Your out:", "T20 S7", 67)
-            case 68:
-                return respond("68 left. Your out:", "T20 D4", 68)
-            case 69:
-                return respond("69 left. Your out:", "T20 T3", 69)
-            case 70:
-                return respond("70 left. Your out:", "T20 D5", 70)
-            case 71:
-                return respond("71 left. Your out:", "T20 S11", 71)
-            case 72:
-                return respond("72 left. Your out:", "T20 T4", 72)
-            case 73:
-                return respond("73 left. Your out:", "T20 S13", 73)
-            case 74:
-                return respond("74 left. Your out:", "T20 D7", 74)
-            case 75:
-                return respond("75 left. Your out:", "T20 T5", 75)
-            case 76:
-                return respond("76 left. Your out:", "T20 D8", 76)
-            case 77:
-                return respond("77 left. Your out:", "T20 S17", 77)
-            case 78:
-                return respond("78 left. Your out:", "T20 T6", 78)
-            case 79:
-                return respond("79 left. Your out:", "T20 S19", 79)
-            case 80:
-                return respond("80 left. Your out:", "T20 D10", 80)
-            case 81:
-                return respond("81 left. Your out:", "T20 T7", 81)
-            case 82:
-                return respond("82 left. Your out:", "T20 D11", 82)
-            case 83:
-                return respond("83 left. Your out:", "T19 D13", 83)
-            case 84:
-                return respond("84 left. Your out:", "T20 T8", 84)
-            case 85:
-                return respond("85 left. Your out:", "T20 Outer Bull", 85)
-            case 86:
-                return respond("86 left. Your out:", "T20 D13", 86)
-            case 87:
-                return respond("87 left. Your out:", "T20 T9", 87)
-            case 88:
-                return respond("88 left. Your out:", "T20 D14", 88)
-            case 89:
-                return respond("89 left. Your out:", "T19 D16", 89)
-            case 90:
-                return respond("90 left. Your out:", "T20 T10", 90)
-            case 91:
-                return respond("91 left. Your out:", "T19 D17", 91)
-            case 92:
-                return respond("92 left. Your out:", "T20 D16", 92)
-            case 93:
-                return respond("93 left. Your out:", "T20 T11", 93)
-            case 94:
-                return respond("94 left. Your out:", "T20 D17", 94)
-            case 95:
-                return respond("95 left. Your out:", "T19 D19", 95)
-            case 96:
-                return respond("96 left. Your out:", "T20 T12", 96)
-            case 97:
-                return respond("97 left. Your out:", "T19 D20", 97)
-            case 98:
-                return respond("98 left. Your out:", "T20 D19", 98)
-            case 99:
-                return respond("99 left. Your out:", "T20 T13", 99)
-            case 100:
-                return respond("100 left. Your out:", "T20 D20", 100)
-            case 101:
-                return respond("101 left. Your out:", "T17 Bull", 101)
-            case 102:
-                return respond("102 left. Your out:", "T20 T14", 102)
-            case 103:
-                return respond("103 left. Your out:", "T20 T14 S1", 103)
-            case 104:
-                return respond("104 left. Your out:", "T18 Bull", 104)
-            case 105:
-                return respond("105 left. Your out:", "T20 T15", 105)
-            case 106:
-                return respond("106 left. Your out:", "T20 T15 S1", 106)
-            case 107:
-                return respond("107 left. Your out:", "T19 Bull", 107)
-            case 108:
-                return respond("108 left. Your out:", "T20 T16", 108)
-            case 109:
-                return respond("109 left. Your out:", "T20 T16 S1", 109)
-            case 110:
-                return respond("110 left. Your out:", "T20 Bull", 110)
-            case 111:
-                return respond("111 left. Your out:", "T20 T17", 111)
-            case 112:
-                return respond("112 left. Your out:", "T20 T17 S1", 112)
-            case 113:
-                return respond("113 left. Your out:", "T20 T17 D1", 113)
-            case 114:
-                return respond("114 left. Your out:", "T20 T18", 114)
-            case 115:
-                return respond("115 left. Your out:", "T20 T18 S1", 115)
-            case 116:
-                return respond("116 left. Your out:", "T20 T18 D1", 116)
-            case 117:
-                return respond("117 left. Your out:", "T20 T19", 117)
-            case 118:
-                return respond("118 left. Your out:", "T20 T19 S1", 118)
-            case 119:
-                return respond("119 left. Your out:", "T20 T19 D1", 119)
-            case 120:
-                return respond("120 left. Your out:", "T20 T20", 120)
-            case 121:
-                return respond("121 left. Your out:", "T20 T20 S1", 121)
-            case 122:
-                return respond("122 left. Your out:", "T20 T20 D1", 122)
-            case 123:
-                return respond("123 left. Your out:", "T20 T20 T1", 123)
-            case 124:
-                return respond("124 left. Your out:", "T20 T20 D2", 124)
-            case 125:
-                return respond("125 left. Your out:", "T20 T20 S5", 125)
-            case 126:
-                return respond("126 left. Your out:", "T20 T20 T2", 126)
-            case 127:
-                return respond("127 left. Your out:", "T20 T20 S7", 127)
-            case 128:
-                return respond("128 left. Your out:", "T20 T20 D4", 128)
-            case 129:
-                return respond("129 left. Your out:", "T20 T20 T3", 129)
-            case 130:
-                return respond("130 left. Your out:", "T20 T20 D5", 130)
-            case 131:
-                return respond("131 left. Your out:", "T20 T20 S11", 131)
-            case 132:
-                return respond("132 left. Your out:", "T20 T20 T4", 132)
-            case 133:
-                return respond("133 left. Your out:", "T20 T20 S13", 133)
-            case 134:
-                return respond("134 left. Your out:", "T20 T20 D7", 134)
-            case 135:
-                return respond("135 left. Your out:", "T20 T20 T5", 135)
-            case 136:
-                return respond("136 left. Your out:", "T20 T20 D8", 136)
-            case 137:
-                return respond("137 left. Your out:", "T20 T20 S17", 137)
-            case 138:
-                return respond("138 left. Your out:", "T20 T20 T6", 138)
-            case 139:
-                return respond("139 left. Your out:", "T20 T20 S19", 139)
-            case 140:
-                return respond("140 left. Your out:", "T20 T20 D10", 140)
-            case 141:
-                return respond("141 left. Your out:", "T20 T20 T7", 141)
-            case 142:
-                return respond("142 left. Your out:", "T20 T20 D11", 142)
-            case 143:
-                return respond("143 left. Your out:", "T20 T19 D13", 143)
-            case 144:
-                return respond("144 left. Your out:", "T20 T20 T8", 144)
-            case 145:
-                return respond("145 left. Your out:", "T20 T20 Outer Bull", 145)
-            case 146:
-                return respond("146 left. Your out:", "T20 T20 D13", 146)
-            case 147:
-                return respond("147 left. Your out:", "T20 T20 T9", 147)
-            case 148:
-                return respond("148 left. Your out:", "T20 T20 D14", 148)
-            case 149:
-                return respond("149 left. Your out:", "T20 T19 D16", 149)
-            case 150:
-                return respond("150 left. Your out:", "T20 T20 T10", 150)
-            case 151:
-                return respond("151 left. Your out:", "T20 T19 D17", 151)
-            case 152:
-                return respond("152 left. Your out:", "T20 T20 D16", 152)
-            case 153:
-                return respond("153 left. Your out:", "T20 T20 T11", 153)
-            case 154:
-                return respond("154 left. Your out:", "T20 T20 D17", 154)
-            case 155:
-                return respond("155 left. Your out:", "T20 T19 D19", 155)
-            case 156:
-                return respond("156 left. Your out:", "T20 T20 T12", 156)
-            case 157:
-                return respond("157 left. Your out:", "T20 T19 D20", 157)
-            case 158:
-                return respond("158 left. Your out:", "T20 T20 D19", 158)
-            case 159:
-                return respond("159 left. Your out:", "T20 T20 T13", 159)
-            case 160:
-                return respond("160 left. Your out:", "T20 T20 D20", 160)
-            case 161:
-                return respond("161 left. Your out:", "T20 T17 Bull", 161)
-            case 162:
-                return respond("162 left. Your out:", "T20 T20 T14", 162)
-            case 164:
-                return respond("164 left. Your out:", "T20 T18 Bull", 164)
-            case 165:
-                return respond("165 left. Your out:", "T20 T20 T15", 165)
-            case 167:
-                return respond("167 left. Your out:", "T20 T19 Bull", 167)
-            case 168:
-                return respond("168 left. Your out:", "T20 T20 T16", 168)
-            case 170:
-                return respond("170 left. Your out:", "T20 T20 Bull", 170)
-            case 171:
-                return respond("171 left. Your out:", "T20 T20 T17", 171)
-            case 174:
-                return respond("174 left. Your out:", "T20 T20 T18", 174)
-            case 177:
-                return respond("177 left. Your out:", "T20 T20 T19", 177)
-            case 180:
-                return respond("180 left. Your out:", "T20 T20 T20", 180)
-            case n if n > 180:
-                return respond("No out possible. 180 is the highest straight out.", "", n)
-            case n:
-                return respond(f"{n} has no 3-dart straight out.", "", n)
- 
-    elif out_type == "double":
-        match start_num:
-            case n if n < 2:
-                return respond("Enter a number of 2 or more (1 is impossible in double out).", "", n)
-            case 2:
-                return respond("2 left. Your out:", "D1", 2)
-            case 3:
-                return respond("3 left. Your out:", "S1 D1", 3)
-            case 4:
-                return respond("4 left. Your out:", "D2", 4)
-            case 5:
-                return respond("5 left. Your out:", "T1 D1", 5)
-            case 6:
-                return respond("6 left. Your out:", "D3", 6)
-            case 7:
-                return respond("7 left. Your out:", "S5 D1", 7)
-            case 8:
-                return respond("8 left. Your out:", "D4", 8)
-            case 9:
-                return respond("9 left. Your out:", "S7 D1", 9)
-            case 10:
-                return respond("10 left. Your out:", "D5", 10)
-            case 11:
-                return respond("11 left. Your out:", "T3 D1", 11)
-            case 12:
-                return respond("12 left. Your out:", "D6", 12)
-            case 13:
-                return respond("13 left. Your out:", "S11 D1", 13)
-            case 14:
-                return respond("14 left. Your out:", "D7", 14)
-            case 15:
-                return respond("15 left. Your out:", "S13 D1", 15)
-            case 16:
-                return respond("16 left. Your out:", "D8", 16)
-            case 17:
-                return respond("17 left. Your out:", "T5 D1", 17)
-            case 18:
-                return respond("18 left. Your out:", "D9", 18)
-            case 19:
-                return respond("19 left. Your out:", "S17 D1", 19)
-            case 20:
-                return respond("20 left. Your out:", "D10", 20)
-            case 21:
-                return respond("21 left. Your out:", "S19 D1", 21)
-            case 22:
-                return respond("22 left. Your out:", "D11", 22)
-            case 23:
-                return respond("23 left. Your out:", "T7 D1", 23)
-            case 24:
-                return respond("24 left. Your out:", "D12", 24)
-            case 25:
-                return respond("25 left. Your out:", "T7 D2", 25)
-            case 26:
-                return respond("26 left. Your out:", "D13", 26)
-            case 27:
-                return respond("27 left. Your out:", "Outer Bull D1", 27)
-            case 28:
-                return respond("28 left. Your out:", "D14", 28)
-            case 29:
-                return respond("29 left. Your out:", "T9 D1", 29)
-            case 30:
-                return respond("30 left. Your out:", "D15", 30)
-            case 31:
-                return respond("31 left. Your out:", "T9 D2", 31)
-            case 32:
-                return respond("32 left. Your out:", "D16", 32)
-            case 33:
-                return respond("33 left. Your out:", "T9 D3", 33)
-            case 34:
-                return respond("34 left. Your out:", "D17", 34)
-            case 35:
-                return respond("35 left. Your out:", "T11 D1", 35)
-            case 36:
-                return respond("36 left. Your out:", "D18", 36)
-            case 37:
-                return respond("37 left. Your out:", "T11 D2", 37)
-            case 38:
-                return respond("38 left. Your out:", "D19", 38)
-            case 39:
-                return respond("39 left. Your out:", "T11 D3", 39)
-            case 40:
-                return respond("40 left. Your out:", "D20", 40)
-            case 41:
-                return respond("41 left. Your out:", "T13 D1", 41)
-            case 42:
-                return respond("42 left. Your out:", "D20 D1", 42)
-            case 43:
-                return respond("43 left. Your out:", "T13 D2", 43)
-            case 44:
-                return respond("44 left. Your out:", "T14 D1", 44)
-            case 45:
-                return respond("45 left. Your out:", "T13 D3", 45)
-            case 46:
-                return respond("46 left. Your out:", "T14 D2", 46)
-            case 47:
-                return respond("47 left. Your out:", "T15 D1", 47)
-            case 48:
-                return respond("48 left. Your out:", "T14 D3", 48)
-            case 49:
-                return respond("49 left. Your out:", "T15 D2", 49)
-            case 50:
-                return respond("50 left. Your out:", "Bull", 50)
-            case 51:
-                return respond("51 left. Your out:", "T15 D3", 51)
-            case 52:
-                return respond("52 left. Your out:", "Bull D1", 52)
-            case 53:
-                return respond("53 left. Your out:", "T17 D1", 53)
-            case 54:
-                return respond("54 left. Your out:", "Bull D2", 54)
-            case 55:
-                return respond("55 left. Your out:", "T17 D2", 55)
-            case 56:
-                return respond("56 left. Your out:", "T18 D1", 56)
-            case 57:
-                return respond("57 left. Your out:", "T17 D3", 57)
-            case 58:
-                return respond("58 left. Your out:", "T18 D2", 58)
-            case 59:
-                return respond("59 left. Your out:", "T19 D1", 59)
-            case 60:
-                return respond("60 left. Your out:", "T18 D3", 60)
-            case 61:
-                return respond("61 left. Your out:", "T19 D2", 61)
-            case 62:
-                return respond("62 left. Your out:", "T20 D1", 62)
-            case 63:
-                return respond("63 left. Your out:", "T19 D3", 63)
-            case 64:
-                return respond("64 left. Your out:", "T20 D2", 64)
-            case 65:
-                return respond("65 left. Your out:", "T19 D4", 65)
-            case 66:
-                return respond("66 left. Your out:", "T20 D3", 66)
-            case 67:
-                return respond("67 left. Your out:", "T19 D5", 67)
-            case 68:
-                return respond("68 left. Your out:", "T20 D4", 68)
-            case 69:
-                return respond("69 left. Your out:", "T19 D6", 69)
-            case 70:
-                return respond("70 left. Your out:", "T20 D5", 70)
-            case 71:
-                return respond("71 left. Your out:", "T19 D7", 71)
-            case 72:
-                return respond("72 left. Your out:", "T20 D6", 72)
-            case 73:
-                return respond("73 left. Your out:", "T19 D8", 73)
-            case 74:
-                return respond("74 left. Your out:", "T20 D7", 74)
-            case 75:
-                return respond("75 left. Your out:", "T19 D9", 75)
-            case 76:
-                return respond("76 left. Your out:", "T20 D8", 76)
-            case 77:
-                return respond("77 left. Your out:", "T19 D10", 77)
-            case 78:
-                return respond("78 left. Your out:", "T20 D9", 78)
-            case 79:
-                return respond("79 left. Your out:", "T19 D11", 79)
-            case 80:
-                return respond("80 left. Your out:", "T20 D10", 80)
-            case 81:
-                return respond("81 left. Your out:", "T19 D12", 81)
-            case 82:
-                return respond("82 left. Your out:", "T20 D11", 82)
-            case 83:
-                return respond("83 left. Your out:", "T19 D13", 83)
-            case 84:
-                return respond("84 left. Your out:", "T20 D12", 84)
-            case 85:
-                return respond("85 left. Your out:", "T19 D14", 85)
-            case 86:
-                return respond("86 left. Your out:", "T20 D13", 86)
-            case 87:
-                return respond("87 left. Your out:", "T19 D15", 87)
-            case 88:
-                return respond("88 left. Your out:", "T20 D14", 88)
-            case 89:
-                return respond("89 left. Your out:", "T19 D16", 89)
-            case 90:
-                return respond("90 left. Your out:", "T20 D15", 90)
-            case 91:
-                return respond("91 left. Your out:", "T19 D17", 91)
-            case 92:
-                return respond("92 left. Your out:", "T20 D16", 92)
-            case 93:
-                return respond("93 left. Your out:", "T19 D18", 93)
-            case 94:
-                return respond("94 left. Your out:", "T20 D17", 94)
-            case 95:
-                return respond("95 left. Your out:", "T19 D19", 95)
-            case 96:
-                return respond("96 left. Your out:", "T20 D18", 96)
-            case 97:
-                return respond("97 left. Your out:", "T19 D20", 97)
-            case 98:
-                return respond("98 left. Your out:", "T20 D19", 98)
-            case 99:
-                return respond("99 left. Your out:", "T20 T11 D3", 99)
-            case 100:
-                return respond("100 left. Your out:", "T20 D20", 100)
-            case 101:
-                return respond("101 left. Your out:", "T17 Bull", 101)
-            case 102:
-                return respond("102 left. Your out:", "T20 D20 D1", 102)
-            case 103:
-                return respond("103 left. Your out:", "T20 T13 D2", 103)
-            case 104:
-                return respond("104 left. Your out:", "T18 Bull", 104)
-            case 105:
-                return respond("105 left. Your out:", "T20 T13 D3", 105)
-            case 106:
-                return respond("106 left. Your out:", "T20 T14 D2", 106)
-            case 107:
-                return respond("107 left. Your out:", "T19 Bull", 107)
-            case 108:
-                return respond("108 left. Your out:", "T20 T14 D3", 108)
-            case 109:
-                return respond("109 left. Your out:", "T20 T15 D2", 109)
-            case 110:
-                return respond("110 left. Your out:", "T20 Bull", 110)
-            case 111:
-                return respond("111 left. Your out:", "T20 T15 D3", 111)
-            case 112:
-                return respond("112 left. Your out:", "T20 Bull D1", 112)
-            case 113:
-                return respond("113 left. Your out:", "T20 T17 D1", 113)
-            case 114:
-                return respond("114 left. Your out:", "T20 Bull D2", 114)
-            case 115:
-                return respond("115 left. Your out:", "T20 T17 D2", 115)
-            case 116:
-                return respond("116 left. Your out:", "T20 T18 D1", 116)
-            case 117:
-                return respond("117 left. Your out:", "T20 T17 D3", 117)
-            case 118:
-                return respond("118 left. Your out:", "T20 T18 D2", 118)
-            case 119:
-                return respond("119 left. Your out:", "T20 T19 D1", 119)
-            case 120:
-                return respond("120 left. Your out:", "T20 T18 D3", 120)
-            case 121:
-                return respond("121 left. Your out:", "T20 T19 D2", 121)
-            case 122:
-                return respond("122 left. Your out:", "T20 T20 D1", 122)
-            case 123:
-                return respond("123 left. Your out:", "T20 T19 D3", 123)
-            case 124:
-                return respond("124 left. Your out:", "T20 T20 D2", 124)
-            case 125:
-                return respond("125 left. Your out:", "T20 T19 D4", 125)
-            case 126:
-                return respond("126 left. Your out:", "T20 T20 D3", 126)
-            case 127:
-                return respond("127 left. Your out:", "T20 T19 D5", 127)
-            case 128:
-                return respond("128 left. Your out:", "T20 T20 D4", 128)
-            case 129:
-                return respond("129 left. Your out:", "T20 T19 D6", 129)
-            case 130:
-                return respond("130 left. Your out:", "T20 T20 D5", 130)
-            case 131:
-                return respond("131 left. Your out:", "T20 T19 D7", 131)
-            case 132:
-                return respond("132 left. Your out:", "T20 T20 D6", 132)
-            case 133:
-                return respond("133 left. Your out:", "T20 T19 D8", 133)
-            case 134:
-                return respond("134 left. Your out:", "T20 T20 D7", 134)
-            case 135:
-                return respond("135 left. Your out:", "T20 T19 D9", 135)
-            case 136:
-                return respond("136 left. Your out:", "T20 T20 D8", 136)
-            case 137:
-                return respond("137 left. Your out:", "T20 T19 D10", 137)
-            case 138:
-                return respond("138 left. Your out:", "T20 T20 D9", 138)
-            case 139:
-                return respond("139 left. Your out:", "T20 T19 D11", 139)
-            case 140:
-                return respond("140 left. Your out:", "T20 T20 D10", 140)
-            case 141:
-                return respond("141 left. Your out:", "T20 T19 D12", 141)
-            case 142:
-                return respond("142 left. Your out:", "T20 T20 D11", 142)
-            case 143:
-                return respond("143 left. Your out:", "T20 T19 D13", 143)
-            case 144:
-                return respond("144 left. Your out:", "T20 T20 D12", 144)
-            case 145:
-                return respond("145 left. Your out:", "T20 T19 D14", 145)
-            case 146:
-                return respond("146 left. Your out:", "T20 T20 D13", 146)
-            case 147:
-                return respond("147 left. Your out:", "T20 T19 D15", 147)
-            case 148:
-                return respond("148 left. Your out:", "T20 T20 D14", 148)
-            case 149:
-                return respond("149 left. Your out:", "T20 T19 D16", 149)
-            case 150:
-                return respond("150 left. Your out:", "T20 T20 D15", 150)
-            case 151:
-                return respond("151 left. Your out:", "T20 T19 D17", 151)
-            case 152:
-                return respond("152 left. Your out:", "T20 T20 D16", 152)
-            case 153:
-                return respond("153 left. Your out:", "T20 T19 D18", 153)
-            case 154:
-                return respond("154 left. Your out:", "T20 T20 D17", 154)
-            case 155:
-                return respond("155 left. Your out:", "T20 T19 D19", 155)
-            case 156:
-                return respond("156 left. Your out:", "T20 T20 D18", 156)
-            case 157:
-                return respond("157 left. Your out:", "T20 T19 D20", 157)
-            case 158:
-                return respond("158 left. Your out:", "T20 T20 D19", 158)
-            case 160:
-                return respond("160 left. Your out:", "T20 T20 D20", 160)
-            case 161:
-                return respond("161 left. Your out:", "T20 T17 Bull", 161)
-            case 164:
-                return respond("164 left. Your out:", "T20 T18 Bull", 164)
-            case 167:
-                return respond("167 left. Your out:", "T20 T19 Bull", 167)
-            case 170:
-                return respond("170 left. Your out:", "T20 T20 Bull", 170)
-            case 159 | 162 | 163 | 165 | 166 | 168 | 169:
-                return respond(f"{start_num} has no 3-dart out (one of the 7 impossible numbers).", "", start_num)
-            case n if n > 170:
-                return respond("No out possible. 170 is the highest double out.", "", n)
-            case n:
-                return respond(f"{n} has no 3-dart double out.", "", n)
- 
+        routes = STRAIGHT_START_OUTS.get(start_num)
+        if routes:
+            return render_checkout(start_num, routes)
+
+        if start_num > 180:
+            return render_checkout(start_num, ("", "", ""))
+        return render_checkout(start_num, ("", "", ""))
+
+    if out_type == "double":
+        routes = DOUBLE_START_OUTS.get(start_num)
+        if routes:
+            return render_checkout(start_num, routes)
+
+        return render_checkout(start_num, ("", "", ""))
+
     return render_template("out.html")
- 
- 
-# ======================= DOUBLE OUT =======================
- 
-@app.route("/first-dart-double", methods=["POST"])   # 2 darts left after this
+
+
+@app.route("/first-dart-double", methods=["POST"])
 def first_dart_double():
-    global first_double_hit, left_over
-    first_double_hit = int(request.form.get("hitDouble1"))
-    left_over = start_num - first_double_hit
-    match left_over:
-        case 0:
-            return respond("Checked out!", "", 0)
-        case n if n < 0:
-            return respond("Bust! You went over.", "", n)
-        case 1:
-            return respond("Bust! You can't be left on 1 in double out.", "", 1)
-        case 2:
-            return respond("2 left. Your out:", "D1", 2)
-        case 3:
-            return respond("3 left. Your out:", "S1 D1", 3)
-        case 4:
-            return respond("4 left. Your out:", "D2", 4)
-        case 5:
-            return respond("5 left. Your out:", "T1 D1", 5)
-        case 6:
-            return respond("6 left. Your out:", "D3", 6)
-        case 7:
-            return respond("7 left. Your out:", "S5 D1", 7)
-        case 8:
-            return respond("8 left. Your out:", "D4", 8)
-        case 9:
-            return respond("9 left. Your out:", "S7 D1", 9)
-        case 10:
-            return respond("10 left. Your out:", "D5", 10)
-        case 11:
-            return respond("11 left. Your out:", "T3 D1", 11)
-        case 12:
-            return respond("12 left. Your out:", "D6", 12)
-        case 13:
-            return respond("13 left. Your out:", "S11 D1", 13)
-        case 14:
-            return respond("14 left. Your out:", "D7", 14)
-        case 15:
-            return respond("15 left. Your out:", "S13 D1", 15)
-        case 16:
-            return respond("16 left. Your out:", "D8", 16)
-        case 17:
-            return respond("17 left. Your out:", "T5 D1", 17)
-        case 18:
-            return respond("18 left. Your out:", "D9", 18)
-        case 19:
-            return respond("19 left. Your out:", "S17 D1", 19)
-        case 20:
-            return respond("20 left. Your out:", "D10", 20)
-        case 21:
-            return respond("21 left. Your out:", "S19 D1", 21)
-        case 22:
-            return respond("22 left. Your out:", "D11", 22)
-        case 23:
-            return respond("23 left. Your out:", "T7 D1", 23)
-        case 24:
-            return respond("24 left. Your out:", "D12", 24)
-        case 25:
-            return respond("25 left. Your out:", "T7 D2", 25)
-        case 26:
-            return respond("26 left. Your out:", "D13", 26)
-        case 27:
-            return respond("27 left. Your out:", "Outer Bull D1", 27)
-        case 28:
-            return respond("28 left. Your out:", "D14", 28)
-        case 29:
-            return respond("29 left. Your out:", "T9 D1", 29)
-        case 30:
-            return respond("30 left. Your out:", "D15", 30)
-        case 31:
-            return respond("31 left. Your out:", "T9 D2", 31)
-        case 32:
-            return respond("32 left. Your out:", "D16", 32)
-        case 33:
-            return respond("33 left. Your out:", "T9 D3", 33)
-        case 34:
-            return respond("34 left. Your out:", "D17", 34)
-        case 35:
-            return respond("35 left. Your out:", "T11 D1", 35)
-        case 36:
-            return respond("36 left. Your out:", "D18", 36)
-        case 37:
-            return respond("37 left. Your out:", "T11 D2", 37)
-        case 38:
-            return respond("38 left. Your out:", "D19", 38)
-        case 39:
-            return respond("39 left. Your out:", "T11 D3", 39)
-        case 40:
-            return respond("40 left. Your out:", "D20", 40)
-        case 41:
-            return respond("41 left. Your out:", "T13 D1", 41)
-        case 42:
-            return respond("42 left. Your out:", "D20 D1", 42)
-        case 43:
-            return respond("43 left. Your out:", "T13 D2", 43)
-        case 44:
-            return respond("44 left. Your out:", "T14 D1", 44)
-        case 45:
-            return respond("45 left. Your out:", "T13 D3", 45)
-        case 46:
-            return respond("46 left. Your out:", "T14 D2", 46)
-        case 47:
-            return respond("47 left. Your out:", "T15 D1", 47)
-        case 48:
-            return respond("48 left. Your out:", "T14 D3", 48)
-        case 49:
-            return respond("49 left. Your out:", "T15 D2", 49)
-        case 50:
-            return respond("50 left. Your out:", "Bull", 50)
-        case 51:
-            return respond("51 left. Your out:", "T15 D3", 51)
-        case 52:
-            return respond("52 left. Your out:", "Bull D1", 52)
-        case 53:
-            return respond("53 left. Your out:", "T17 D1", 53)
-        case 54:
-            return respond("54 left. Your out:", "Bull D2", 54)
-        case 55:
-            return respond("55 left. Your out:", "T17 D2", 55)
-        case 56:
-            return respond("56 left. Your out:", "T18 D1", 56)
-        case 57:
-            return respond("57 left. Your out:", "T17 D3", 57)
-        case 58:
-            return respond("58 left. Your out:", "T18 D2", 58)
-        case 59:
-            return respond("59 left. Your out:", "T19 D1", 59)
-        case 60:
-            return respond("60 left. Your out:", "T18 D3", 60)
-        case 61:
-            return respond("61 left. Your out:", "T19 D2", 61)
-        case 62:
-            return respond("62 left. Your out:", "T20 D1", 62)
-        case 63:
-            return respond("63 left. Your out:", "T19 D3", 63)
-        case 64:
-            return respond("64 left. Your out:", "T20 D2", 64)
-        case 65:
-            return respond("65 left. Your out:", "T19 D4", 65)
-        case 66:
-            return respond("66 left. Your out:", "T20 D3", 66)
-        case 67:
-            return respond("67 left. Your out:", "T19 D5", 67)
-        case 68:
-            return respond("68 left. Your out:", "T20 D4", 68)
-        case 69:
-            return respond("69 left. Your out:", "T19 D6", 69)
-        case 70:
-            return respond("70 left. Your out:", "T20 D5", 70)
-        case 71:
-            return respond("71 left. Your out:", "T19 D7", 71)
-        case 72:
-            return respond("72 left. Your out:", "T20 D6", 72)
-        case 73:
-            return respond("73 left. Your out:", "T19 D8", 73)
-        case 74:
-            return respond("74 left. Your out:", "T20 D7", 74)
-        case 75:
-            return respond("75 left. Your out:", "T19 D9", 75)
-        case 76:
-            return respond("76 left. Your out:", "T20 D8", 76)
-        case 77:
-            return respond("77 left. Your out:", "T19 D10", 77)
-        case 78:
-            return respond("78 left. Your out:", "T20 D9", 78)
-        case 79:
-            return respond("79 left. Your out:", "T19 D11", 79)
-        case 80:
-            return respond("80 left. Your out:", "T20 D10", 80)
-        case 81:
-            return respond("81 left. Your out:", "T19 D12", 81)
-        case 82:
-            return respond("82 left. Your out:", "T20 D11", 82)
-        case 83:
-            return respond("83 left. Your out:", "T19 D13", 83)
-        case 84:
-            return respond("84 left. Your out:", "T20 D12", 84)
-        case 85:
-            return respond("85 left. Your out:", "T19 D14", 85)
-        case 86:
-            return respond("86 left. Your out:", "T20 D13", 86)
-        case 87:
-            return respond("87 left. Your out:", "T19 D15", 87)
-        case 88:
-            return respond("88 left. Your out:", "T20 D14", 88)
-        case 89:
-            return respond("89 left. Your out:", "T19 D16", 89)
-        case 90:
-            return respond("90 left. Your out:", "T20 D15", 90)
-        case 91:
-            return respond("91 left. Your out:", "T19 D17", 91)
-        case 92:
-            return respond("92 left. Your out:", "T20 D16", 92)
-        case 93:
-            return respond("93 left. Your out:", "T19 D18", 93)
-        case 94:
-            return respond("94 left. Your out:", "T20 D17", 94)
-        case 95:
-            return respond("95 left. Your out:", "T19 D19", 95)
-        case 96:
-            return respond("96 left. Your out:", "T20 D18", 96)
-        case 97:
-            return respond("97 left. Your out:", "T19 D20", 97)
-        case 98:
-            return respond("98 left. Your out:", "T20 D19", 98)
-        case 100:
-            return respond("100 left. Your out:", "T20 D20", 100)
-        case 101:
-            return respond("101 left. Your out:", "T17 Bull", 101)
-        case 104:
-            return respond("104 left. Your out:", "T18 Bull", 104)
-        case 107:
-            return respond("107 left. Your out:", "T19 Bull", 107)
-        case 110:
-            return respond("110 left. Your out:", "T20 Bull", 110)
-        case n if n > 110:
-            return respond(f"{n} left. Too high for 2 dart(s) (max is 110).", "", n)
-        case n:
-            return respond(f"{n} left. No 2-dart out, set up for the next dart.", "", n)
- 
-@app.route("/second-dart-double", methods=["POST"])   # 1 dart left after this
+    hit = int(request.form.get("hitDouble1"))
+    session["first_double_hit"] = hit
+
+    left_over = session["start_num"] - hit
+
+    if left_over <= 0:
+        return render_checkout(left_over, ("", "", ""))
+
+    routes = FIRST_DART_DOUBLE_OUTS.get(left_over, ("", "", ""))
+    return render_checkout(left_over, routes)
+
+
+@app.route("/second-dart-double", methods=["POST"])
 def second_dart_double():
-    global second_double_hit
-    second_double_hit = int(request.form.get("hitDouble2"))
-    left_over = start_num - first_double_hit - second_double_hit
-    match left_over:
-        case 0:
-            return respond("Checked out!", "", 0)
-        case n if n < 0:
-            return respond("Bust! You went over.", "", n)
-        case 1:
-            return respond("Bust! You can't be left on 1 in double out.", "", 1)
-        case 2:
-            return respond("2 left. Your out:", "D1", 2)
-        case 4:
-            return respond("4 left. Your out:", "D2", 4)
-        case 6:
-            return respond("6 left. Your out:", "D3", 6)
-        case 8:
-            return respond("8 left. Your out:", "D4", 8)
-        case 10:
-            return respond("10 left. Your out:", "D5", 10)
-        case 12:
-            return respond("12 left. Your out:", "D6", 12)
-        case 14:
-            return respond("14 left. Your out:", "D7", 14)
-        case 16:
-            return respond("16 left. Your out:", "D8", 16)
-        case 18:
-            return respond("18 left. Your out:", "D9", 18)
-        case 20:
-            return respond("20 left. Your out:", "D10", 20)
-        case 22:
-            return respond("22 left. Your out:", "D11", 22)
-        case 24:
-            return respond("24 left. Your out:", "D12", 24)
-        case 26:
-            return respond("26 left. Your out:", "D13", 26)
-        case 28:
-            return respond("28 left. Your out:", "D14", 28)
-        case 30:
-            return respond("30 left. Your out:", "D15", 30)
-        case 32:
-            return respond("32 left. Your out:", "D16", 32)
-        case 34:
-            return respond("34 left. Your out:", "D17", 34)
-        case 36:
-            return respond("36 left. Your out:", "D18", 36)
-        case 38:
-            return respond("38 left. Your out:", "D19", 38)
-        case 40:
-            return respond("40 left. Your out:", "D20", 40)
-        case 50:
-            return respond("50 left. Your out:", "Bull", 50)
-        case n if n > 50:
-            return respond(f"{n} left. Too high for 1 dart(s) (max is 50).", "", n)
-        case n:
-            return respond(f"{n} left. No 1-dart out, set up for the next dart.", "", n)
- 
-@app.route("/third-dart-double", methods=["POST"])   # no darts left
+    hit = int(request.form.get("hitDouble2"))
+    session["second_double_hit"] = hit
+
+    left_over = (
+        session["start_num"]
+        - session["first_double_hit"]
+        - hit
+    )
+
+    if left_over <= 0:
+        return render_checkout(left_over, ("", "", ""))
+
+    routes = SECOND_DART_DOUBLE_OUTS.get(left_over, ("", "", ""))
+    return render_checkout(left_over, routes)
+
+
+@app.route("/third-dart-double", methods=["POST"])
 def third_dart_double():
-    global third_double_hit
-    third_double_hit = int(request.form.get("hitDouble3"))
-    left_over = start_num - first_double_hit - second_double_hit - third_double_hit
-    match left_over:
-        case 0:
-            return respond("Checked out!", "", 0)
-        case 1:
-            return respond("Bust! You can't be left on 1 in double out.", "", 1)
-        case n if n < 0:
-            return respond("Bust! Score doesn't count.", "", n)
-        case n:
-            return respond(f"Out of darts. You have {n} left.", "", n)
- 
- 
-# ======================= STRAIGHT OUT =======================
- 
-@app.route("/first-dart-straight", methods=["POST"])   # 2 darts left after this
+    hit = int(request.form.get("hitDouble3"))
+
+    left_over = (
+        session["start_num"]
+        - session["first_double_hit"]
+        - session["second_double_hit"]
+        - hit
+    )
+
+    return render_checkout(left_over, ("", "", ""))
+
+
+@app.route("/first-dart-straight", methods=["POST"])
 def first_dart_straight():
-    global first_straight_hit, left_over
-    first_straight_hit = int(request.form.get("hitStraight1"))
-    left_over = start_num - first_straight_hit
-    match left_over:
-        case 0:
-            return respond("Checked out!", "", 0)
-        case n if n < 0:
-            return respond("Bust! You went over.", "", n)
-        case 1:
-            return respond("1 left. Your out:", "S1", 1)
-        case 2:
-            return respond("2 left. Your out:", "D1", 2)
-        case 3:
-            return respond("3 left. Your out:", "T1", 3)
-        case 4:
-            return respond("4 left. Your out:", "D2", 4)
-        case 5:
-            return respond("5 left. Your out:", "S5", 5)
-        case 6:
-            return respond("6 left. Your out:", "T2", 6)
-        case 7:
-            return respond("7 left. Your out:", "S7", 7)
-        case 8:
-            return respond("8 left. Your out:", "D4", 8)
-        case 9:
-            return respond("9 left. Your out:", "T3", 9)
-        case 10:
-            return respond("10 left. Your out:", "D5", 10)
-        case 11:
-            return respond("11 left. Your out:", "S11", 11)
-        case 12:
-            return respond("12 left. Your out:", "T4", 12)
-        case 13:
-            return respond("13 left. Your out:", "S13", 13)
-        case 14:
-            return respond("14 left. Your out:", "D7", 14)
-        case 15:
-            return respond("15 left. Your out:", "T5", 15)
-        case 16:
-            return respond("16 left. Your out:", "D8", 16)
-        case 17:
-            return respond("17 left. Your out:", "S17", 17)
-        case 18:
-            return respond("18 left. Your out:", "T6", 18)
-        case 19:
-            return respond("19 left. Your out:", "S19", 19)
-        case 20:
-            return respond("20 left. Your out:", "D10", 20)
-        case 21:
-            return respond("21 left. Your out:", "T7", 21)
-        case 22:
-            return respond("22 left. Your out:", "D11", 22)
-        case 23:
-            return respond("23 left. Your out:", "D11 S1", 23)
-        case 24:
-            return respond("24 left. Your out:", "T8", 24)
-        case 25:
-            return respond("25 left. Your out:", "Outer Bull", 25)
-        case 26:
-            return respond("26 left. Your out:", "D13", 26)
-        case 27:
-            return respond("27 left. Your out:", "T9", 27)
-        case 28:
-            return respond("28 left. Your out:", "D14", 28)
-        case 29:
-            return respond("29 left. Your out:", "D14 S1", 29)
-        case 30:
-            return respond("30 left. Your out:", "T10", 30)
-        case 31:
-            return respond("31 left. Your out:", "T10 S1", 31)
-        case 32:
-            return respond("32 left. Your out:", "D16", 32)
-        case 33:
-            return respond("33 left. Your out:", "T11", 33)
-        case 34:
-            return respond("34 left. Your out:", "D17", 34)
-        case 35:
-            return respond("35 left. Your out:", "D17 S1", 35)
-        case 36:
-            return respond("36 left. Your out:", "T12", 36)
-        case 37:
-            return respond("37 left. Your out:", "T12 S1", 37)
-        case 38:
-            return respond("38 left. Your out:", "D19", 38)
-        case 39:
-            return respond("39 left. Your out:", "T13", 39)
-        case 40:
-            return respond("40 left. Your out:", "D20", 40)
-        case 41:
-            return respond("41 left. Your out:", "D20 S1", 41)
-        case 42:
-            return respond("42 left. Your out:", "T14", 42)
-        case 43:
-            return respond("43 left. Your out:", "T14 S1", 43)
-        case 44:
-            return respond("44 left. Your out:", "T14 D1", 44)
-        case 45:
-            return respond("45 left. Your out:", "T15", 45)
-        case 46:
-            return respond("46 left. Your out:", "T15 S1", 46)
-        case 47:
-            return respond("47 left. Your out:", "T15 D1", 47)
-        case 48:
-            return respond("48 left. Your out:", "T16", 48)
-        case 49:
-            return respond("49 left. Your out:", "T16 S1", 49)
-        case 50:
-            return respond("50 left. Your out:", "Bull", 50)
-        case 51:
-            return respond("51 left. Your out:", "T17", 51)
-        case 52:
-            return respond("52 left. Your out:", "T17 S1", 52)
-        case 53:
-            return respond("53 left. Your out:", "T17 D1", 53)
-        case 54:
-            return respond("54 left. Your out:", "T18", 54)
-        case 55:
-            return respond("55 left. Your out:", "T18 S1", 55)
-        case 56:
-            return respond("56 left. Your out:", "T18 D1", 56)
-        case 57:
-            return respond("57 left. Your out:", "T19", 57)
-        case 58:
-            return respond("58 left. Your out:", "T19 S1", 58)
-        case 59:
-            return respond("59 left. Your out:", "T19 D1", 59)
-        case 60:
-            return respond("60 left. Your out:", "T20", 60)
-        case 61:
-            return respond("61 left. Your out:", "T20 S1", 61)
-        case 62:
-            return respond("62 left. Your out:", "T20 D1", 62)
-        case 63:
-            return respond("63 left. Your out:", "T20 T1", 63)
-        case 64:
-            return respond("64 left. Your out:", "T20 D2", 64)
-        case 65:
-            return respond("65 left. Your out:", "T20 S5", 65)
-        case 66:
-            return respond("66 left. Your out:", "T20 T2", 66)
-        case 67:
-            return respond("67 left. Your out:", "T20 S7", 67)
-        case 68:
-            return respond("68 left. Your out:", "T20 D4", 68)
-        case 69:
-            return respond("69 left. Your out:", "T20 T3", 69)
-        case 70:
-            return respond("70 left. Your out:", "T20 D5", 70)
-        case 71:
-            return respond("71 left. Your out:", "T20 S11", 71)
-        case 72:
-            return respond("72 left. Your out:", "T20 T4", 72)
-        case 73:
-            return respond("73 left. Your out:", "T20 S13", 73)
-        case 74:
-            return respond("74 left. Your out:", "T20 D7", 74)
-        case 75:
-            return respond("75 left. Your out:", "T20 T5", 75)
-        case 76:
-            return respond("76 left. Your out:", "T20 D8", 76)
-        case 77:
-            return respond("77 left. Your out:", "T20 S17", 77)
-        case 78:
-            return respond("78 left. Your out:", "T20 T6", 78)
-        case 79:
-            return respond("79 left. Your out:", "T20 S19", 79)
-        case 80:
-            return respond("80 left. Your out:", "T20 D10", 80)
-        case 81:
-            return respond("81 left. Your out:", "T20 T7", 81)
-        case 82:
-            return respond("82 left. Your out:", "T20 D11", 82)
-        case 83:
-            return respond("83 left. Your out:", "T19 D13", 83)
-        case 84:
-            return respond("84 left. Your out:", "T20 T8", 84)
-        case 85:
-            return respond("85 left. Your out:", "T20 Outer Bull", 85)
-        case 86:
-            return respond("86 left. Your out:", "T20 D13", 86)
-        case 87:
-            return respond("87 left. Your out:", "T20 T9", 87)
-        case 88:
-            return respond("88 left. Your out:", "T20 D14", 88)
-        case 89:
-            return respond("89 left. Your out:", "T19 D16", 89)
-        case 90:
-            return respond("90 left. Your out:", "T20 T10", 90)
-        case 91:
-            return respond("91 left. Your out:", "T19 D17", 91)
-        case 92:
-            return respond("92 left. Your out:", "T20 D16", 92)
-        case 93:
-            return respond("93 left. Your out:", "T20 T11", 93)
-        case 94:
-            return respond("94 left. Your out:", "T20 D17", 94)
-        case 95:
-            return respond("95 left. Your out:", "T19 D19", 95)
-        case 96:
-            return respond("96 left. Your out:", "T20 T12", 96)
-        case 97:
-            return respond("97 left. Your out:", "T19 D20", 97)
-        case 98:
-            return respond("98 left. Your out:", "T20 D19", 98)
-        case 99:
-            return respond("99 left. Your out:", "T20 T13", 99)
-        case 100:
-            return respond("100 left. Your out:", "T20 D20", 100)
-        case 101:
-            return respond("101 left. Your out:", "T17 Bull", 101)
-        case 102:
-            return respond("102 left. Your out:", "T20 T14", 102)
-        case 104:
-            return respond("104 left. Your out:", "T18 Bull", 104)
-        case 105:
-            return respond("105 left. Your out:", "T20 T15", 105)
-        case 107:
-            return respond("107 left. Your out:", "T19 Bull", 107)
-        case 108:
-            return respond("108 left. Your out:", "T20 T16", 108)
-        case 110:
-            return respond("110 left. Your out:", "T20 Bull", 110)
-        case 111:
-            return respond("111 left. Your out:", "T20 T17", 111)
-        case 114:
-            return respond("114 left. Your out:", "T20 T18", 114)
-        case 117:
-            return respond("117 left. Your out:", "T20 T19", 117)
-        case 120:
-            return respond("120 left. Your out:", "T20 T20", 120)
-        case n if n > 120:
-            return respond(f"{n} left. Too high for 2 dart(s) (max is 120).", "", n)
-        case n:
-            return respond(f"{n} left. No 2-dart out, set up for the next dart.", "", n)
- 
-@app.route("/second-dart-straight", methods=["POST"])   # 1 dart left after this
+    hit = int(request.form.get("hitStraight1"))
+    session["first_straight_hit"] = hit
+
+    left_over = session["start_num"] - hit
+
+    if left_over <= 0:
+        return render_checkout(left_over, ("", "", ""))
+
+    routes = FIRST_DART_STRAIGHT_OUTS.get(left_over, ("", "", ""))
+    return render_checkout(left_over, routes)
+
+
+@app.route("/second-dart-straight", methods=["POST"])
 def second_dart_straight():
-    global second_straight_hit
-    second_straight_hit = int(request.form.get("hitStraight2"))
-    left_over = start_num - first_straight_hit - second_straight_hit
-    match left_over:
-        case 0:
-            return respond("Checked out!", "", 0)
-        case n if n < 0:
-            return respond("Bust! You went over.", "", n)
-        case 1:
-            return respond("1 left. Your out:", "S1", 1)
-        case 2:
-            return respond("2 left. Your out:", "D1", 2)
-        case 3:
-            return respond("3 left. Your out:", "T1", 3)
-        case 4:
-            return respond("4 left. Your out:", "D2", 4)
-        case 5:
-            return respond("5 left. Your out:", "S5", 5)
-        case 6:
-            return respond("6 left. Your out:", "T2", 6)
-        case 7:
-            return respond("7 left. Your out:", "S7", 7)
-        case 8:
-            return respond("8 left. Your out:", "D4", 8)
-        case 9:
-            return respond("9 left. Your out:", "T3", 9)
-        case 10:
-            return respond("10 left. Your out:", "D5", 10)
-        case 11:
-            return respond("11 left. Your out:", "S11", 11)
-        case 12:
-            return respond("12 left. Your out:", "T4", 12)
-        case 13:
-            return respond("13 left. Your out:", "S13", 13)
-        case 14:
-            return respond("14 left. Your out:", "D7", 14)
-        case 15:
-            return respond("15 left. Your out:", "T5", 15)
-        case 16:
-            return respond("16 left. Your out:", "D8", 16)
-        case 17:
-            return respond("17 left. Your out:", "S17", 17)
-        case 18:
-            return respond("18 left. Your out:", "T6", 18)
-        case 19:
-            return respond("19 left. Your out:", "S19", 19)
-        case 20:
-            return respond("20 left. Your out:", "D10", 20)
-        case 21:
-            return respond("21 left. Your out:", "T7", 21)
-        case 22:
-            return respond("22 left. Your out:", "D11", 22)
-        case 24:
-            return respond("24 left. Your out:", "T8", 24)
-        case 25:
-            return respond("25 left. Your out:", "Outer Bull", 25)
-        case 26:
-            return respond("26 left. Your out:", "D13", 26)
-        case 27:
-            return respond("27 left. Your out:", "T9", 27)
-        case 28:
-            return respond("28 left. Your out:", "D14", 28)
-        case 30:
-            return respond("30 left. Your out:", "T10", 30)
-        case 32:
-            return respond("32 left. Your out:", "D16", 32)
-        case 33:
-            return respond("33 left. Your out:", "T11", 33)
-        case 34:
-            return respond("34 left. Your out:", "D17", 34)
-        case 36:
-            return respond("36 left. Your out:", "T12", 36)
-        case 38:
-            return respond("38 left. Your out:", "D19", 38)
-        case 39:
-            return respond("39 left. Your out:", "T13", 39)
-        case 40:
-            return respond("40 left. Your out:", "D20", 40)
-        case 42:
-            return respond("42 left. Your out:", "T14", 42)
-        case 45:
-            return respond("45 left. Your out:", "T15", 45)
-        case 48:
-            return respond("48 left. Your out:", "T16", 48)
-        case 50:
-            return respond("50 left. Your out:", "Bull", 50)
-        case 51:
-            return respond("51 left. Your out:", "T17", 51)
-        case 54:
-            return respond("54 left. Your out:", "T18", 54)
-        case 57:
-            return respond("57 left. Your out:", "T19", 57)
-        case 60:
-            return respond("60 left. Your out:", "T20", 60)
-        case n if n > 60:
-            return respond(f"{n} left. Too high for 1 dart(s) (max is 60).", "", n)
-        case n:
-            return respond(f"{n} left. No 1-dart out, set up for the next dart.", "", n)
- 
-@app.route("/third-dart-straight", methods=["POST"])   # no darts left
+    hit = int(request.form.get("hitStraight2"))
+    session["second_straight_hit"] = hit
+
+    left_over = (
+        session["start_num"]
+        - session["first_straight_hit"]
+        - hit
+    )
+
+    if left_over <= 0:
+        return render_checkout(left_over, ("", "", ""))
+
+    routes = SECOND_DART_STRAIGHT_OUTS.get(left_over, ("", "", ""))
+    return render_checkout(left_over, routes)
+
+
+@app.route("/third-dart-straight", methods=["POST"])
 def third_dart_straight():
-    global third_straight_hit
-    third_straight_hit = int(request.form.get("hitStraight3"))
-    left_over = start_num - first_straight_hit - second_straight_hit - third_straight_hit
-    match left_over:
-        case 0:
-            return respond("Checked out!", "", 0)
-        case n if n < 0:
-            return respond("Bust! Score doesn't count.", "", n)
-        case n:
-            return respond(f"Out of darts. You have {n} left.", "", n)
+    hit = int(request.form.get("hitStraight3"))
+
+    left_over = (
+        session["start_num"]
+        - session["first_straight_hit"]
+        - session["second_straight_hit"]
+        - hit
+    )
+
+    return render_checkout(left_over, ("", "", ""))
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000, use_reloader=False)
+            
