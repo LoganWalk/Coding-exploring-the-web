@@ -1,23 +1,23 @@
 :root {
   /* ---------------------------------------------------------
-     MODERN FITNESS COLOR SYSTEM (NAVY + TEAL + BLUE)
+     LIGHT FITNESS COLOR SYSTEM (WHITE + SLATE + TEAL)
      --------------------------------------------------------- */
-  --base-dark-charcoal: #0f172a; /* 👈 Deep slate-navy page background */
-  --surface-cream-white: #f8fafc; /* 👈 Clean cool-white content surface */
-  --cyber-gold-yellow: #14b8a6; /* 👈 Teal accent for selected states and highlights */
+  --base-dark-charcoal: #f1f5f9; /* Soft light-grey page background */
+  --surface-cream-white: #ffffff; /* Clean white content surface */
+  --cyber-gold-yellow: #0f766e; /* Teal accent for selected states and highlights */
 
   /* TEAM ACCENTS */
-  --varsity-blue: #1e293b; /* 👈 Slate for structure and prominent text */
+  --varsity-blue: #1e293b; /* Deep slate for text and contrast */
   --athletic-crimson: #2563eb; /* 👈 Confident blue for primary actions */
 
   /* TEXT ELEMENTS */
-  --text-on-dark: #f8fafc; /* Cream text for charcoal backgrounds */
-  --text-on-light: #0f172a; /* Deep navy text for cream backgrounds */
+  --text-on-dark: #1e293b; /* Dark slate text on light backgrounds */
+  --text-on-light: #1e293b; /* Dark slate text on white backgrounds */
 
   /* BORDERS & SURFACES */
-  --border-stark-navy: #334155;
+  --border-stark-navy: #cbd5e1;
   --border-athletic-gold: #0f766e;
-  --surface-panel-grey: #334155;
+  --surface-panel-grey: #e2e8f0;
 
   /* EFFECT & SIZES */
   --hover-brightness: 0.85;
@@ -28,14 +28,14 @@
   --radius-large: 25px;
   --button-height: 40px;
   --border-small: 3px;
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.16);
-  --shadow-normal: 0 4px 10px rgba(15, 23, 42, 0.18);
-  --shadow-large: 0 8px 20px rgba(15, 23, 42, 0.2);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --shadow-normal: 0 4px 10px rgba(15, 23, 42, 0.10);
+  --shadow-large: 0 8px 20px rgba(15, 23, 42, 0.12);
 }
 
 /* =========================================================
    GENERAL PAGE
-   The page body uses the dark aesthetic to frame the light content.
+   The page uses a soft light background with crisp white content surfaces.
    ========================================================= */
 body {
   min-height: 100vh;
