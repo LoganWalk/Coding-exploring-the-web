@@ -1,36 +1,34 @@
 :root {
-  /* ---------------------------------------------------------
-     LIGHT FITNESS COLOR SYSTEM (WHITE + SLATE + TEAL)
-     --------------------------------------------------------- */
-  --base-dark-charcoal: #f1f5f9; /* Soft light-grey page background */
-  --surface-cream-white: #ffffff; /* Clean white content surface */
-  --cyber-gold-yellow: #0f766e; /* Teal accent for selected states and highlights */
+  /* FOUR-COLOR SYSTEM: 50 / 30 / 10 / 10 */
+  --color-main: #F5F7FA;
+  --color-surface: #FFFFFF;
+  --color-structure: #1F2937;
+  --color-accent: #0F766E;
 
-  /* TEAM ACCENTS */
-  --varsity-blue: #1e293b; /* Deep slate for text and contrast */
-  --athletic-crimson: #2563eb; /* 👈 Confident blue for primary actions */
+  /* Existing semantic names retained so page styling stays compatible */
+  --base-dark-charcoal: var(--color-main);
+  --surface-cream-white: var(--color-surface);
+  --cyber-gold-yellow: var(--color-accent);
+  --varsity-blue: var(--color-structure);
+  --athletic-crimson: var(--color-accent);
+  --text-on-dark: var(--color-structure);
+  --text-on-light: var(--color-structure);
+  --border-stark-navy: var(--color-structure);
+  --border-athletic-gold: var(--color-accent);
+  --surface-panel-grey: var(--color-main);
 
-  /* TEXT ELEMENTS */
-  --text-on-dark: #1e293b; /* Dark slate text on light backgrounds */
-  --text-on-light: #1e293b; /* Dark slate text on white backgrounds */
-
-  /* BORDERS & SURFACES */
-  --border-stark-navy: #cbd5e1;
-  --border-athletic-gold: #0f766e;
-  --surface-panel-grey: #e2e8f0;
-
-  /* EFFECT & SIZES */
-  --hover-brightness: 0.85;
-  --selected-brightness: 0.75;
+  /* Sizing and restrained depth */
+  --hover-brightness: 0.94;
+  --selected-brightness: 0.94;
   --radius-xsmall: 5px;
   --radius-small: 10px;
   --radius-medium: 15px;
   --radius-large: 25px;
   --button-height: 40px;
-  --border-small: 3px;
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
-  --shadow-normal: 0 4px 10px rgba(15, 23, 42, 0.10);
-  --shadow-large: 0 8px 20px rgba(15, 23, 42, 0.12);
+  --border-small: 2px;
+  --shadow-sm: 0 1px 3px rgba(31, 41, 55, 0.08);
+  --shadow-normal: 0 4px 10px rgba(31, 41, 55, 0.10);
+  --shadow-large: 0 8px 20px rgba(31, 41, 55, 0.12);
 }
 
 /* =========================================================
@@ -123,7 +121,7 @@ html {
 #submitMaxWeight,
 #oneRepButton,
 #threeRepButton {
-  color: var(--text-on-dark);
+  color: var(--surface-cream-white);
   font-family: monospace;
   font-weight: bold;
   width: auto;
@@ -282,7 +280,7 @@ a {
    Features a bold dark cyber-gold yellow background with high contrast dark text.
    ========================================================= */
 .selected {
-  color: var(--varsity-blue);
+  color: var(--surface-cream-white);
   font-weight: bold;
   font-family: cursive;
   font-size: 1.55em;
@@ -502,7 +500,7 @@ a {
 
 /* ---------- Rules for the other pages' sign-in link (leave alone) ---------- */
 #signin-button {
-  color: var(--varsity-blue);
+  color: var(--surface-cream-white);
   font-family: monospace;
   font-weight: bold;
   width: auto;
@@ -553,7 +551,7 @@ a {
   align-items: center;
   gap: 40px;
   border: 2px solid var(--border-stark-navy);
-  background-color: var(--varsity-blue);
+  background-color: var(--surface-cream-white);
   border-radius: var(--radius-large);
   padding: 20px;
   box-shadow: var(--shadow-normal);
@@ -562,7 +560,7 @@ a {
 .signin-title {
   margin: 0;
   text-align: center;
-  color: var(--cyber-gold-yellow);
+  color: var(--text-on-light);
   font-family: monospace;
   font-weight: bold;
   font-size: 3em;
@@ -603,7 +601,7 @@ a {
 
 /* ---------- Labels and inputs ---------- */
 .input-label {
-  color: var(--cyber-gold-yellow);
+  color: var(--text-on-light);
   font-family: monospace;
   font-weight: bold;
   font-size: 1.6em;
@@ -613,7 +611,7 @@ a {
 .text-input {
   box-sizing: border-box;
   color: var(--text-on-light);
-  background-color: var(--cyber-gold-yellow) !important;
+  background-color: var(--surface-cream-white);
   border: 2px solid var(--border-athletic-gold);
   border-radius: var(--radius-small);
   font-size: 1.45em;
@@ -639,7 +637,7 @@ a {
   font-family: monospace;
   font-weight: bold;
   font-size: 1.53em;
-  color: var(--varsity-blue);
+  color: var(--surface-cream-white);
   background-color: var(--cyber-gold-yellow);
   border: 2px solid var(--border-athletic-gold);
   border-radius: var(--radius-small);
@@ -673,7 +671,7 @@ a {
   appearance: none;
   border-radius: var(--radius-small);
   box-shadow: var(--shadow-sm);
-  background-color: var(--varsity-blue);
+  background-color: var(--surface-cream-white);
   border: 3px dashed var(--border-athletic-gold);
   width: 25px;
   height: 25px;
