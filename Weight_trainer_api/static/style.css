@@ -1,23 +1,23 @@
 :root {
   /* ---------------------------------------------------------
-     ATHLETIC & CONTRAST COLOR SYSTEM (WHITE + DARK BLEND)
+     MODERN FITNESS COLOR SYSTEM (NAVY + TEAL + BLUE)
      --------------------------------------------------------- */
-  --base-dark-charcoal: #2d3748; /* 👈 Your exact requested dark base */
-  --surface-cream-white: #fdfbf7; /* 👈 Rich, premium athletic cream white */
-  --cyber-gold-yellow: #d4af37; /* 👈 Deep high-contrast athletic gold yellow */
+  --base-dark-charcoal: #0f172a; /* 👈 Deep slate-navy page background */
+  --surface-cream-white: #f8fafc; /* 👈 Clean cool-white content surface */
+  --cyber-gold-yellow: #14b8a6; /* 👈 Teal accent for selected states and highlights */
 
   /* TEAM ACCENTS */
-  --varsity-blue: #1a365d; /* 👈 Deep navy for borders and prominent structural text */
-  --athletic-crimson: #dc2626; /* 👈 High-visibility red for buttons and actions */
+  --varsity-blue: #1e293b; /* 👈 Slate for structure and prominent text */
+  --athletic-crimson: #2563eb; /* 👈 Confident blue for primary actions */
 
   /* TEXT ELEMENTS */
-  --text-on-dark: #fdfbf7; /* Cream text for charcoal backgrounds */
-  --text-on-light: #1a365d; /* Deep navy text for cream backgrounds */
+  --text-on-dark: #f8fafc; /* Cream text for charcoal backgrounds */
+  --text-on-light: #0f172a; /* Deep navy text for cream backgrounds */
 
   /* BORDERS & SURFACES */
-  --border-stark-navy: #13233c;
-  --border-athletic-gold: #b3922e;
-  --surface-panel-grey: #4a5568;
+  --border-stark-navy: #334155;
+  --border-athletic-gold: #0f766e;
+  --surface-panel-grey: #334155;
 
   /* EFFECT & SIZES */
   --hover-brightness: 0.85;
@@ -28,9 +28,9 @@
   --radius-large: 25px;
   --button-height: 40px;
   --border-small: 3px;
-  --shadow-sm: 1px 3px 1px #000;
-  --shadow-normal: 2px 4px 2px #000;
-  --shadow-large: 3px 5px 3px #000;
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.16);
+  --shadow-normal: 0 4px 10px rgba(15, 23, 42, 0.18);
+  --shadow-large: 0 8px 20px rgba(15, 23, 42, 0.2);
 }
 
 /* =========================================================
