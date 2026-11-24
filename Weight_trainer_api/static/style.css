@@ -1,11 +1,11 @@
 :root {
-  /* FOUR-COLOR SYSTEM: 50 / 30 / 10 / 10 */
-  --color-main: #F5F7FA;
-  --color-surface: #FFFFFF;
-  --color-structure: #1F2937;
-  --color-accent: #0F766E;
+  /* FOUR-COLOR SYSTEM: 50 / 30 / 15 / 5 */
+  --color-main: #F4F6F8;       /* 50%: soft, cool light-gray canvas */
+  --color-accent: #0F766E;     /* 30%: confident, professional teal */
+  --color-structure: #526174;  /* 15%: lighter, matte slate */
+  --color-surface: #F4E5EA;    /* 5%: subtle blush-pink surface */
 
-  /* Existing semantic names retained so page styling stays compatible */
+  /* Existing semantic names retained for compatibility */
   --base-dark-charcoal: var(--color-main);
   --surface-cream-white: var(--color-surface);
   --cyber-gold-yellow: var(--color-accent);
@@ -26,9 +26,9 @@
   --radius-large: 25px;
   --button-height: 40px;
   --border-small: 2px;
-  --shadow-sm: 0 1px 3px rgba(31, 41, 55, 0.08);
-  --shadow-normal: 0 4px 10px rgba(31, 41, 55, 0.10);
-  --shadow-large: 0 8px 20px rgba(31, 41, 55, 0.12);
+  --shadow-sm: 0 1px 3px rgba(38, 50, 65, 0.07);
+  --shadow-normal: 0 4px 10px rgba(38, 50, 65, 0.09);
+  --shadow-large: 0 8px 20px rgba(38, 50, 65, 0.11);
 }
 
 /* =========================================================
