@@ -65,8 +65,8 @@ def store_input():
         weight = int(raw_weight) if (raw_weight and raw_weight.isdigit()) else 0
     
     exercise = [exercise_name,rep_amount,weight,typeOfExercise,muscleTargeted]
-    
     list_of_exercises.append(exercise)
+    
     with open("exercises.json", "w") as file:
         json.dump(list_of_exercises, file, indent=4)
     
