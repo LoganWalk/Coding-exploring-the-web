@@ -687,7 +687,7 @@ a {
 #show-password-checkbox:checked {
   box-shadow: var(--shadow-sm);
   background-color: var(--cyber-gold-yellow);
-  border: 3px dashed var(--varsity-blue);
+  border: 2px solid var(--varsity-blue);
 }
 
 /* ---------- Success message ---------- */
