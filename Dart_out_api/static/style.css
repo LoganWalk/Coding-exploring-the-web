@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Rajdhani:wght@500;600;700&display=swap');
 
 :root {
   /* Main palette */
@@ -25,7 +25,7 @@
   --shadow-md: 0 5px 12px rgba(230, 227, 227, 0.24);
 
   /* Typography */
-  --header-font: "Orbitron", sans-serif;
+  --header-font: "Rajdhani", sans-serif;
   --body-font: "Merriweather", serif;
 }
 
@@ -79,7 +79,8 @@ body {
 
 .header:hover {
   border: 1px solid var(--accent-color);
-  border-radius: 30px;
+  border-radius: 12px;
+  corner-shape: squircle;
   /* Bordered elements do not receive a shadow. */
   font-size: 1.82em;
   filter: brightness(0.95);
@@ -95,7 +96,8 @@ body {
   text-decoration: none;
   font-size: 1.85em;
   padding: 5px;
-  border-radius: 30px;
+  border-radius: 12px;
+  corner-shape: squircle;
   filter: brightness(0.95);
   transition:
     opacity 0.2s ease,
@@ -182,7 +184,7 @@ body {
 }
 
 .page {
-  border: 2px solid var(--accent-color);
+  border: 1px solid var(--accent-color);
   background-color: var(--surface-color);
   color: var(--text-color);
   font-family: var(--body-font);
@@ -228,4 +230,6 @@ button[type="button"],
 button[type="submit"],
 button[type="reset"] {
   color: var(--primary-color);
+  border-radius: 12px;
+  corner-shape: squircle;
 }
