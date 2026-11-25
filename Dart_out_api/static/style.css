@@ -1,12 +1,23 @@
 :root {
-  --neutral-color: #E5E7EB;
+  --neutral-color: #10B981;
   --primary-color: #10B981;
-  --secondary-color: #1E2229;
+  --secondary-color: #292F38;
   --background-color: #121417;
+  --crisp-cloud-color: #B8DDF5;
   --shadow-xs: 1px 3px 1px #0a0a0a;
   --shadow-sm: 3px 4px 2px #0a0a0a;
   --shadow-md: 4px 6px 2px #0a0a0a;
 }
+
+html {
+  background: var(--background-color);
+  color: var(--primary-color);
+}
+
+body {
+  color: var(--primary-color);
+}
+
 .content {
   animation: pageEnter 1s ease-out forwards;
   width: 100%;
@@ -48,9 +59,9 @@
   cursor: pointer;
 }
 .selected {
-  background-color: var(--primary-color);
+  background-color: var(--crisp-cloud-color);
   box-shadow: var(--shadow-sm);
-  color: var(--neutral-color);
+  color: var(--primary-color);
   font-family: fantasy, monospace;
   text-decoration: none;
   font-size: 1.85em;
@@ -67,7 +78,7 @@
 .buttons {
   /* 1. FIX: Pull it out of the regular document flow and snap it to the right edge */
   position: absolute;
-  right: 10px; /* 👈 Anchors the right edge 10px away from the screen wall */
+  right: 10px; /* Anchors the right edge 10px away from the screen wall */
   top: 10px; /* Adjust vertical placement as needed */
 
   display: flex;
@@ -85,8 +96,6 @@
     width 0.4s ease,
     border-radius 0.4s ease;
   overflow: hidden;
-  /* margin-right: 10px; Remove this since right: 10px replaces it */
-  /* margin-top: 10px;   Remove this since top: 10px replaces it */
   z-index: 100;
 }
 .buttons:hover {
@@ -112,13 +121,10 @@
   width: 30px;
   height: 20px;
 
-  /* =========================================================
-     FIX: EXPLORING CORNER BOUNDS
-     ========================================================= */
-  top: 38px; /* 👈 Pushes the lines 15px down from the top edge */
-  right: 32px; /* 👈 Pushes the lines 15px in from the right edge */
+  /* Corner positioning */
+  top: 38px;
+  right: 32px;
 
-  /* Remove old centering overrides completely */
   bottom: auto;
   margin: 0;
   transform: none;
@@ -131,38 +137,42 @@
   z-index: 101;
 }
 
-/* Styling the individual horizontal bars */
 .circle-lines span {
   display: block;
   width: 100%;
-  height: 3px; /* Thickness of the lines */
-  background-color: var(--neutral-color); /* Uses your high-contrast gold */
+  height: 3px;
+  background-color: var(--crisp-cloud-color);
   border-radius: 2px;
 }
 
-/* =========================================================
-   HOVER HOOKS (THE MAGIC INTERACTIONS)
-   ========================================================= */
-
-/* 3. Hide the lines instantly when the user hovers over the navbar wrapper */
 .buttons:hover .circle-lines {
   opacity: 0;
   visibility: hidden;
-  transition-delay: 0s; /* Vanishes right away so buttons can slide in */
+  transition-delay: 0s;
 }
 
-html {
-  background: var(--background-color);
-}
 .page {
-  border: 1px solid var(--secondary-color);
+  border: 1px solid var(--crisp-cloud-color);
   background-color: var(--secondary-color);
-  color: var(--neutral-color);
+  color: var(--primary-color);
   font-family: fantasy, monospace;
   border-radius: 15px;
   padding: 5px;
   width: fit-content;
   height: fit-content;
   box-shadow: var(--shadow-sm);
-}/*hello
+}
 
+/* Keep text emerald throughout the app, including nested elements. */
+.page *,
+.buttons *,
+.content * {
+  color: var(--primary-color);
+}
+
+/* Keep the menu's decorative lines in the blue highlight color. */
+.circle-lines span {
+  background-color: var(--crisp-cloud-color);
+}
+
+/*hello
