@@ -53,7 +53,7 @@ body {
   margin-right:auto;
 }
 .header:hover {
-  border: 1px solid var(--primary-color);
+  border: 1px solid var(--accent-color);
   border-radius: 30px;
   box-shadow: var(--shadow-xs);
   font-size: 1.82em;
