@@ -12,7 +12,8 @@
 
   /* Primary and accent */
   --primary-color: #F56B6B;
-  --accent-color: #E6D870;
+  --accent-color: #DC143C;
+  --button-background: #1B1B1F;
 
   /* Silver gradient */
   --silver-light: #E6E3E3;
@@ -95,9 +96,9 @@ body {
 }
 
 .selected {
-  background-color: var(--primary-color);
+  background-color: var(--button-background);
   box-shadow: var(--shadow-sm);
-  color: var(--background-color);
+  color: var(--accent-color);
   font-family: var(--header-font);
   font-weight: 700;
   text-decoration: none;
@@ -126,7 +127,7 @@ body {
   height: 75px;
   justify-content: flex-end;
   align-items: center;
-  background-color: var(--surface-color);
+  background-color: var(--button-background);
   border-radius: 37.5px;
   box-shadow: var(--shadow-md);
   padding: 5px;
@@ -236,6 +237,7 @@ input[type="reset"],
 button[type="button"],
 button[type="submit"],
 button[type="reset"] {
+  background-color: var(--button-background);
   color: var(--primary-color);
   border-radius: 12px;
   corner-shape: squircle;
