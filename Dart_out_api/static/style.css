@@ -1,8 +1,8 @@
 :root {
-  --neutral-color: #b9d4e6;
-  --primary-color: #ff2e3a;
-  --secondary-color: #2d3748;
-  --background-color: #faf6ee;
+  --neutral-color: #E5E7EB;
+  --primary-color: #10B981;
+  --secondary-color: #1E2229;
+  --background-color: #121417;
   --shadow-xs: 1px 3px 1px #0a0a0a;
   --shadow-sm: 3px 4px 2px #0a0a0a;
   --shadow-md: 4px 6px 2px #0a0a0a;
@@ -155,8 +155,8 @@ html {
   background: var(--background-color);
 }
 .page {
-  border: 3px solid var(--secondary-color);
-  background-color: var(--primary-color);
+  border: 1px solid var(--secondary-color);
+  background-color: var(--secondary-color);
   color: var(--neutral-color);
   font-family: fantasy, monospace;
   border-radius: 15px;
