@@ -2,12 +2,12 @@
 
 :root {
   /* Main palette */
-  --background-color: #393434;
+  --background-color: #302C2D;
   --surface-color: #383838;
   --elevated-surface: #414141;
 
   /* Text */
-  --text-color: #E6E6E6;
+  --text-color: #E4E7ED;
   --secondary-text: #A3A3A3;
 
   /* Primary and accent */
