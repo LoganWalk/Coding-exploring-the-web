@@ -30,20 +30,22 @@
 }
 
 html {
-  background: var(--background-color);
+  background-color: #333031;
   color: var(--text-color);
+  min-height: 100%;
 }
 
 body {
-  /* A subtle satin sheen with a restrained red glow. */
-  background:
-    radial-gradient(ellipse at 18% 0%, rgba(245, 107, 107, 0.16), transparent 43%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.045), transparent 34%, rgba(245, 107, 107, 0.035) 68%, transparent),
-    linear-gradient(145deg, #373233 0%, #303030 52%, #292929 100%);
-  background-attachment: fixed;
+  /* One consistent charcoal tone with a very subtle warm-red undertone. */
+  background-color: #333031;
+  min-height: 100vh;
   color: var(--text-color);
   font-family: var(--body-font);
   font-style: italic;
+  /* A restrained highlight adds sheen without using a color gradient. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.055),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12);
 }
 
 .content {
