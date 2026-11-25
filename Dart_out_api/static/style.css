@@ -220,7 +220,7 @@ h6 {
 
 /* Keep the navigation's decorative lines consistent with the text color. */
 .circle-lines span {
-  background-color: var(--silver-light);
+  background-color: var(--text-color);
 }
 
 
