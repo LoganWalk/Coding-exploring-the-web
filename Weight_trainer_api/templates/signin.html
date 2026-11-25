@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workout App Workout Page</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body class="signin-page">
+    <button
+      type="button"
+      class="action-button back-button"
+      onclick="window.location.href = '/'"
+    >
+      BACK
+    </button>
+
+    <div class="signin-card">
+      <h1 class="signin-title">Sign In</h1>
+
+      <form
+        class="signin-form"
+        onsubmit="
+          event.preventDefault();
+          document.getElementById('success-message').innerText =
+            'Sign in was successful. Click the back button and log in';
+        "
+      >
+        <div class="inputs-column">
+          <div class="input-group">
+            <label class="input-label" for="email-input"
+              >Enter your email:</label
+            >
+            <input
+              type="email"
+              id="email-input"
+              class="text-input"
+              name="email"
+              required
+              placeholder="you@domain.com"
+            />
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="password-input">Password:</label>
+            <input
+              type="password"
+              id="password-input"
+              class="text-input"
+              name="password"
+              minlength="10"
+              autocomplete="new-password"
+              required
+            />
+            <label class="show-password-row">
+              <input
+                type="checkbox"
+                id="show-password-checkbox"
+                onchange="
+                  document.getElementById('password-input').type = this.checked
+                    ? 'text'
+                    : 'password'
+                "
+              />
+              Show password
+            </label>
+          </div>
+        </div>
+
+        <div class="submit-section">
+          <button type="submit" class="action-button submit-button">
+            Submit
+          </button>
+          <p id="success-message"></p>
+        </div>
+      </form>
+    </div>
+    <script src="{{ url_for('static', filename='server.js') }}"></script>
+  </body>
+</html>
