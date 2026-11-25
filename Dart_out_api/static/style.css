@@ -37,7 +37,7 @@ html {
 
 body {
   /* One consistent charcoal tone with a very subtle warm-red undertone. */
-  background-color: #333031;
+  background-color: var(--background-color);
   min-height: 100vh;
   color: var(--text-color);
   font-family: var(--body-font);
