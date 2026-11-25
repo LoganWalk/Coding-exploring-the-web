@@ -80,7 +80,7 @@ body {
 .header:hover {
   border: 1px solid var(--accent-color);
   border-radius: 30px;
-  box-shadow: var(--shadow-xs);
+  /* Bordered elements do not receive a shadow. */
   font-size: 1.82em;
   filter: brightness(0.95);
   cursor: pointer;
@@ -191,7 +191,7 @@ body {
   padding: 5px;
   width: fit-content;
   height: fit-content;
-  box-shadow: var(--shadow-sm);
+  /* Parent boxes use the accent border instead of a shadow. */
 }
 
 /* Keep headings consistent throughout the page. */
@@ -216,4 +216,16 @@ h6 {
 /* Use the silver highlight for the navigation's decorative lines. */
 .circle-lines span {
   background-color: var(--silver-light);
+}
+
+
+/* Buttons use the primary red for their text. */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+button[type="button"],
+button[type="submit"],
+button[type="reset"] {
+  color: var(--primary-color);
 }
