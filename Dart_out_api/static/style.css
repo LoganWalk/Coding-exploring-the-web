@@ -49,6 +49,8 @@ body {
     visibility 0.2s ease;
   transition-delay: 0s;
   visibility: hidden;
+  margin-left:auto;
+  margin-right:auto;
 }
 .header:hover {
   border: 1px solid var(--primary-color);
@@ -73,6 +75,8 @@ body {
     visibility 0.2s ease;
   transition-delay: 0s;
   visibility: hidden;
+  margin-left:auto;
+  margin-right:auto;
 }
 
 .buttons {
@@ -112,22 +116,24 @@ body {
   transition-delay: 0.2s;
 }
 .circle-lines {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+    position: absolute;
+    top: 50%;
+    right: 22px;
+    transform: translateY(-50%);
 
-  width: 30px;
-  height: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
-  /* Corner positioning */
-  
+    width: 30px;
+    height: 20px;
 
-  opacity: 1;
-  visibility: visible;
-  transition:
-    opacity 0.2s ease,
-    visibility 0.2s ease;
-  z-index: 101;
+    opacity: 1;
+    visibility: visible;
+
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
 }
 
 .circle-lines span {
