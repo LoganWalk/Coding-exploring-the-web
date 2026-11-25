@@ -2,7 +2,7 @@
 
 :root {
   /* Main palette */
-  --background-color: #303030;
+  --background-color: #393434;
   --surface-color: #383838;
   --elevated-surface: #414141;
 
@@ -30,7 +30,7 @@
 }
 
 html {
-  background-color: #333031;
+  background-color: var(--background-color);
   color: var(--text-color);
   min-height: 100%;
 }
