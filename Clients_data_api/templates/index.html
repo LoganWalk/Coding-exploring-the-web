@@ -220,14 +220,8 @@
         const recurring = clients.filter((client) =>
           String(client.reoccuring || "").trim().toLowerCase() === "yes"
         ).length;
-        const cities = new Set(clients.map((client) =>
-          String(client.city || "").trim().toLowerCase()
-        ).filter(Boolean));
         const unpaidTotal = clients.reduce((total, client) =>
           total + (Number(client.unpaid_total) || 0), 0
-        );
-        const unpaidJobs = clients.reduce((total, client) =>
-          total + (Number(client.unpaid_count) || 0), 0
         );
 
         document.getElementById("total-clients").textContent = clients.length;
