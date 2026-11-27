@@ -4,133 +4,408 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mowing Business Dashboard</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <style>
+      .dashboard-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .dashboard-heading h1 { margin-bottom: 6px; }
+      .dashboard-subtitle { color: var(--ink-muted); margin: 0; }
+      .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin: 24px 0 32px;
+      }
+      .dashboard-stat {
+        min-width: 0;
+        padding: 20px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-top: 4px solid var(--olive);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-card);
+      }
+      .dashboard-stat-label {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--ink-muted);
+        font-size: .78rem;
+        font-weight: 700;
+        letter-spacing: .055em;
+        text-transform: uppercase;
+      }
+      .dashboard-stat-value {
+        display: block;
+        color: var(--accent);
+        font-family: "Sora", sans-serif;
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+      }
+      .dashboard-stat-note {
+        display: block;
+        margin-top: 8px;
+        color: var(--ink-muted);
+        font-size: .8rem;
+      }
+      .dashboard-section {
+        margin-top: 28px;
+        padding: 22px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+      }
+      .dashboard-section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .dashboard-section-heading h2 { margin: 0; }
+      .directory-tools {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: end;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .directory-field {
+        display: flex;
+        flex: 1 1 220px;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .directory-field label {
+        color: var(--ink-muted);
+        font-size: .8rem;
+        font-weight: 700;
+      }
+      .directory-field input,
+      .directory-field select {
+        width: 100%;
+        min-width: 0;
+        padding: 10px 12px;
+        color: var(--ink);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font: inherit;
+      }
+      .directory-field input:focus,
+      .directory-field select:focus {
+        outline: 2px solid var(--olive);
+        outline-offset: 1px;
+      }
+      #directory-count {
+        color: var(--ink-muted);
+        font-size: .82rem;
+        white-space: nowrap;
+      }
+      #clients-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+        gap: 14px;
+      }
+      .dashboard-client-card {
+        min-width: 0;
+        padding: 17px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--olive);
+        border-radius: var(--radius-md);
+        transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+      }
+      .dashboard-client-card:hover {
+        border-color: var(--olive);
+        box-shadow: var(--shadow-card);
+        transform: translateY(-2px);
+      }
+      .dashboard-client-card h3 {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 7px;
+        margin: 0 0 12px;
+        color: var(--student-name);
+        font-family: "Sora", sans-serif;
+        font-size: 1rem;
+      }
+      .dashboard-client-card dl {
+        display: grid;
+        grid-template-columns: minmax(100px, .8fr) minmax(0, 1.4fr);
+        gap: 7px 12px;
+        margin: 0;
+        font-size: .84rem;
+      }
+      .dashboard-client-card dt { color: var(--ink-muted); font-weight: 600; }
+      .dashboard-client-card dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+      .dashboard-client-card .client-quote { color: var(--accent); font-weight: 700; }
+      .dashboard-empty, .dashboard-error {
+        grid-column: 1 / -1;
+        padding: 24px;
+        color: var(--ink-muted);
+        background: var(--accent-soft);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        text-align: center;
+      }
+      .dashboard-error {
+        color: var(--danger);
+        background: var(--danger-soft);
+        border-color: var(--danger);
+      }
+      @media (max-width: 900px) {
+        .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 600px) {
+        .dashboard-heading { align-items: flex-start; flex-direction: column; }
+        .dashboard-stats { gap: 10px; }
+        .dashboard-stat { padding: 15px; }
+        .dashboard-section { padding: 15px; }
+        .dashboard-section-heading { align-items: flex-start; flex-direction: column; }
+        #directory-count { white-space: normal; }
+      }
+    </style>
   </head>
   <body>
     <nav>
-      <a href="/" style="color: var(--accent); background: var(--accent-soft)"
-        >🏠 Dashboard</a
-      >
+      <a href="/" style="color: var(--accent); background: var(--accent-soft)">🏠 Dashboard</a>
       <a href="/revenue-page">💰 Revenue Analytics</a>
       <a href="/calendar-page">📅 Work Agenda</a>
       <a href="/client-page">🧑 Clients</a>
-      <img
-        id="image"
+      <img id="image"
         src="https://mail.google.com/mail/u/0?ui=2&ik=c86d39d499&attid=0.1&permmsgid=msg-f:1873875814774685893&th=1a01582014d740c5&view=att&disp=safe&realattid=f_msytoggp0&zw"
-        ,
-        width="60"
-        ,
-        height="60"
-      />
+        width="60" height="60" alt="Business logo" />
     </nav>
 
-    <div class="content">
-      <h1>Mowing Business Operations Center</h1>
+    <main class="content">
+      <div class="dashboard-heading">
+        <div>
+          <h1>Business Dashboard</h1>
+          <p class="dashboard-subtitle">A quick overview of your mowing business.</p>
+        </div>
+      </div>
 
-      <form id="filter-form">
-        <label for="city-filter">Filter Directory by City:</label>
-        <select id="city-filter">
-          <option value="all">Show All(Show All Clients)</option>
-          <option value="Blue Springs">Blue Springs</option>
-          <option value="Grain Valley">Grain Valley</option>
-          <option value="Independence">Independence</option>
-          <option value="Kansas City">Kansas City</option>
-          <option value="Lee's Summit">Lee's Summit</option>
-          <option value="Lexington">Lexington</option>
-          <option value="Odessa">Odessa</option>
-          <option value="Raytown">Raytown</option>
-          <option value="Richmond">Richmond</option>
-        </select>
-      </form>
+      <section class="dashboard-stats" aria-label="Business overview">
+        <article class="dashboard-stat">
+          <span class="dashboard-stat-label">Total Clients</span>
+          <strong class="dashboard-stat-value" id="total-clients">—</strong>
+          <span class="dashboard-stat-note">Clients in your directory</span>
+        </article>
+        <article class="dashboard-stat">
+          <span class="dashboard-stat-label">Recurring Clients</span>
+          <strong class="dashboard-stat-value" id="recurring-clients">—</strong>
+          <span class="dashboard-stat-note">Clients set up for repeat service</span>
+        </article>
+        <article class="dashboard-stat">
+          <span class="dashboard-stat-label">Cities Served</span>
+          <strong class="dashboard-stat-value" id="cities-served">—</strong>
+          <span class="dashboard-stat-note">Different client locations</span>
+        </article>
+        <article class="dashboard-stat">
+          <span class="dashboard-stat-label">Outstanding Payments</span>
+          <strong class="dashboard-stat-value" id="outstanding-payments">—</strong>
+          <span class="dashboard-stat-note" id="outstanding-note">Loading payment information</span>
+        </article>
+      </section>
 
-      <h2>👥 Active Client Directory</h2>
-      <div id="clients-container">Loading active customer files...</div>
-    </div>
+      <section class="dashboard-section">
+        <div class="dashboard-section-heading">
+          <h2>👥 Client Directory</h2>
+          <span id="directory-count">Loading clients...</span>
+        </div>
+        <div class="directory-tools">
+          <div class="directory-field">
+            <label for="client-search">Search clients</label>
+            <input id="client-search" type="search" placeholder="Search by name, address, or city..." autocomplete="off" />
+          </div>
+          <div class="directory-field">
+            <label for="city-filter">Filter by city</label>
+            <select id="city-filter">
+              <option value="all">All cities</option>
+            </select>
+          </div>
+        </div>
+        <div id="clients-container" aria-live="polite">
+          <div class="dashboard-empty">Loading your client directory...</div>
+        </div>
+      </section>
+    </main>
 
     <script>
       const container = document.getElementById("clients-container");
+      const searchInput = document.getElementById("client-search");
+      const cityFilter = document.getElementById("city-filter");
+      const directoryCount = document.getElementById("directory-count");
       let allClients = [];
 
+      function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[character]);
+      }
+
       function paymentBadge(client) {
-        if (!client.job_count) {
-          return "";
+        const unpaidCount = Number(client.unpaid_count || 0);
+        const jobCount = Number(client.job_count || 0);
+        if (!jobCount) return "";
+        if (unpaidCount > 0) {
+          return '<span class="paid-badge unpaid" title="' + unpaidCount +
+            ' unpaid job(s)">Owes $' + Number(client.unpaid_total || 0).toFixed(2) + '</span>';
         }
-
-        if (client.unpaid_count > 0) {
-          const jobs = client.unpaid_count === 1 ? "job" : "jobs";
-
-          return `<span class="paid-badge unpaid" title="${client.unpaid_count} unpaid ${jobs}">Owes $${Number(client.unpaid_total).toFixed(2)}</span>`;
-        }
-
-        return `<span class="paid-badge paid">Paid up</span>`;
+        return '<span class="paid-badge paid">Paid up</span>';
       }
 
       function mapsUrl(client) {
-        const parts = [
-          client.street_address,
-          client.city,
-          client.state,
-          client.zip,
-        ]
-          .map((part) => String(part || "").trim())
-          .filter(Boolean);
-
-        return (
-          "https://www.google.com/maps/search/?api=1&query=" +
-          encodeURIComponent(parts.join(", "))
-        );
+        const parts = [client.street_address, client.city, client.state, client.zip]
+          .map((part) => String(part || "").trim()).filter(Boolean);
+        return "https://www.google.com/maps/search/?api=1&query=" +
+          encodeURIComponent(parts.join(", "));
       }
 
-      function renderClients(clients) {
-        container.innerHTML = "";
-        if (clients.length === 0) {
-          container.innerHTML =
-            '<div class="alert">No matching records found.</div>';
+      function updateOverview(clients) {
+        const recurring = clients.filter((client) =>
+          String(client.reoccuring || "").trim().toLowerCase() === "yes"
+        ).length;
+        const cities = new Set(clients.map((client) =>
+          String(client.city || "").trim().toLowerCase()
+        ).filter(Boolean));
+        const unpaidTotal = clients.reduce((total, client) =>
+          total + (Number(client.unpaid_total) || 0), 0
+        );
+        const unpaidJobs = clients.reduce((total, client) =>
+          total + (Number(client.unpaid_count) || 0), 0
+        );
+
+        document.getElementById("total-clients").textContent = clients.length;
+        document.getElementById("recurring-clients").textContent = recurring;
+        document.getElementById("cities-served").textContent = cities.size;
+        document.getElementById("outstanding-payments").textContent =
+          "$" + unpaidTotal.toFixed(2);
+        document.getElementById("outstanding-note").textContent =
+          unpaidJobs + (unpaidJobs === 1 ? " unpaid job" : " unpaid jobs");
+      }
+
+      function populateCityFilter(clients) {
+        const selectedCity = cityFilter.value;
+        const cities = [...new Set(clients.map((client) =>
+          String(client.city || "").trim()
+        ).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+
+        cityFilter.innerHTML = '<option value="all">All cities</option>';
+        cities.forEach((city) => {
+          const option = document.createElement("option");
+          option.value = city;
+          option.textContent = city;
+          cityFilter.appendChild(option);
+        });
+
+        if (cities.some((city) => city.toLowerCase() === selectedCity.toLowerCase())) {
+          cityFilter.value = cities.find((city) =>
+            city.toLowerCase() === selectedCity.toLowerCase()
+          );
+        } else {
+          cityFilter.value = "all";
+        }
+      }
+
+      function renderClients() {
+        const query = searchInput.value.trim().toLowerCase();
+        const city = cityFilter.value.toLowerCase();
+        const filtered = allClients.filter((client) => {
+          const matchesCity = city === "all" ||
+            String(client.city || "").trim().toLowerCase() === city;
+          const searchable = [
+            client.first_name, client.last_name, client.additional_name,
+            client.street_address, client.city, client.state, client.zip
+          ].join(" ").toLowerCase();
+          return matchesCity && searchable.includes(query);
+        });
+
+        directoryCount.textContent = "Showing " + filtered.length +
+          " of " + allClients.length + " clients";
+
+        if (filtered.length === 0) {
+          container.innerHTML = '<div class="dashboard-empty">No clients match your search.</div>';
           return;
         }
-        clients.forEach((client) => {
-          const addName =
-            client.additional_name !== "none"
-              ? ` (${client.additional_name})`
-              : "";
-          const card = `
-                    <div class="post">
-                        <h2>${client.first_name} ${client.last_name}${addName} ${paymentBadge(client)}</h2>
-                        <dl class="student-details">
-                            <dt>Street Address</dt><dd><a class="map-link" href="${mapsUrl(client)}" target="_blank" rel="noopener">${client.street_address}</a></dd>
-                            <dt>Location</dt><dd>${client.city}, ${client.state} ${client.zip}</dd>
-                            <dt>Service Interval</dt><dd>${client.frequency} (${client.reoccuring === "yes" ? "Recurring" : "One-time"})</dd>
-                            <dt>Job Type</dt><dd>${client.type_of_service} [${client.type}]</dd>
-                            <dt>Special Notes</dt><dd>${client.additional_service}</dd>
-                            <dt>Quote Pricing</dt><dd><strong>$${client.quote_price}</strong></dd>
-                        </dl>
-                    </div>
-                `;
-          container.innerHTML += card;
-        });
+
+        container.innerHTML = filtered.map((client) => {
+          const first = escapeHTML(client.first_name);
+          const last = escapeHTML(client.last_name);
+          const additionalName = client.additional_name &&
+            String(client.additional_name).toLowerCase() !== "none"
+            ? " (" + escapeHTML(client.additional_name) + ")" : "";
+          const address = escapeHTML(client.street_address);
+          const cityName = escapeHTML(client.city);
+          const state = escapeHTML(client.state);
+          const zip = escapeHTML(client.zip);
+          const frequency = escapeHTML(client.frequency);
+          const recurring = String(client.reoccuring || "").toLowerCase() === "yes"
+            ? "Recurring" : "One-time";
+          const service = escapeHTML(client.type_of_service);
+          const serviceType = escapeHTML(client.type);
+          const notes = escapeHTML(client.additional_service);
+          const quote = Number(client.quote_price || 0);
+          const safeMapUrl = mapsUrl(client);
+
+          return `
+            <article class="dashboard-client-card">
+              <h3>${first} ${last}${additionalName} ${paymentBadge(client)}</h3>
+              <dl>
+                <dt>Address</dt>
+                <dd><a class="map-link" href="${safeMapUrl}" target="_blank" rel="noopener">${address || "Not provided"}</a></dd>
+                <dt>Location</dt>
+                <dd>${cityName}, ${state} ${zip}</dd>
+                <dt>Service</dt>
+                <dd>${frequency || "Not set"} · ${recurring}</dd>
+                <dt>Job Type</dt>
+                <dd>${service || "Not set"} · ${serviceType || "Not set"}</dd>
+                <dt>Special Notes</dt>
+                <dd>${notes || "None"}</dd>
+                <dt>Quote Price</dt>
+                <dd class="client-quote">${Number.isFinite(quote) ? "$" + quote.toFixed(2) : "Not set"}</dd>
+              </dl>
+            </article>
+          `;
+        }).join("");
       }
 
-      fetch("/api/clients/all")
-        .then((res) => res.json())
-        .then((data) => {
-          allClients = data;
-          renderClients(allClients);
-        });
+      async function loadClients() {
+        try {
+          const response = await fetch("/api/clients/all");
+          if (!response.ok) {
+            throw new Error("Server returned " + response.status);
+          }
+          const data = await response.json();
+          if (!Array.isArray(data)) {
+            throw new Error("The server returned an unexpected client list.");
+          }
 
-      document.getElementById("city-filter").addEventListener("change", (e) => {
-        const city = e.target.value;
-        if (city === "all") {
-          renderClients(allClients);
-        } else {
-          const filtered = allClients.filter(
-            (c) => c.city.toLowerCase() === city.toLowerCase(),
-          );
-          renderClients(filtered);
+          allClients = data;
+          updateOverview(allClients);
+          populateCityFilter(allClients);
+          renderClients();
+        } catch (error) {
+          console.error("Could not load dashboard clients:", error);
+          directoryCount.textContent = "Client data unavailable";
+          container.innerHTML =
+            '<div class="dashboard-error">Could not load your client data. Check that the server is running, then refresh the page.</div>';
+          document.getElementById("outstanding-note").textContent = "Payment data unavailable";
         }
-      });
+      }
+
+      searchInput.addEventListener("input", renderClients);
+      cityFilter.addEventListener("change", renderClients);
+      loadClients();
     </script>
   </body>
 </html>
