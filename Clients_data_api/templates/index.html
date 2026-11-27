@@ -6,172 +6,122 @@
     <title>Mowing Business Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <style>
-      .dashboard-heading {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 24px;
-      }
-      .dashboard-heading h1 { margin-bottom: 6px; }
-      .dashboard-subtitle { color: var(--ink-muted); margin: 0; }
+      .dashboard-heading { margin-bottom: 26px; }
+      .dashboard-heading h1 { margin-bottom: 4px; }
+      .dashboard-subtitle { margin: 0; color: var(--ink-muted); }
       .dashboard-stats {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 16px;
-        margin: 24px 0 32px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px;
+        margin: 28px 0 42px;
+        padding: 20px 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
       }
-      .dashboard-stat {
-        min-width: 0;
-        padding: 20px;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-top: 4px solid var(--olive);
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-card);
-      }
+      .dashboard-stat { min-width: 0; }
       .dashboard-stat-label {
         display: block;
-        margin-bottom: 10px;
+        margin-bottom: 7px;
         color: var(--ink-muted);
-        font-size: .78rem;
-        font-weight: 700;
-        letter-spacing: .055em;
+        font-size: .75rem;
+        font-weight: 600;
+        letter-spacing: .04em;
         text-transform: uppercase;
       }
       .dashboard-stat-value {
         display: block;
-        color: var(--accent);
+        color: var(--ink);
         font-family: "Sora", sans-serif;
-        font-size: clamp(1.5rem, 3vw, 2rem);
-        font-weight: 700;
+        font-size: 1.8rem;
+        font-weight: 650;
         line-height: 1.15;
         overflow-wrap: anywhere;
       }
-      .dashboard-stat-note {
-        display: block;
-        margin-top: 8px;
-        color: var(--ink-muted);
-        font-size: .8rem;
-      }
-      .dashboard-section {
-        margin-top: 28px;
-        padding: 22px;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-sm);
-      }
+      .dashboard-stat-note { display: none; }
+      .dashboard-section { margin-top: 0; }
       .dashboard-section-heading {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        margin-bottom: 16px;
-      }
-      .dashboard-section-heading h2 { margin: 0; }
-      .directory-tools {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: end;
-        gap: 12px;
         margin-bottom: 18px;
       }
-      .directory-field {
+      .dashboard-section-heading h2 { margin: 0; font-size: 1.25rem; }
+      #directory-count { color: var(--ink-muted); font-size: .82rem; }
+      .directory-tools {
         display: flex;
-        flex: 1 1 220px;
-        flex-direction: column;
-        gap: 6px;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
       }
-      .directory-field label {
-        color: var(--ink-muted);
-        font-size: .8rem;
-        font-weight: 700;
-      }
-      .directory-field input,
-      .directory-field select {
+      .directory-field { display: flex; flex: 1 1 220px; }
+      .directory-field label { display: none; }
+      .directory-field input, .directory-field select {
         width: 100%;
         min-width: 0;
         padding: 10px 12px;
         color: var(--ink);
-        background: var(--bg);
+        background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
+        border-radius: 7px;
         font: inherit;
+        font-size: .88rem;
       }
-      .directory-field input:focus,
-      .directory-field select:focus {
+      .directory-field input:focus, .directory-field select:focus {
         outline: 2px solid var(--olive);
         outline-offset: 1px;
       }
-      #directory-count {
-        color: var(--ink-muted);
-        font-size: .82rem;
-        white-space: nowrap;
-      }
       #clients-container {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
-        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+        gap: 10px;
       }
       .dashboard-client-card {
         min-width: 0;
-        padding: 17px;
+        padding: 15px 16px;
         background: var(--surface);
         border: 1px solid var(--border);
-        border-left: 4px solid var(--olive);
-        border-radius: var(--radius-md);
-        transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+        border-radius: 9px;
       }
-      .dashboard-client-card:hover {
-        border-color: var(--olive);
-        box-shadow: var(--shadow-card);
-        transform: translateY(-2px);
-      }
+      .dashboard-client-card:hover { border-color: var(--olive); }
       .dashboard-client-card h3 {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 7px;
-        margin: 0 0 12px;
-        color: var(--student-name);
+        margin: 0 0 10px;
+        color: var(--ink);
         font-family: "Sora", sans-serif;
-        font-size: 1rem;
+        font-size: .96rem;
       }
       .dashboard-client-card dl {
         display: grid;
-        grid-template-columns: minmax(100px, .8fr) minmax(0, 1.4fr);
-        gap: 7px 12px;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 5px 12px;
         margin: 0;
-        font-size: .84rem;
+        font-size: .82rem;
       }
-      .dashboard-client-card dt { color: var(--ink-muted); font-weight: 600; }
+      .dashboard-client-card dt { color: var(--ink-muted); }
       .dashboard-client-card dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
-      .dashboard-client-card .client-quote { color: var(--accent); font-weight: 700; }
+      .dashboard-client-card .client-quote { color: var(--accent); font-weight: 650; }
       .dashboard-empty, .dashboard-error {
         grid-column: 1 / -1;
-        padding: 24px;
+        padding: 22px;
         color: var(--ink-muted);
-        background: var(--accent-soft);
+        background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: var(--radius-md);
+        border-radius: 8px;
         text-align: center;
       }
-      .dashboard-error {
-        color: var(--danger);
-        background: var(--danger-soft);
-        border-color: var(--danger);
+      .dashboard-error { color: var(--danger); }
+      @media (max-width: 700px) {
+        .dashboard-stats { gap: 16px; }
+        .dashboard-stat-value { font-size: 1.5rem; }
       }
-      @media (max-width: 900px) {
+      @media (max-width: 520px) {
         .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      }
-      @media (max-width: 600px) {
-        .dashboard-heading { align-items: flex-start; flex-direction: column; }
-        .dashboard-stats { gap: 10px; }
-        .dashboard-stat { padding: 15px; }
-        .dashboard-section { padding: 15px; }
+        .directory-tools { align-items: stretch; flex-direction: column; }
         .dashboard-section-heading { align-items: flex-start; flex-direction: column; }
-        #directory-count { white-space: normal; }
       }
     </style>
   </head>
@@ -198,22 +148,17 @@
         <article class="dashboard-stat">
           <span class="dashboard-stat-label">Total Clients</span>
           <strong class="dashboard-stat-value" id="total-clients">—</strong>
-          <span class="dashboard-stat-note">Clients in your directory</span>
+          
         </article>
         <article class="dashboard-stat">
           <span class="dashboard-stat-label">Recurring Clients</span>
           <strong class="dashboard-stat-value" id="recurring-clients">—</strong>
-          <span class="dashboard-stat-note">Clients set up for repeat service</span>
-        </article>
-        <article class="dashboard-stat">
-          <span class="dashboard-stat-label">Cities Served</span>
-          <strong class="dashboard-stat-value" id="cities-served">—</strong>
-          <span class="dashboard-stat-note">Different client locations</span>
+          
         </article>
         <article class="dashboard-stat">
           <span class="dashboard-stat-label">Outstanding Payments</span>
           <strong class="dashboard-stat-value" id="outstanding-payments">—</strong>
-          <span class="dashboard-stat-note" id="outstanding-note">Loading payment information</span>
+          
         </article>
       </section>
 
@@ -287,11 +232,8 @@
 
         document.getElementById("total-clients").textContent = clients.length;
         document.getElementById("recurring-clients").textContent = recurring;
-        document.getElementById("cities-served").textContent = cities.size;
         document.getElementById("outstanding-payments").textContent =
           "$" + unpaidTotal.toFixed(2);
-        document.getElementById("outstanding-note").textContent =
-          unpaidJobs + (unpaidJobs === 1 ? " unpaid job" : " unpaid jobs");
       }
 
       function populateCityFilter(clients) {
@@ -351,9 +293,6 @@
           const frequency = escapeHTML(client.frequency);
           const recurring = String(client.reoccuring || "").toLowerCase() === "yes"
             ? "Recurring" : "One-time";
-          const service = escapeHTML(client.type_of_service);
-          const serviceType = escapeHTML(client.type);
-          const notes = escapeHTML(client.additional_service);
           const quote = Number(client.quote_price || 0);
           const safeMapUrl = mapsUrl(client);
 
@@ -367,10 +306,6 @@
                 <dd>${cityName}, ${state} ${zip}</dd>
                 <dt>Service</dt>
                 <dd>${frequency || "Not set"} · ${recurring}</dd>
-                <dt>Job Type</dt>
-                <dd>${service || "Not set"} · ${serviceType || "Not set"}</dd>
-                <dt>Special Notes</dt>
-                <dd>${notes || "None"}</dd>
                 <dt>Quote Price</dt>
                 <dd class="client-quote">${Number.isFinite(quote) ? "$" + quote.toFixed(2) : "Not set"}</dd>
               </dl>
@@ -399,7 +334,6 @@
           directoryCount.textContent = "Client data unavailable";
           container.innerHTML =
             '<div class="dashboard-error">Could not load your client data. Check that the server is running, then refresh the page.</div>';
-          document.getElementById("outstanding-note").textContent = "Payment data unavailable";
         }
       }
 
