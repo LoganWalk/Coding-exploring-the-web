@@ -251,31 +251,32 @@ form input[type="submit"]:active {
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap");
 
 :root {
-  --bg: #d6ead0;
-  --surface: #ffffff;
-  --surface-alt: #c6dfbf;
-  --border: #a8cca1;
-  --ink: #0f2414;
-  --ink-muted: #4a6a50;
-  --accent: #1b5e20;
-  --accent-hover: #0f3d14;
-  --accent-soft: #e6f5e2;
-  --student-name: #14532d;
-  --olive: #6b8e23;
-  --olive-glow: rgba(107, 142, 35, 0.35);
-  --alert-bg: #ffd5de;
-  --alert-text: #970020;
-  --danger: #c62828;
-  --danger-soft: #fde8e8;
-  --success: #2e7d32;
-  --success-soft: #e8f5e9;
+  /* Modern Turf & Slate */
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-alt: #F1F5F9;
+  --border: #E2E8F0;
+  --ink: #0F172A;
+  --ink-muted: #475569;
+  --accent: #15803D;
+  --accent-hover: #166534;
+  --accent-soft: #F0FDF4;
+  --student-name: #0F172A;
+  --olive: #15803D;
+  --olive-glow: rgba(21, 128, 61, 0.16);
+  --alert-bg: #FFF1F2;
+  --alert-text: #9F1239;
+  --danger: #B91C1C;
+  --danger-soft: #FEF2F2;
+  --success: #15803D;
+  --success-soft: #F0FDF4;
   --radius-sm: 10px;
   --radius-md: 15px;
   --radius-lg: 20px;
-  --shadow-sm: 0 2px 6px rgba(15, 36, 20, 0.06);
-  --shadow-card: 0 3px 10px rgba(27, 94, 32, 0.1);
-  --shadow-lg: 0 12px 40px rgba(15, 36, 20, 0.18);
-  --shadow-nav: 0 1px 5px rgba(27, 94, 32, 0.08);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.045);
+  --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.14);
+  --shadow-nav: 0 1px 2px rgba(15, 23, 42, 0.035);
 }
 
 *,
@@ -685,7 +686,7 @@ form input[type="submit"]:hover {
   min-width: 0;
   height: 650px;
   padding: 10px;
-  background: #f7fcf6;
+  background: #FFFFFF;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
 }
@@ -1613,3 +1614,128 @@ nav a[style*="--accent"] {
 .owed-row .paid-toggle {
   margin-top: 0;
 }
+
+
+/* APP-WIDE MODERN TURF & SLATE PALETTE */
+body { background: var(--bg); color: var(--ink); }
+
+.content > h1,
+.content > h2,
+.calendar-panel > h2,
+.client-frequency-section > h3,
+.completed-sidebar h2,
+.client-modal-content h2,
+.post h2,
+#group-routes-list h4 { color: var(--ink); }
+
+nav {
+  background: var(--surface);
+  border-bottom-color: var(--border);
+  box-shadow: var(--shadow-nav);
+}
+nav a { color: var(--ink-muted); }
+nav a:hover,
+nav a:focus-visible { color: var(--accent); background: var(--accent-soft); }
+
+form, .post, .calendar-panel, .completed-sidebar, .client-card,
+.client-modal-content, .actual-revenue-section, .predicted-revenue-section {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+form select,
+form input[type="text"],
+form input[type="number"],
+form input[type="date"],
+.client-edit input {
+  background: var(--bg);
+  color: var(--ink);
+  border-color: var(--border);
+}
+form select:focus,
+form input:focus,
+.client-edit input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.12);
+}
+
+.calendar-sidebar .calendar-client,
+.calendar-client,
+.scheduled-client,
+.completed-job-card,
+.completed-job,
+.route-group,
+.mowing-job,
+.client-info-item,
+.revenue-stat,
+.actual-total {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.calendar-sidebar .calendar-client,
+.calendar-client,
+.scheduled-client {
+  border-left-color: var(--border);
+  box-shadow: none;
+}
+.calendar-sidebar .calendar-client:hover,
+.calendar-client:hover,
+.scheduled-client:hover,
+.completed-job-card:hover {
+  background: var(--surface-alt);
+  box-shadow: var(--shadow-sm);
+}
+
+.week-header .day-column {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+.week-header .day-column h2 { color: var(--ink); }
+.week-header .day-column p { color: var(--ink-muted); }
+.week-body .day-column { background: var(--surface); border-color: var(--border); }
+
+.client-drop-zone.drag-over,
+.drop-zone.drag-over,
+.drag-over {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent) !important;
+}
+
+.client-card:hover { border-color: #A7CDB4; box-shadow: var(--shadow-sm); }
+.client-info-item { border: 1px solid var(--border); }
+
+.client-price,
+.revenue-number,
+.revenue-stat p,
+.actual-total p,
+.owed-amount { color: var(--accent); }
+
+.actual-total { border-left: 3px solid var(--accent); }
+
+.paid-toggle,
+form input[type="submit"],
+.calendar-controls button {
+  background: var(--accent);
+  color: #FFFFFF;
+}
+.paid-toggle:hover,
+form input[type="submit"]:hover,
+.calendar-controls button:hover { background: var(--accent-hover); }
+
+nav a[style*="--accent"],
+nav a[style*="accent"] {
+  color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.client-modal { background: rgba(15, 23, 42, 0.42); }
+.client-modal-close:hover,
+.close-modal:hover { color: var(--accent); background: var(--accent-soft); }
+
+* { scrollbar-color: var(--border) transparent; }
+*::-webkit-scrollbar-thumb { background: var(--border); }
+*::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
